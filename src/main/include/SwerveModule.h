@@ -17,6 +17,8 @@
 #include <frc/Timer.h>
 #include <frc/DataLogManager.h>
 
+#include <networktables/NetworkTableEntry.h>
+
 #include <rev/CANSparkMax.h>
 #include <ctre/phoenix6/TalonFX.hpp>
 
@@ -80,6 +82,7 @@ private:
     CANSparkMax m_turningMotor;
 
     std::string m_id;
+    bool m_driveMotorReversed = false;
 
     SparkMaxAlternateEncoder m_turningEncoder = m_turningMotor.GetAlternateEncoder(SparkMaxAlternateEncoder::Type::kQuadrature, kEncoderResolution);
 
@@ -102,4 +105,12 @@ private:
     wpi::log::DoubleLogEntry m_logTurningNewAngle;
     wpi::log::DoubleLogEntry m_logDriveNewSpeed;
     wpi::log::DoubleLogEntry m_logDriveNormalizedSpeed;
+
+    std::array<std::string, 4> m_nameArray = 
+    {
+        "FrontLeft"
+    ,   "FrontRight"
+    ,   "RearRight"
+    ,   "RearLeft"
+    };
 };

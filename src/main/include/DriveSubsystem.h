@@ -17,6 +17,7 @@
 #include <frc/trajectory/Trajectory.h>
 #include <frc/controller/PIDController.h>
 #include <frc2/command/SubsystemBase.h>
+#include <frc/Preferences.h>
 
 #include "IDriveSubsystem.h"
 #include "ConstantsCANIDs.h"
@@ -99,25 +100,34 @@ private:
   const frc::Translation2d m_rearLeftLocation{-kWheelBase / 2, kTrackWidth / 2};
   const frc::Translation2d m_rearRightLocation{-kWheelBase / 2, -kTrackWidth / 2};
 
-  
-#define ZERO_OFFSETS
+  const double kFLoffset = frc::Preferences::GetDouble("Offset1", 0.0);
+  const double kFRoffset = frc::Preferences::GetDouble("Offset2", 0.0);
+  const double kBLoffset = frc::Preferences::GetDouble("Offset4", 0.0);
+  const double kBRoffset = frc::Preferences::GetDouble("Offset3", 0.0);
+
+/* Valid Offsets
+//#define ZERO_OFFSETS
 #ifdef ZERO_OFFSETS
   static constexpr double kFLoffset = 0.0;    static constexpr double kFRoffset = 0.0;
   static constexpr double kBLoffset = 0.0;    static constexpr double kBRoffset = 0.0;
 #else
-  // Mk4 swerve modules with L1 gear set
-  // static constexpr double kFLoffset = 0.440;   static constexpr double kFRoffset = 0.631;
-  // static constexpr double kBLoffset = 0.960;   static constexpr double kBRoffset = 0.986;
-
-  // Mk4 swerve modules with L3 gear set
-  static constexpr double kFLoffset = 0.002;/*0.002;*/    static constexpr double kFRoffset = 0.248;/*0.242;*/
-  static constexpr double kBLoffset = 0.482;/*0.469;*/    static constexpr double kBRoffset = 0.759;/*0.762;*/
+#define THING1
+#ifdef THING1
+  // *************************************************************************************THING 1 Mk4i swerve modules with L3 gear set
+  static constexpr double kFLoffset = 0.983;    static constexpr double kFRoffset = 0.742;
+  static constexpr double kBLoffset = 0.194;    static constexpr double kBRoffset = 0.880;
+#else
+  // *************************************************************************************THING 2 Mk4i swerve modules with L2 gear set
+  static constexpr double kFLoffset = 0.221;   static constexpr double kFRoffset = 0.360;
+  static constexpr double kBLoffset = 0.334;   static constexpr double kBRoffset = 0.920;
 #endif
+#endif
+*/
 
-  SwerveModule m_frontLeft  { kFrontLeftDriveCANID, kFrontLeftTurningCANID, kFLoffset, false };
-  SwerveModule m_frontRight { kFrontRightDriveCANID, kFrontRightTurningCANID, kFRoffset, true };
-  SwerveModule m_rearLeft   { kRearLeftDriveCANID, kRearLeftTurningCANID, kBLoffset, false };
-  SwerveModule m_rearRight  { kRearRightDriveCANID, kRearRightTurningCANID, kBRoffset, true };
+  SwerveModule m_frontLeft  { kFrontLeftDriveCANID, kFrontLeftTurningCANID, kFLoffset, true };     // 1
+  SwerveModule m_frontRight { kFrontRightDriveCANID, kFrontRightTurningCANID, kFRoffset, false };  // 2
+  SwerveModule m_rearLeft   { kRearLeftDriveCANID, kRearLeftTurningCANID, kBLoffset, true };       // 4
+  SwerveModule m_rearRight  { kRearRightDriveCANID, kRearRightTurningCANID, kBRoffset, false };    // 3
 
   PigeonGyro m_gyro;
 

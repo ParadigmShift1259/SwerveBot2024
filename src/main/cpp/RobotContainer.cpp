@@ -78,9 +78,11 @@ CommandPtr RobotContainer::GetAutonomousCommand()
 }
 #endif
 
-void RobotContainer::Periodic() {
+void RobotContainer::Periodic()
+{
   m_drive.Periodic();
   // m_vision.Periodic();
+  SmartDashboard::PutBoolean("FieldRelative", m_fieldRelative);
 }
 
 void RobotContainer::SetDefaultCommands()

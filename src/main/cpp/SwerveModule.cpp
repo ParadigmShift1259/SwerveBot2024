@@ -9,11 +9,16 @@
 #include <frc/geometry/Rotation2d.h>
 
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/shuffleboard/ShuffleboardWidget.h>
+
+#include <cstdlib>
 
 SwerveModule::SwerveModule(const int driveMotorCanId, const int turningMotorCanId, double offset, bool driveMotorReversed)
   : m_driveMotor(driveMotorCanId)
   , m_turningMotor(turningMotorCanId, rev::CANSparkLowLevel::MotorType::kBrushless)
   , m_id(std::to_string(turningMotorCanId / 2))
+  , m_driveMotorReversed(driveMotorReversed)
   , m_absEnc((turningMotorCanId / 2) - 1)
   , m_offset(offset)
 {
@@ -43,7 +48,7 @@ SwerveModule::SwerveModule(const int driveMotorCanId, const int turningMotorCanI
   currentLimitConfigs.WithSupplyCurrentLimitEnable(true);
   currentLimitConfigs.WithSupplyCurrentThreshold(70);
   currentLimitConfigs.WithSupplyTimeThreshold(0.85);
-  m_driveMotor.SetInverted(driveMotorReversed);
+//  m_driveMotor.SetInverted(driveMotorReversed);
   // m_driveMotor.ConfigSelectedFeedbackSensor(TalonFXFeedbackDevice::IntegratedSensor);
   m_driveMotor.SetPosition(units::angle::turn_t(0.0));
   m_driveMotor.SetNeutralMode(ctre::phoenix6::signals::NeutralModeValue::Brake);
@@ -90,12 +95,30 @@ SwerveModule::SwerveModule(const int driveMotorCanId, const int turningMotorCanI
   
   m_timer.Reset();
   m_timer.Start();
+
+  frc::ShuffleboardTab& tab = frc::Shuffleboard::GetTab("AbsEncTuning");
+  std::string name = m_nameArray[stoi(m_id) - 1];
+  std::string nteName = name + " offset";
+  const wpi::StringMap<nt::Value> sliderPropMap
+  {
+    std::make_pair("Min", nt::Value::MakeDouble(0.0))
+  , std::make_pair("Max", nt::Value::MakeDouble(2 * std::numbers::pi))
+  , std::make_pair("Block increment", nt::Value::MakeDouble(std::numbers::pi / 180))
+  };
+  tab.Add(nteName, m_offset)
+    .WithWidget(frc::BuiltInWidgets::kNumberSlider)
+    .WithProperties(sliderPropMap)
+    .GetEntry();
+  nteName = name + " voltage";
+  tab.Add(nteName, m_turningMotor.GetAnalog(rev::SparkAnalogSensor::Mode::kRelative).GetVoltage())
+    .WithWidget(frc::BuiltInWidgets::kVoltageView)
+    .GetEntry();
 }
 
 void SwerveModule::Periodic()
 {
   auto time = m_timer.Get();
-  if (time < 1.0_s)
+  if (time < 2.0_s)
   {
     ResyncAbsRelEnc();
   }
@@ -111,8 +134,8 @@ void SwerveModule::Periodic()
   auto angle = fmod(1 + m_offset - absPos, 1.0);
   m_logTurningEncoderPosition.Append(m_turningEncoder.GetPosition());
   //m_logAbsoluteEncoderPosition.Append(absPos * 2 * std::numbers::pi);
-  m_logAbsoluteEncoderPosition.Append(((m_offset - absPos) * 2 * std::numbers::pi) - (m_turningEncoder.GetPosition()));
-  m_logAbsoluteEncoderPositionWithOffset.Append((m_offset - absPos) * 2 * std::numbers::pi);
+  m_logAbsoluteEncoderPosition.Append(((1 + m_offset - absPos) * 2 * std::numbers::pi) - (m_turningEncoder.GetPosition()));
+  m_logAbsoluteEncoderPositionWithOffset.Append((1 + m_offset - absPos) * 2 * std::numbers::pi);
 
   bool bLoadPID = frc::SmartDashboard::GetBoolean("Load Turn PID", false);
   if (bLoadPID)
@@ -130,7 +153,8 @@ void SwerveModule::Periodic()
   }
 
   frc::SmartDashboard::PutNumber("Abs Pos" + m_id, absPos);
-  frc::SmartDashboard::PutNumber("Abs Pos Offset" + m_id, angle);
+  frc::SmartDashboard::PutNumber("Abs Pos plus Offset" + m_id, angle);
+  frc::SmartDashboard::PutNumber("Offset" + m_id, m_offset);
 
   frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, -1.0 * m_turningEncoder.GetPosition());
   frc::SmartDashboard::PutNumber("Turn Mot Pos" + m_id, -1.0 * m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
@@ -138,18 +162,22 @@ void SwerveModule::Periodic()
 
 void SwerveModule::ResyncAbsRelEnc()
 {
-  auto angleInRot = fmod(1 + m_offset - m_absEnc.GetAbsolutePosition(), 1.0); // Returns rotations between 0 and 1
-  auto angleInRad = angleInRot * 2 * std::numbers::pi;                        // Changes rotations to radians
-  if (angleInRad > std::numbers::pi)                                          // If angle is between pi and 2pi, put it between -pi and 0
+
+  auto absPos = m_absEnc.GetAbsolutePosition();         // Returns rotations between 0 and 1
+  auto angleInRot = fmod(1 + m_offset - absPos, 1.0);   // Returns rotations between 0 and 1
+  auto angleInRad = angleInRot * 2 * std::numbers::pi;  // Changes rotations to radians
+  if (angleInRad > std::numbers::pi)                    // If angle is between pi and 2pi, put it between -pi and 0
       angleInRad -= 2 * std::numbers::pi;
 
   m_turningEncoder.SetPosition(angleInRad);
 #define PRINT_ABS_RESYNC
 #ifdef PRINT_ABS_RESYNC
   auto time = m_timer.Get();
-  printf("Module %s %.3f Set abs enc %.3f [rot] %.3f [rad] to rel enc %.3f [rad] mot pos %.3f [rot]\n"
+  printf("Module %s %.3f AbsPos %.3f offset %.3f Set abs enc %.3f [rot] %.3f [rad] to rel enc %.3f [rad] mot pos %.3f [rot]\n"
         , m_id.c_str()
         , time.to<double>()
+        , absPos
+        , m_offset
         , angleInRot
         , angleInRad
         , -1.0 * m_turningEncoder.GetPosition()
@@ -192,13 +220,17 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
 #else
     // TODO Change how the speed to the drive motor is calculated
     // m_driveMotor.Set(TalonFXControlMode::Velocity, CalcTicksPer100Ms(state.speed));
-    if (m_id == "1")
+    // if (m_id == "1")
+    // {
+    //   m_driveMotor.Set(1.0);
+    // }
+    // else
     {
-      m_driveMotor.Set(1.0);
-    }
-    else
-    {
-      m_driveMotor.Set((state.speed / m_currentMaxSpeed).to<double>());
+      auto spd = (state.speed / m_currentMaxSpeed).to<double>();
+      spd *= m_driveMotorReversed ? -1.0 : 1.0;
+      frc::SmartDashboard::PutNumber("Drive Speed" + m_id, spd);
+      m_driveMotor.Set(spd);
+      //m_driveMotor.Set((state.speed / m_currentMaxSpeed).to<double>());
     }
 #endif
   }

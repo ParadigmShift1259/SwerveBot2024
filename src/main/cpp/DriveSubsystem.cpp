@@ -21,6 +21,15 @@ DriveSubsystem::DriveSubsystem()
   m_logDriveInputX = wpi::log::DoubleLogEntry(log, "/input/X");
   m_logDriveInputY = wpi::log::DoubleLogEntry(log, "/input/Y");
   m_logDriveInputRot = wpi::log::DoubleLogEntry(log, "/input/Rot");
+
+  frc::Preferences::SetString("BuildDate", __DATE__);
+  frc::Preferences::SetString("BuildTime", __TIME__);
+
+  frc::Preferences::InitString("Name", "ThingX");
+  frc::Preferences::InitDouble("Offset1", 0.0);
+  frc::Preferences::InitDouble("Offset2", 0.0);
+  frc::Preferences::InitDouble("Offset3", 0.0);
+  frc::Preferences::InitDouble("Offset4", 0.0);
 }
 
 void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
@@ -149,6 +158,8 @@ void DriveSubsystem::Periodic()
   m_logRobotAccel.Append(m_acceleration);
   frc::SmartDashboard::PutNumber("GyroPitch", m_gyro.GetPitch());
   m_logGyroPitch.Append(m_gyro.GetPitch()); 
+
+  frc::SmartDashboard::PutBoolean("SlowSpeed", m_currentMaxSpeed == kLowSpeed);
 }
 
 frc::Pose2d DriveSubsystem::GetPose()
