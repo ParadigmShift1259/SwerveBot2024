@@ -37,17 +37,23 @@ public:
   CommandPtr GetAutonomousCommand();
   enum EAutoPath
   {
-      kAutoPathPlaceAndBalance
-    , kAutoPathPlaceAndExitTags1Or8
-    , kAutoPathPlaceAndExitTags3Or6
-    //, kAutoPath
+      kAutoPathDefault
+    , kAutoPathFourNote = kAutoPathDefault
+    , kAutoPathThreeNote
+    , kAutoPathTwoNote
+    , kAutoPathOneNote
+    , kAutoPathExitZone
+    , kAutoPathDoNothing
     // Keep the emun in sync with the LUT
   };
   std::vector<std::string> m_pathPlannerLUT
   { 
-      "PlaceAndBalance"       // These strings are the names of the PathPlanner .path files
-    , "PlaceAndExitTags1Or8" 
-    , "PlaceAndExitTags3Or6"
+      "Four Note" 
+    , "Three Note"
+    , "Two Note" 
+    , "One Note"
+    , "Exit Zone" 
+    , "Do Nothing"       // These strings are the names of the PathPlanner .path files
   };
   frc::SendableChooser<EAutoPath> m_chooser;
   void SetIsAutoRunning(bool isAutoRunning) { m_isAutoRunning = isAutoRunning; }

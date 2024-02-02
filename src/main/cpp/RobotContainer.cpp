@@ -7,6 +7,7 @@
 #include <frc/MathUtil.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <frc/DriverStation.h>
 
 #include <frc2/command/Commands.h>
 #include <frc2/command/ParallelDeadlineGroup.h>
@@ -17,8 +18,12 @@
 #include <pathplanner/lib/path/PathPlannerTrajectory.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
 #include <pathplanner/lib/path/PathPoint.h>
+#include <pathplanner/lib/util/HolonomicPathFollowerConfig.h>
+#include <pathplanner/lib/util/PIDConstants.h>
+#include <pathplanner/lib/util/ReplanningConfig.h>
 
-// using namespace pathplanner;
+
+using namespace pathplanner;
 
 RobotContainer::RobotContainer() 
   : m_drive()
@@ -26,9 +31,11 @@ RobotContainer::RobotContainer()
   SetDefaultCommands();
   ConfigureBindings();
 
-  m_chooser.SetDefaultOption("Place and Balance", EAutoPath::kAutoPathPlaceAndBalance);
-  m_chooser.AddOption("Place and Exit Tag 1 or 8", EAutoPath::kAutoPathPlaceAndExitTags1Or8);
-  m_chooser.AddOption("Place and Exit Tag 3 or 6", EAutoPath::kAutoPathPlaceAndExitTags3Or6);
+  m_chooser.SetDefaultOption(m_pathPlannerLUT[kAutoPathDefault], EAutoPath::kAutoPathDefault);
+  for (int i = 0; i < (int)m_pathPlannerLUT.size(); i++)
+  {
+    m_chooser.AddOption(m_pathPlannerLUT[i], (EAutoPath)i);
+  }
   frc::SmartDashboard::PutData("Auto Path", &m_chooser);
 }
 
@@ -48,33 +55,32 @@ CommandPtr RobotContainer::GetAutonomousCommand()
 {
   auto autoPath = m_chooser.GetSelected();
   auto pathFile = m_pathPlannerLUT[autoPath];
-  std::shared_ptr<pathplanner::PathPlannerPath> path = pathplanner::PathPlannerPath::fromPathFile(pathFile/*, {pathplanner::PathConstraints(2_mps, 2_mps_sq)}*/);
+  std::shared_ptr<PathPlannerPath> path = PathPlannerPath::fromPathFile(pathFile);
 
   static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
+  //eventMap.emplace("Shoot", std::make_shared<Shoot>(m_drive, *this));
+  //eventMap.emplace("Intake Note", std::make_shared<Intake>(m_drive, *this));
 
   // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this could be in RobotContainer along with your subsystems
-  static pathplanner::AutoBuilder autoBuilder;
+  static AutoBuilder autoBuilder;
   
-  pathplanner::PIDConstants translationConstants = pathplanner::PIDConstants(5.0, 0.0, 0.0);
-  pathplanner::PIDConstants rotationConstants = pathplanner::PIDConstants(0.5, 0.0, 0.0);
+  PIDConstants translationConstants = PIDConstants(5.0, 0.0, 0.0);
+  PIDConstants rotationConstants = PIDConstants(0.5, 0.0, 0.0);
   units::meters_per_second_t maxModuleSpeed = 2_mps; //	Max speed of an individual drive module in meters/sec
-  units::meter_t driveBaseRadius = 17.25_in; // Distance from the center of the robot to the farthest swerve module 
-  pathplanner::ReplanningConfig replanningConfig;
-
+  units::meter_t driveBaseRadius = 20.86_in; // Distance from the center of the robot to the farthest swerve module 
+  ReplanningConfig replanningConfig;
 
   autoBuilder.configureHolonomic(
       [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
       [this](auto initPose) { GetDrive().ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
-      // PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-      // PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
       [this]() { return GetDrive().GetChassisSpeeds(); },
       [this](ChassisSpeeds speeds) { GetDrive().Drive(speeds.vx, speeds.vy, speeds.omega, true); }, // Output function that accepts field relative ChassisSpeeds
-      pathplanner::HolonomicPathFollowerConfig( translationConstants, rotationConstants, maxModuleSpeed, driveBaseRadius, replanningConfig ),
+      HolonomicPathFollowerConfig( translationConstants, rotationConstants, maxModuleSpeed, driveBaseRadius, replanningConfig ),
       [this]() { return true; }, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-      { &m_drive } // Drive requirements, usually just a single drive subsystem
+      &m_drive // Drive requirements, usually just a single drive subsystem
   );
 
-  return pathplanner::AutoBuilder::followPath(path);
+  return AutoBuilder::followPath(path);
 }
 #endif
 
