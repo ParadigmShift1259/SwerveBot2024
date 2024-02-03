@@ -32,7 +32,7 @@ RobotContainer::RobotContainer()
   ConfigureBindings();
 
   m_chooser.SetDefaultOption(m_pathPlannerLUT[kAutoPathDefault], EAutoPath::kAutoPathDefault);
-  for (int i = 0; i < (int)m_pathPlannerLUT.size(); i++)
+  for (int i = 1; i < (int)m_pathPlannerLUT.size(); i++)
   {
     m_chooser.AddOption(m_pathPlannerLUT[i], (EAutoPath)i);
   }

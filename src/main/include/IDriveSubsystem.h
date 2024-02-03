@@ -7,6 +7,7 @@
 #include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/kinematics/SwerveModulePosition.h>
+#include <frc/kinematics/ChassisSpeeds.h>
 
 #include <units/angle.h>
 #include <units/angular_velocity.h>
