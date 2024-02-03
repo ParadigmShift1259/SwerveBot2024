@@ -3,10 +3,10 @@
 
 #include "ISubsystemAccess.h"
 
-class GoToPodiumCommand: public frc2::CommandHelper<frc2::Command, GoToPodiumCommand>
+class GoToPositionCommand: public frc2::CommandHelper<frc2::Command, GoToPositionCommand>
 {
     public:
-        explicit GoToPodiumCommand(ISubsystemAccess& subsystemAccess);
+        explicit GoToPositionCommand(ISubsystemAccess& subsystemAccess, bool bGoToPodium);
         void Initialize() override;
         void Execute() override;
         bool IsFinished() override;
@@ -15,4 +15,6 @@ class GoToPodiumCommand: public frc2::CommandHelper<frc2::Command, GoToPodiumCom
     private:
         DriveSubsystem&        m_driveSubsystem;
         VisionSubsystem&        m_visionSubsystem;
+        double m_targetX;
+        double m_targetY;
 };

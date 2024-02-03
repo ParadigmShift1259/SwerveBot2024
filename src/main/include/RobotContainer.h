@@ -23,7 +23,7 @@
 #include <unordered_map>
 
 #include "ISubsystemAccess.h"
-// #include "DriveSubsystem.h"
+// #include "subsystems/DriveSubsystem.h"
 
 using namespace frc;
 using namespace frc2;
@@ -64,6 +64,12 @@ public:
   DriveSubsystem&        GetDrive() override { return m_drive; }
   VisionSubsystem&       GetVision() override { return m_vision; }
 
+  IntakeSubsystem&        GetIntake() override { return m_intake; }
+  ShooterSubsystem&        GetShooter() override { return m_shooter; }
+  ClimberSubsystem&        GetClimber() override { return m_climber; }
+  FeederSubsystem&        GetFeeder() override { return m_feeder; }  
+  AmpSubsystem&        GetAmp() override { return m_amp; }
+
   wpi::log::DataLog&         GetLogger() override { return DataLogManager::GetLog(); }
 
 private:
@@ -79,6 +85,12 @@ private:
   // The robot's subsystems and commands are defined here...
   DriveSubsystem m_drive;
   VisionSubsystem m_vision;
+
+  IntakeSubsystem m_intake;
+  ShooterSubsystem m_shooter;
+  ClimberSubsystem m_climber;
+  FeederSubsystem m_feeder;
+  AmpSubsystem m_amp;
 
   CommandXboxController m_primaryController{0};
   CommandXboxController m_secondaryController{1};

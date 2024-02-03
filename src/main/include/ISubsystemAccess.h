@@ -3,8 +3,15 @@
 #ifndef __SUBSYSTEMACCESS_H__
 #define __SUBSYSTEMACCESS_H__
 
-#include "DriveSubsystem.h"
-#include "VisionSubsystem.h"
+#include "subsystems/DriveSubsystem.h"
+#include "subsystems/VisionSubsystem.h"
+
+#include "subsystems/IntakeSubsystem.h"
+#include "subsystems/ShooterSubsystem.h"
+#include "subsystems/ClimberSubsystem.h"
+#include "subsystems/FeederSubsystem.h"
+#include "subsystems/AmpSubsystem.h"
+
 
 #include <frc/DataLogManager.h>
 
@@ -13,6 +20,13 @@ class ISubsystemAccess
 public:
     virtual DriveSubsystem&        GetDrive() = 0;
     virtual VisionSubsystem&        GetVision() = 0;
+
+    virtual IntakeSubsystem&        GetIntake() = 0;
+    virtual ShooterSubsystem&        GetShooter() = 0;
+    virtual ClimberSubsystem&        GetClimber() = 0;
+    virtual FeederSubsystem&        GetFeeder() = 0;    
+    virtual AmpSubsystem&        GetAmp() = 0;
+
 
     virtual wpi::log::DataLog&      GetLogger() = 0;
 };

@@ -21,7 +21,7 @@
 
 #include "IDriveSubsystem.h"
 #include "ConstantsCANIDs.h"
-#include "SwerveModule.h"
+#include "subsystems/SwerveModule.h"
 #include "PigeonGyro.h"
 
 static constexpr units::meters_per_second_t kMaxSpeed = 18.0_fps;  // L3 Gear Ratio Falcon Max Speed

@@ -41,7 +41,7 @@ class VisionSubsystem : public frc2::SubsystemBase
     std::vector<double> m_zero_vector = {42.0, 42.0, 42.0, 92, 10, 22};
 
     std::shared_ptr<nt::NetworkTable> m_net_table = 
-        nt::NetworkTableInstance::GetDefault().GetTable("limelight-twoplus");
+        nt::NetworkTableInstance::GetDefault().GetTable("limelight-threone");
 
   wpi::log::DoubleLogEntry m_logRobotPoseX;
   wpi::log::DoubleLogEntry m_logRobotPoseY;
