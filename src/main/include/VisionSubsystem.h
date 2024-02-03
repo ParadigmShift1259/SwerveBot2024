@@ -29,12 +29,14 @@ class VisionSubsystem : public frc2::SubsystemBase
   public:
     VisionSubsystem(/* args */);
     void Periodic();
+    bool IsValid() { return m_isValid; }
     double GetX() { return m_net_buffer[eX]; }
     double GetY() { return m_net_buffer[eY]; }
     double GetYaw() { return m_net_buffer[eYaw]; }
     double GetLatency() { return m_net_buffer[eLatency]; }
 
   private:
+    bool m_isValid = false;
     std::vector<double> m_net_buffer{2};
     std::vector<double> m_zero_vector = {42.0, 42.0, 42.0, 92, 10, 22};
 

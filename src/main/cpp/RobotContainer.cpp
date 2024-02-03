@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
+#include "GoToPodiumCommand.h"
 
 #include <frc/MathUtil.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -157,7 +158,7 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // primary.Start().WhileTrue(&m_OverrideOn);
   // primary.Back().WhileTrue(&m_OverrideOff);
 #else
-  // primary.A().OnTrue(ClawOpen(*this).ToPtr());
+  primary.A().WhileTrue(GoToPodiumCommand(*this).ToPtr());
   // primary.B().OnTrue(ClawClose(*this).ToPtr());
   // primary.X().OnTrue(RetrieveGamePiece(*this).ToPtr());
   // primary.Y().OnTrue(ReleaseCone(*this).ToPtr());

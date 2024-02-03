@@ -12,7 +12,8 @@ VisionSubsystem::VisionSubsystem()
 
 void VisionSubsystem::Periodic()
 {
-  if (m_net_table->GetNumber("tv", 0))
+  m_isValid = m_net_table->GetNumber("tv", 0);
+  if (m_isValid)
   {
       m_net_buffer = m_net_table->GetNumberArray("botpose_wpiblue", m_zero_vector);
       m_logRobotPoseX.Append(m_net_buffer[eX]);
