@@ -9,7 +9,6 @@
 #include "subsystems/IntakeSubsystem.h"
 #include "subsystems/ShooterSubsystem.h"
 #include "subsystems/ClimberSubsystem.h"
-#include "subsystems/FeederSubsystem.h"
 #include "subsystems/AmpSubsystem.h"
 
 
@@ -23,8 +22,7 @@ public:
 
     virtual IntakeSubsystem&        GetIntake() = 0;
     virtual ShooterSubsystem&        GetShooter() = 0;
-    virtual ClimberSubsystem&        GetClimber() = 0;
-    virtual FeederSubsystem&        GetFeeder() = 0;    
+    virtual ClimberSubsystem&        GetClimber() = 0; 
     virtual AmpSubsystem&        GetAmp() = 0;
 
 

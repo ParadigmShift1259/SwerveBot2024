@@ -20,7 +20,7 @@ void IntakeIngest::Execute()
 {
   m_intake.ExtendIntake();
   frc2::WaitCommand(0.25_s); // Wait for backplate to extend and turntable motor to engage
-  // m_intake.Set(kIngestSpeed);
+  m_intake.Set(kIngestSpeed);
 }
 
 void IntakeIngest::End(bool interrupted) 

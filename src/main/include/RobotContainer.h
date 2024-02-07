@@ -67,7 +67,6 @@ public:
   IntakeSubsystem&        GetIntake() override { return m_intake; }
   ShooterSubsystem&        GetShooter() override { return m_shooter; }
   ClimberSubsystem&        GetClimber() override { return m_climber; }
-  FeederSubsystem&        GetFeeder() override { return m_feeder; }  
   AmpSubsystem&        GetAmp() override { return m_amp; }
 
   wpi::log::DataLog&         GetLogger() override { return DataLogManager::GetLog(); }
@@ -89,7 +88,6 @@ private:
   IntakeSubsystem m_intake;
   ShooterSubsystem m_shooter;
   ClimberSubsystem m_climber;
-  FeederSubsystem m_feeder;
   AmpSubsystem m_amp;
 
   CommandXboxController m_primaryController{0};

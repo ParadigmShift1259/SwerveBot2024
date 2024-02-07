@@ -4,6 +4,10 @@
 
 #include "RobotContainer.h"
 #include "commands/GoToPositionCommand.h"
+#include "commands/IntakeStop.h"
+#include "commands/IntakeRelease.h"
+#include "commands/IntakeIngest.h"
+#include "commands/ShootCommand.h"
 
 #include <frc/MathUtil.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -158,11 +162,18 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // primary.Start().WhileTrue(&m_OverrideOn);
   // primary.Back().WhileTrue(&m_OverrideOff);
 #else
-  primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
-  primary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
+  primary.A().WhileTrue(ShootCommand(*this).ToPtr());
+  // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
+  // primary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
   // primary.B().OnTrue(ClawClose(*this).ToPtr());
   // primary.X().OnTrue(RetrieveGamePiece(*this).ToPtr());
   // primary.Y().OnTrue(ReleaseCone(*this).ToPtr());
+  primary.X().WhileTrue(IntakeIngest(*this).ToPtr());
+  primary.Y().WhileTrue(IntakeStop(*this).ToPtr());
+  // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  // primary.POVUp(loop).Rising().IfHigh([this] { ShootCommand(*this).Schedule(); });
+  
+  
 #endif
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
