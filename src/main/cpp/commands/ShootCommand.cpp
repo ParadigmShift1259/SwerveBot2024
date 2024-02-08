@@ -22,7 +22,7 @@ void ShootCommand::Execute()
 
 bool ShootCommand::IsFinished()
 {
-    return true;
+    return false;
 }
 
 void ShootCommand::End(bool interrupted)

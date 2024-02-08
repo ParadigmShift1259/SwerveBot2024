@@ -1,6 +1,6 @@
 #pragma once
 
-// #define OVERUNDER
+#include "Constants.h"
 
 #include <wpi/DataLog.h>
 
@@ -43,19 +43,18 @@ class ShooterSubsystem : public frc2::SubsystemBase
     rev::SparkRelativeEncoder m_OverRelativeEnc = m_OverWheels.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);
     rev::SparkRelativeEncoder m_UnderRelativeEnc = m_UnderWheels.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);
 #ifdef OVERUNDER    
-    rev::SparkRelativeEncoder m_BackRelativeEnc = m_BackWheels.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);
-    rev::SparkRelativeEncoder m_ElevationRelativeEnc = m_ElevationController.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);    
+    rev::SparkRelativeEncoder m_BackRelativeEnc = m_BackWheels.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor);
+    rev::SparkRelativeEncoder m_ElevationRelativeEnc = m_ElevationController.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor);
 
     ctre::phoenix6::hardware::CANcoder m_ElevationEncoder;
 #endif    
 
-	  wpi::log::DoubleLogEntry m_logOverRPM;
+	wpi::log::DoubleLogEntry m_logOverRPM;
     wpi::log::DoubleLogEntry m_logUnderRPM;
 #ifdef OVERUNDER
-	  wpi::log::DoubleLogEntry m_logBackRPM;
-	  wpi::log::DoubleLogEntry m_logCurrentAngle;
-	  wpi::log::DoubleLogEntry m_logCommandedAngle;
-	  wpi::log::DoubleLogEntry m_logAbsoluteAngle;
+	wpi::log::DoubleLogEntry m_logBackRPM;
+	wpi::log::DoubleLogEntry m_logCurrentAngle;
+	wpi::log::DoubleLogEntry m_logCommandedAngle;
+	wpi::log::DoubleLogEntry m_logAbsoluteAngle;
 #endif
-
 };

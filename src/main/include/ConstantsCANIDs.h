@@ -12,9 +12,12 @@ constexpr int kRearRightTurningCANID  = 6;       //!< Rear Right Turn CAN ID (Sp
 constexpr int kRearLeftDriveCANID     = 7;       //!< Rear Left Drive CAN ID (TalonFX)   
 constexpr int kRearLeftTurningCANID   = 8;       //!< Rear Left Turn CAN ID (SparkMAX)
 
-// Subsystem TalonSRXs
-constexpr int kIntakeCANID     = 11;
-constexpr int kTurntableCANID  = 22;
 
-// Subsystem SparkMaxs
-constexpr int kDeploymentCANID = 22;
+constexpr int kIntakeRollerCANID     = 11;       // TalonSRX
+constexpr int kIntakeDeployCANID      = 15;       // SparkMax
+
+constexpr int kShooterOverWheelsCANID  = 12;
+constexpr int kShooterUnderWheelsCANID = 13;
+constexpr int kShooterBackWheelsCANID = 22;
+constexpr int kShooterElevationControllerCANID = 23;
+constexpr int kElevationEncoderCANID = 1;

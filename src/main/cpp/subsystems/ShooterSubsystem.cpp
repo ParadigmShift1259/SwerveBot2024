@@ -1,14 +1,16 @@
+#include "ConstantsCANIDs.h"
+
 #include "subsystems/ShooterSubsystem.h"
 
 #include <frc/Preferences.h>
 
 ShooterSubsystem::ShooterSubsystem()
-  : m_OverWheels(12, rev::CANSparkLowLevel::MotorType::kBrushless)
-  , m_UnderWheels(13, rev::CANSparkLowLevel::MotorType::kBrushless)
+  : m_OverWheels(kShooterOverWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
+  , m_UnderWheels(kShooterUnderWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
 #ifdef OVERUNDER  
-  , m_BackWheels(1, rev::CANSparkLowLevel::MotorType::kBrushless)
-  , m_ElevationController(2, rev::CANSparkLowLevel::MotorType::kBrushless)
-  , m_ElevationEncoder(1)
+  , m_BackWheels(kShooterBackWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
+  , m_ElevationController(kShooterElevationControllerCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
+  , m_ElevationEncoder(kElevationEncoderCANID)
 #endif
 {
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
@@ -24,6 +26,11 @@ ShooterSubsystem::ShooterSubsystem()
   auto result = m_ElevationEncoder.GetAbsolutePosition();
   m_ElevationRelativeEnc.SetPosition(result.GetValueAsDouble());
 
+  m_OverWheels.SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
+  m_OverWheels.SetClosedLoopRampRate(0.0);
+  m_UnderWheels.SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
+  m_UnderWheels.SetClosedLoopRampRate(0.0);
+
   frc::Preferences::InitDouble("kElevationP", 1.0);
   frc::Preferences::InitDouble("kElevationI", 0.0);
   frc::Preferences::InitDouble("kElevationD", 0.0);
@@ -35,19 +42,23 @@ ShooterSubsystem::ShooterSubsystem()
   m_OverPIDController.SetP(frc::Preferences::GetDouble("kShooterP", 1.0));
   m_OverPIDController.SetI(frc::Preferences::GetDouble("kShooterI", 0.0));
   m_OverPIDController.SetD(frc::Preferences::GetDouble("kShooterD", 0.0));
+  m_OverPIDController.SetOutputRange(kMinOut, kMaxOut);
 
   m_UnderPIDController.SetP(frc::Preferences::GetDouble("kShooterP", 1.0));
   m_UnderPIDController.SetI(frc::Preferences::GetDouble("kShooterI", 0.0));
   m_UnderPIDController.SetD(frc::Preferences::GetDouble("kShooterD", 0.0));
+  m_UnderPIDController.SetOutputRange(kMinOut, kMaxOut);
 
 #ifdef OVERUNDER
   m_BackPIDController.SetP(frc::Preferences::GetDouble("kShooterP", 1.0));
   m_BackPIDController.SetI(frc::Preferences::GetDouble("kShooterI", 0.0));
   m_BackPIDController.SetD(frc::Preferences::GetDouble("kShooterD", 0.0));
+  m_BackPIDController.SetOutputRange(kMinOut, kMaxOut);
 
   m_ElevationPIDController.SetP(frc::Preferences::GetDouble("kElevationP", 1.0));
   m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", 0.0));
   m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", 0.0));
+  m_ElevationPIDController  .SetOutputRange(kMinOut, kMaxOut);
 #endif
 }
 
@@ -78,10 +89,14 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
 
 void ShooterSubsystem::Shoot(units::meter_t distance)
 {
+  //m_OverPIDController.SetIAccum(0);
+  //m_UnderPIDController.SetIAccum(0);
+  static bool bFirstTime = false;
+  
   double overRPM = 1500.0;
   double underRPM = 1500.0;
 #ifdef OVERUNDER  
-  double backRPM = 1500.0;
+  double backRPM = -0.5;
 #endif
 
   m_OverWheels.Set(0.5);
@@ -89,8 +104,13 @@ void ShooterSubsystem::Shoot(units::meter_t distance)
   //m_OverPIDController.SetReference(overRPM, rev::CANSparkBase::ControlType::kVelocity);
   //m_UnderPIDController.SetReference(underRPM, rev::CANSparkBase::ControlType::kVelocity);
 #ifdef OVERUNDER  
-  m_BackPIDController.SetReference(backRPM, rev::CANSparkBase::ControlType::kVelocity);
+  //m_BackWheels.Set(-0.5);
+  if (!bFirstTime)
+  {
+    m_BackPIDController.SetReference(backRPM, rev::CANSparkBase::ControlType::kVelocity);
+  }
 #endif
+  bFirstTime = true;
 }
 
 void ShooterSubsystem::Stop()

@@ -13,7 +13,7 @@ void Robot::RobotInit()
 {
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
   logMatchTime = wpi::log::DoubleLogEntry(log, "/robot/matchTime");
-  frc::CameraServer::StartAutomaticCapture();
+  // frc::CameraServer::StartAutomaticCapture();
 }
 
 void Robot::RobotPeriodic()
