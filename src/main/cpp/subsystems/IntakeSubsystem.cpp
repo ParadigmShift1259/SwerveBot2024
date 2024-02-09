@@ -13,10 +13,11 @@ IntakeSubsystem::IntakeSubsystem()
     : m_motor(kIntakeRollerCANID)
 #ifdef OVERUNDER
     , m_deployMotor(kIntakeDeployCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
+    , m_elevationLimitFront(kElevationLimitFront)
+    , m_elevationLimitRear(kElevationLimitRear)
 #endif
 {
-    
-    m_motor.SetNeutralMode(NeutralMode::Coast);
+  m_motor.SetNeutralMode(NeutralMode::Coast);
 
 #ifdef OVERUNDER
   m_deployMotor.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);

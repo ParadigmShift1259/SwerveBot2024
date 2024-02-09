@@ -49,6 +49,10 @@ class ShooterSubsystem : public frc2::SubsystemBase
     ctre::phoenix6::hardware::CANcoder m_ElevationEncoder;
 #endif    
 
+    double m_overRPM;
+    double m_underRPM;
+    double m_backRPM;
+
 	wpi::log::DoubleLogEntry m_logOverRPM;
     wpi::log::DoubleLogEntry m_logUnderRPM;
 #ifdef OVERUNDER

@@ -2,9 +2,10 @@
 #pragma once
 
 #include "Constants.h"
-#include "ConstantsDigitalOut.h"
+#include "ConstantsDigitalInputs.h"
 #include "ConstantsCANIDs.h"
 
+#include <frc/DigitalInput.h>
 
 #include <frc/Timer.h>
 #include <frc2/command/SubsystemBase.h>
@@ -37,6 +38,9 @@ public:
     // Retracts the intake into the robot
     void RetractIntake();
 
+    bool GetLimitFront() const { return m_elevationLimitFront.Get(); }
+    bool GetLimitRear() const { return m_elevationLimitRear.Get(); }
+
 private:
     /// 775 that runs intake
     TalonSRX m_motor;
@@ -46,6 +50,9 @@ private:
     rev::CANSparkMax m_deployMotor;
     
     rev::SparkPIDController m_deployMotorPIDController = m_deployMotor.GetPIDController();
+
+    frc::DigitalInput m_elevationLimitFront;
+    frc::DigitalInput m_elevationLimitRear;
 #endif
 
     static constexpr bool kIntakeExtend = true;

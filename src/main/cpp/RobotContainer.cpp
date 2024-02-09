@@ -163,7 +163,7 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // primary.Back().WhileTrue(&m_OverrideOff);
 #else
   //primary.A().WhileTrue(ShootCommand(*this).ToPtr());
-  primary.A().OnTrue(ShootCommand(*this).ToPtr());
+  primary.A().WhileTrue(ShootCommand(*this).ToPtr());
   // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
   // primary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
   // primary.B().OnTrue(ClawClose(*this).ToPtr());
