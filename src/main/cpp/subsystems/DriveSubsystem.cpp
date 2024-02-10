@@ -139,35 +139,39 @@ void DriveSubsystem::Periodic()
   m_rearRight.Periodic();
 
   //Log Odometry Values
-  frc::Pose2d pose = m_odometry.GetPose();
-  frc::Trajectory::State state;
-  state.t = m_timer.GetFPGATimestamp();
-  state.pose = pose;
+  //frc::Pose2d pose = m_odometry.GetPose();
+  //frc::Trajectory::State state;
+  //state.t = m_timer.GetFPGATimestamp();
+  //state.pose = pose;
 	//auto& prevState = m_StateHist.back();
   //state.velocity = (pose - prevState.pose).Translation().Norm() / (state.t - prevState.t);
   //state.acceleration = (state.velocity - prevState.velocity) / (state.t - prevState.t);
   //m_StateHist.push_back(state);
 
-  m_velocity = (double)state.velocity;
-  m_acceleration = (double)state.acceleration;
+  //m_velocity = (double)state.velocity;
+  //m_acceleration = (double)state.acceleration;
 
-  m_logRobotPoseX.Append(pose.X().to<double>());
-  m_logRobotPoseY.Append(pose.Y().to<double>());
-  m_logRobotPoseTheta.Append(pose.Rotation().Degrees().to<double>());
-  m_logRobotSpeed.Append(m_velocity);
-  m_logRobotAccel.Append(m_acceleration);
-  frc::SmartDashboard::PutNumber("GyroPitch", m_gyro.GetPitch());
+  //m_logRobotPoseX.Append(pose.X().to<double>());
+  //m_logRobotPoseY.Append(pose.Y().to<double>());
+  //m_logRobotPoseTheta.Append(pose.Rotation().Degrees().to<double>());
+  //m_logRobotSpeed.Append(m_velocity);
+  //m_logRobotAccel.Append(m_acceleration);
+  //frc::SmartDashboard::PutNumber("GyroPitch", m_gyro.GetPitch());
   m_logGyroPitch.Append(m_gyro.GetPitch()); 
 
-  frc::SmartDashboard::PutBoolean("SlowSpeed", m_currentMaxSpeed == kLowSpeed);
+  static int count = 0;
+  if (count++ % 100 == 0)
+  {
+    frc::SmartDashboard::PutBoolean("SlowSpeed", m_currentMaxSpeed == kLowSpeed);
+  }
 }
 
 frc::Pose2d DriveSubsystem::GetPose()
 {
   auto pose = m_odometry.GetPose();
-  frc::SmartDashboard::PutNumber("X", pose.X().to<double>());
-  frc::SmartDashboard::PutNumber("Y", pose.Y().to<double>());
-  frc::SmartDashboard::PutNumber("Rot", pose.Rotation().Degrees().to<double>());
+  // frc::SmartDashboard::PutNumber("X", pose.X().to<double>());
+  // frc::SmartDashboard::PutNumber("Y", pose.Y().to<double>());
+  // frc::SmartDashboard::PutNumber("Rot", pose.Rotation().Degrees().to<double>());
 
   return m_odometry.GetPose();
 }
@@ -194,9 +198,9 @@ void DriveSubsystem::UpdateOdometry()
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose)
 {
-  frc::SmartDashboard::PutNumber("ResetX", pose.X().to<double>());
-  frc::SmartDashboard::PutNumber("Resety", pose.Y().to<double>());
-  frc::SmartDashboard::PutNumber("ResetRot", pose.Rotation().Degrees().to<double>());
+  // frc::SmartDashboard::PutNumber("ResetX", pose.X().to<double>());
+  // frc::SmartDashboard::PutNumber("Resety", pose.Y().to<double>());
+  // frc::SmartDashboard::PutNumber("ResetRot", pose.Rotation().Degrees().to<double>());
 
   SwerveModulePositions modulePositions = {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
                                            m_rearLeft.GetPosition(), m_rearRight.GetPosition()};

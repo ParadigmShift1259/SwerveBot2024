@@ -6,6 +6,8 @@
 
 #include <frc2/command/SubsystemBase.h>
 #include <frc/DataLogManager.h>
+#include <frc/DigitalInput.h>
+#include <frc/Timer.h>
 
 #include <rev/CANSparkFlex.h>
 #include <ctre/phoenix6/CANcoder.hpp>
@@ -20,11 +22,17 @@ class ShooterSubsystem : public frc2::SubsystemBase
     ShooterSubsystem();
     void Periodic();
     void GoToElevation(units::degree_t angle);
+    void StartOverAndUnder();
     void Shoot(units::meter_t distance);
     void Stop();
+    bool GetLimitFront() const { return m_elevationLimitFront.Get(); }
+    bool GetLimitRear() const { return m_elevationLimitRear.Get(); }
+
     
   private:
     double m_elevationAngle = 0.0;
+    bool m_poppedPin = false;
+    frc::Timer m_timer;
 
     rev::CANSparkMax m_OverWheels;
     rev::CANSparkMax m_UnderWheels;
@@ -47,6 +55,9 @@ class ShooterSubsystem : public frc2::SubsystemBase
     rev::SparkRelativeEncoder m_ElevationRelativeEnc = m_ElevationController.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor);
 
     ctre::phoenix6::hardware::CANcoder m_ElevationEncoder;
+    frc::DigitalInput m_elevationLimitFront;
+    frc::DigitalInput m_elevationLimitRear;
+    
 #endif    
 
     double m_overRPM;

@@ -86,10 +86,10 @@ SwerveModule::SwerveModule(const int driveMotorCanId, const int turningMotorCanI
   m_turningPIDController.SetP(kTurnP);
   m_turningPIDController.SetI(kTurnI);
   m_turningPIDController.SetD(kTurnD);
-  frc::SmartDashboard::PutBoolean("Load Turn PID", false);
-  frc::SmartDashboard::PutNumber("Turn P", kTurnP);
-  frc::SmartDashboard::PutNumber("Turn I", kTurnI);
-  frc::SmartDashboard::PutNumber("Turn D", kTurnD);
+  // frc::SmartDashboard::PutBoolean("Load Turn PID", false);
+  // frc::SmartDashboard::PutNumber("Turn P", kTurnP);
+  // frc::SmartDashboard::PutNumber("Turn I", kTurnI);
+  // frc::SmartDashboard::PutNumber("Turn D", kTurnD);
   m_turningMotor.SetSmartCurrentLimit(20);
   m_turningMotor.SetIdleMode(CANSparkMax::IdleMode::kBrake);
   
@@ -137,27 +137,27 @@ void SwerveModule::Periodic()
   m_logAbsoluteEncoderPosition.Append(((1 + m_offset - absPos) * 2 * std::numbers::pi) - (m_turningEncoder.GetPosition()));
   m_logAbsoluteEncoderPositionWithOffset.Append((1 + m_offset - absPos) * 2 * std::numbers::pi);
 
-  bool bLoadPID = frc::SmartDashboard::GetBoolean("Load Turn PID", false);
-  if (bLoadPID)
-  {
-    double kTurnP = frc::SmartDashboard::GetNumber("Turn P", 0.5);
-    double kTurnI = frc::SmartDashboard::GetNumber("Turn I", 0.00001);
-    double kTurnD = frc::SmartDashboard::GetNumber("Turn D", 0.05);
-    m_turningPIDController.SetP(kTurnP);
-    m_turningPIDController.SetI(kTurnI);
-    m_turningPIDController.SetD(kTurnD);
-    frc::SmartDashboard::PutNumber("Turn P echo", kTurnP);
-    frc::SmartDashboard::PutNumber("Turn I echo", kTurnI);
-    frc::SmartDashboard::PutNumber("Turn D echo", kTurnD);
-    printf("Loaded Turn PID values P %.3f I %.3f D %.3f\n", kTurnP, kTurnI, kTurnD);
-  }
+  // bool bLoadPID = frc::SmartDashboard::GetBoolean("Load Turn PID", false);
+  // if (bLoadPID)
+  // {
+  //   double kTurnP = frc::SmartDashboard::GetNumber("Turn P", 0.5);
+  //   double kTurnI = frc::SmartDashboard::GetNumber("Turn I", 0.00001);
+  //   double kTurnD = frc::SmartDashboard::GetNumber("Turn D", 0.05);
+  //   m_turningPIDController.SetP(kTurnP);
+  //   m_turningPIDController.SetI(kTurnI);
+  //   m_turningPIDController.SetD(kTurnD);
+  //   frc::SmartDashboard::PutNumber("Turn P echo", kTurnP);
+  //   frc::SmartDashboard::PutNumber("Turn I echo", kTurnI);
+  //   frc::SmartDashboard::PutNumber("Turn D echo", kTurnD);
+  //   printf("Loaded Turn PID values P %.3f I %.3f D %.3f\n", kTurnP, kTurnI, kTurnD);
+  // }
 
-  frc::SmartDashboard::PutNumber("Abs Pos" + m_id, absPos);
-  frc::SmartDashboard::PutNumber("Abs Pos plus Offset" + m_id, angle);
-  frc::SmartDashboard::PutNumber("Offset" + m_id, m_offset);
+  // frc::SmartDashboard::PutNumber("Abs Pos" + m_id, absPos);
+  // frc::SmartDashboard::PutNumber("Abs Pos plus Offset" + m_id, angle);
+  // frc::SmartDashboard::PutNumber("Offset" + m_id, m_offset);
 
-  frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, -1.0 * m_turningEncoder.GetPosition());
-  frc::SmartDashboard::PutNumber("Turn Mot Pos" + m_id, -1.0 * m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
+  // frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, -1.0 * m_turningEncoder.GetPosition());
+  // frc::SmartDashboard::PutNumber("Turn Mot Pos" + m_id, -1.0 * m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
 }
 
 void SwerveModule::ResyncAbsRelEnc()
@@ -170,7 +170,7 @@ void SwerveModule::ResyncAbsRelEnc()
       angleInRad -= 2 * std::numbers::pi;
 
   m_turningEncoder.SetPosition(angleInRad);
-#define PRINT_ABS_RESYNC
+//#define PRINT_ABS_RESYNC
 #ifdef PRINT_ABS_RESYNC
   auto time = m_timer.Get();
   printf("Module %s %.3f AbsPos %.3f offset %.3f Set abs enc %.3f [rot] %.3f [rad] to rel enc %.3f [rad] mot pos %.3f [rot]\n"
@@ -228,7 +228,7 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
     {
       auto spd = (state.speed / m_currentMaxSpeed).to<double>();
       spd *= m_driveMotorReversed ? -1.0 : 1.0;
-      frc::SmartDashboard::PutNumber("Drive Speed" + m_id, spd);
+      //frc::SmartDashboard::PutNumber("Drive Speed" + m_id, spd);
       m_driveMotor.Set(spd);
       //m_driveMotor.Set((state.speed / m_currentMaxSpeed).to<double>());
     }

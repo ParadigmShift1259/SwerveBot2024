@@ -38,9 +38,6 @@ public:
     // Retracts the intake into the robot
     void RetractIntake();
 
-    bool GetLimitFront() const { return m_elevationLimitFront.Get(); }
-    bool GetLimitRear() const { return m_elevationLimitRear.Get(); }
-
 private:
     /// 775 that runs intake
     TalonSRX m_motor;
@@ -48,11 +45,9 @@ private:
 
 #ifdef OVERUNDER
     rev::CANSparkMax m_deployMotor;
-    
-    rev::SparkPIDController m_deployMotorPIDController = m_deployMotor.GetPIDController();
+    rev::SparkRelativeEncoder m_deployRelativeEnc = m_deployMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);    
+    rev::SparkPIDController m_deployPIDController = m_deployMotor.GetPIDController();
 
-    frc::DigitalInput m_elevationLimitFront;
-    frc::DigitalInput m_elevationLimitRear;
 #endif
 
     static constexpr bool kIntakeExtend = true;
