@@ -1,4 +1,5 @@
 
+#include "ConstantsDigitalInputs.h"
 #include "subsystems/IntakeSubsystem.h"
 
 #include <frc/SmartDashBoard/SmartDashboard.h>
@@ -11,6 +12,7 @@ using namespace ctre::phoenix::motorcontrol;
 
 IntakeSubsystem::IntakeSubsystem() 
     : m_motor(kIntakeRollerCANID)
+    , m_photoEye(kIntakePhotoeye)
 #ifdef OVERUNDER
     , m_deployMotor(kIntakeDeployCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
 #endif
@@ -52,11 +54,11 @@ void IntakeSubsystem::Set(double speed)
 
 void IntakeSubsystem::ExtendIntake()
 {
-#ifdef OVERUNDER
+#ifdef OVERUNDERXXX
     double turns = frc::SmartDashboard::GetNumber("DepExtTurns", 9.1);
     //double turns = 9.142;
     printf("dep turns %.3f\n", turns);
-    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+//    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
     frc::SmartDashboard::PutNumber("DepApplOut", m_deployMotor.GetAppliedOutput());
     frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());
     frc::SmartDashboard::PutNumber("DepTemp", m_deployMotor.GetMotorTemperature());
@@ -68,11 +70,11 @@ void IntakeSubsystem::ExtendIntake()
 
 void IntakeSubsystem::RetractIntake()
 {
-#ifdef OVERUNDER
+#ifdef OVERUNDERXXX
     double turns = frc::SmartDashboard::GetNumber("DepRtctTurns", 0.0476);
     //double turns = 0.0476;
     printf("dep turns %.3f\n", turns);
-    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+//    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
 #endif
 
 

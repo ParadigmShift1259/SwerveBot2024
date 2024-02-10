@@ -22,7 +22,6 @@ constexpr double kReleaseSpeed = -1.0;
 class IntakeSubsystem : public frc2::SubsystemBase
 {
 public:
-
     IntakeSubsystem();
 
     /// Will be called periodically whenever the CommandScheduler runs.
@@ -38,16 +37,18 @@ public:
     // Retracts the intake into the robot
     void RetractIntake();
 
+    bool IsNotePresent() { return m_photoEye.Get(); }
+
 private:
     /// 775 that runs intake
     TalonSRX m_motor;
     frc::Timer m_timer;
+    frc::DigitalInput m_photoEye;
 
 #ifdef OVERUNDER
     rev::CANSparkMax m_deployMotor;
     rev::SparkRelativeEncoder m_deployRelativeEnc = m_deployMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);    
     rev::SparkPIDController m_deployPIDController = m_deployMotor.GetPIDController();
-
 #endif
 
     static constexpr bool kIntakeExtend = true;

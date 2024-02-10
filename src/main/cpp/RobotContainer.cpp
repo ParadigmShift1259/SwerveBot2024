@@ -7,6 +7,7 @@
 #include "commands/IntakeStop.h"
 #include "commands/IntakeRelease.h"
 #include "commands/IntakeIngest.h"
+#include "commands/PreShootCommand.h"
 #include "commands/ShootCommand.h"
 
 #include <frc/MathUtil.h>
@@ -19,6 +20,7 @@
 #include <frc2/command/WaitCommand.h>
 #include <frc2/command/WaitUntilCommand.h>
 #include <frc2/command/button/JoystickButton.h>
+#include <frc2/command/SequentialCommandGroup.h>
 
 #include <pathplanner/lib/path/PathPlannerTrajectory.h>
 #include <pathplanner/lib/auto/AutoBuilder.h>
@@ -93,7 +95,11 @@ void RobotContainer::Periodic()
 {
   m_drive.Periodic();
   // m_vision.Periodic();
-  SmartDashboard::PutBoolean("FieldRelative", m_fieldRelative);
+  static int count = 0;
+  if (count++ % 100 == 0)
+  {
+    SmartDashboard::PutBoolean("FieldRelative", m_fieldRelative);
+  }
 }
 
 void RobotContainer::SetDefaultCommands()
@@ -162,8 +168,15 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // primary.Start().WhileTrue(&m_OverrideOn);
   // primary.Back().WhileTrue(&m_OverrideOff);
 #else
-  //primary.A().WhileTrue(ShootCommand(*this).ToPtr());
+    // frc2::SequentialCommandGroup cmdGrp;
+    // cmdGrp.AddCommands({
+    //     PreShootCommand(*this).ToPtr()
+    //   , frc2::WaitCommand(1.0_s).ToPtr()
+    //   , ShootCommand(*this).ToPtr()
+    // });
+
   primary.A().WhileTrue(ShootCommand(*this).ToPtr());
+  //primary.A().WhileTrue(cmdGrp.ToPtr());
   // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
   // primary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
   // primary.B().OnTrue(ClawClose(*this).ToPtr());

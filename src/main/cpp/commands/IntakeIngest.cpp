@@ -23,6 +23,11 @@ void IntakeIngest::Execute()
   m_intake.Set(kIngestSpeed);
 }
 
+bool IntakeIngest::IsFinished()
+{
+  m_intake.IsNotePresent();
+}
+
 void IntakeIngest::End(bool interrupted) 
 {
   m_logStartCommand.Append(false);

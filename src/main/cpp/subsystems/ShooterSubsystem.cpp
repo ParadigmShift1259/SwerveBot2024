@@ -135,28 +135,28 @@ void ShooterSubsystem::Periodic()
   m_logAbsoluteAngle.Append(m_ElevationEncoder.GetAbsolutePosition().GetValueAsDouble());
 #endif
 
-static int count = 0;
-if (count++ % 100 == 0)
-{
-  m_overRPM = frc::SmartDashboard::GetNumber("OverRPM", -3000.0);
-  m_underRPM = frc::SmartDashboard::GetNumber("UnderRPM", 3000.0);
-  m_backRPM = frc::SmartDashboard::GetNumber("BackRPM", -3000.0);
+  static int count = 0;
+  if (count++ % 100 == 0)
+  {
+    m_overRPM = frc::SmartDashboard::GetNumber("OverRPM", -3000.0);
+    m_underRPM = frc::SmartDashboard::GetNumber("UnderRPM", 3000.0);
+    m_backRPM = frc::SmartDashboard::GetNumber("BackRPM", -3000.0);
 
 #ifdef OVERUNDER
-  m_ElevationPIDController.SetP(frc::Preferences::GetDouble("kElevationP", 0.05));
-  m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", 0.0));
-  m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", 0.0));
-  m_ElevationPIDController.SetFF(frc::Preferences::GetDouble("kElevationFF", 0.0001));
+    m_ElevationPIDController.SetP(frc::Preferences::GetDouble("kElevationP", 0.05));
+    m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", 0.0));
+    m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", 0.0));
+    m_ElevationPIDController.SetFF(frc::Preferences::GetDouble("kElevationFF", 0.0001));
 #endif
 
-  frc::SmartDashboard::PutNumber("OverRPM echo", m_OverRelativeEnc.GetVelocity());
-  frc::SmartDashboard::PutNumber("UnderRPM echo", m_UnderRelativeEnc.GetVelocity());
+    frc::SmartDashboard::PutNumber("OverRPM echo", m_OverRelativeEnc.GetVelocity());
+    frc::SmartDashboard::PutNumber("UnderRPM echo", m_UnderRelativeEnc.GetVelocity());
 #ifdef OVERUNDER
-  frc::SmartDashboard::PutNumber("BackRPM echo", m_BackRelativeEnc.GetVelocity());
-  frc::SmartDashboard::PutNumber("Elevation echo", m_ElevationRelativeEnc.GetPosition());
-  frc::SmartDashboard::PutNumber("ElevABS echo", m_ElevationEncoder.GetAbsolutePosition().GetValueAsDouble());
+    frc::SmartDashboard::PutNumber("BackRPM echo", m_BackRelativeEnc.GetVelocity());
+    frc::SmartDashboard::PutNumber("Elevation echo", m_ElevationRelativeEnc.GetPosition());
+    frc::SmartDashboard::PutNumber("ElevABS echo", m_ElevationEncoder.GetAbsolutePosition().GetValueAsDouble());
 #endif
-}
+  }
 }
 
 #ifdef OVERUNDER
