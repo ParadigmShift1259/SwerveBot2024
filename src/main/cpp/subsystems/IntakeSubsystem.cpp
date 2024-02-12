@@ -1,3 +1,5 @@
+#include <wpi/deprecated.h>
+#define WPI_IGNORE_DEPRECATED
 
 #include "ConstantsDigitalInputs.h"
 #include "subsystems/IntakeSubsystem.h"
@@ -76,6 +78,5 @@ void IntakeSubsystem::RetractIntake()
     printf("dep turns %.3f\n", turns);
 //    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
 #endif
-
-
 }
+#define WPI_UNIGNORE_DEPRECATED
