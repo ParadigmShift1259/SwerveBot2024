@@ -168,30 +168,16 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // primary.Start().WhileTrue(&m_OverrideOn);
   // primary.Back().WhileTrue(&m_OverrideOff);
 #else
-  // auto cmdGrp = frc2::SequentialCommandGroup{
-  //     PreShootCommand(*this)
-  //   , frc2::WaitCommand(1.0_s)
-  //   , ShootCommand(*this)
-  // };
-
-  // frc2::SequentialCommandGroup cmdGrp;
-  // cmdGrp.AddCommands({
-  //     PreShootCommand(*this).ToPtr()
-  //   , frc2::WaitCommand(1.0_s).ToPtr()
-  //   , ShootCommand(*this).ToPtr()
-  // });
-  //primary.A().WhileTrue(cmdGrp.ToPtr());
-
   primary.A().WhileTrue(frc2::SequentialCommandGroup{
       PreShootCommand(*this)
-    , frc2::WaitCommand(1.0_s)
+    , frc2::WaitCommand(4.0_s)
     , ShootCommand(*this)
   }.ToPtr());
 
   //primary.A().WhileTrue(ShootCommand(*this).ToPtr());
   // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
   // primary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
-  // primary.B().OnTrue(ClawClose(*this).ToPtr());
+  primary.B().OnTrue(PreShootCommand(*this).ToPtr());
   // primary.X().OnTrue(RetrieveGamePiece(*this).ToPtr());
   // primary.Y().OnTrue(ReleaseCone(*this).ToPtr());
   primary.X().WhileTrue(IntakeIngest(*this).ToPtr());

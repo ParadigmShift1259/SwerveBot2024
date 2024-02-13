@@ -152,7 +152,7 @@ void SwerveModule::Periodic()
   //   printf("Loaded Turn PID values P %.3f I %.3f D %.3f\n", kTurnP, kTurnI, kTurnD);
   // }
 
-  // frc::SmartDashboard::PutNumber("Abs Pos" + m_id, absPos);
+  frc::SmartDashboard::PutNumber("Abs Pos" + m_id, absPos);
   // frc::SmartDashboard::PutNumber("Abs Pos plus Offset" + m_id, angle);
   // frc::SmartDashboard::PutNumber("Offset" + m_id, m_offset);
 

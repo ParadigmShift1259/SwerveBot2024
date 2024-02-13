@@ -88,6 +88,7 @@ ShooterSubsystem::ShooterSubsystem()
   frc::SmartDashboard::PutNumber("BackRPM", -3000.0);
   frc::SmartDashboard::PutNumber("ElevationAngle", 44.0);
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
+  frc::SmartDashboard::PutNumber("RelTurns", 0);
 
   //m_timer.Reset();
   //m_timer.Stop();
@@ -191,6 +192,7 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   // Min         1         -0.056    0.740
   // Linear fit
   double turns = -0.0204 * m_elevationAngle + 0.742;
+  turns = frc::SmartDashboard::GetNumber("RelTurns", 0);
   //printf("elev angle %.3f turns %.3f\n", m_elevationAngle, turns);
   frc::SmartDashboard::PutNumber("ElevationTurns", turns);
   m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);

@@ -10,9 +10,9 @@
 #include <frc2/command/SubsystemBase.h>
 
 #include <wpi/deprecated.h>
-#define WPI_IGNORE_DEPRECATED
+WPI_IGNORE_DEPRECATED
 #include <ctre/phoenix/motorcontrol/can/TalonSRX.h>
-#define WPI_UNIGNORE_DEPRECATED
+WPI_UNIGNORE_DEPRECATED
 
 #include <rev/CANSparkMax.h>
 
@@ -56,4 +56,3 @@ private:
     static constexpr bool kIntakeExtend = true;
     static constexpr bool kIntakeRetract = false;
 };
-#define WPI_UNIGNORE_DEPRECATED

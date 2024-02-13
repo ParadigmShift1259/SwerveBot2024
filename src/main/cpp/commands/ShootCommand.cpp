@@ -1,5 +1,4 @@
 #include "commands/ShootCommand.h"
-#include <frc2/command/WaitCommand.h>
 
 ShootCommand::ShootCommand(ISubsystemAccess& subsystemAccess)
     : m_shooterSubsystem(subsystemAccess.GetShooter())
@@ -13,10 +12,8 @@ ShootCommand::ShootCommand(ISubsystemAccess& subsystemAccess)
 void ShootCommand::Initialize()
 {
   m_logStartShootCommand.Append(true);
-  m_shooterSubsystem.GoToElevation(37.0_deg);
-  m_shooterSubsystem.StartOverAndUnder();
-  //frc2::WaitCommand(0.5_s);
   m_shooterSubsystem.Shoot(129_in);
+  printf("Shoot initialized \n");
 }
 
 void ShootCommand::Execute()
@@ -32,4 +29,5 @@ void ShootCommand::End(bool interrupted)
 {
   m_shooterSubsystem.Stop();
   m_logStartShootCommand.Append(false);
+  printf("Shoot end \n");
 }

@@ -1,5 +1,3 @@
-#include <wpi/deprecated.h>
-#define WPI_IGNORE_DEPRECATED
 
 #include "ConstantsDigitalInputs.h"
 #include "subsystems/IntakeSubsystem.h"
@@ -56,27 +54,24 @@ void IntakeSubsystem::Set(double speed)
 
 void IntakeSubsystem::ExtendIntake()
 {
-#ifdef OVERUNDERXXX
+#ifdef OVERUNDER
     double turns = frc::SmartDashboard::GetNumber("DepExtTurns", 9.1);
     //double turns = 9.142;
     printf("dep turns %.3f\n", turns);
-//    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
     frc::SmartDashboard::PutNumber("DepApplOut", m_deployMotor.GetAppliedOutput());
     frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());
     frc::SmartDashboard::PutNumber("DepTemp", m_deployMotor.GetMotorTemperature());
     frc::SmartDashboard::PutNumber("DepOutAmps", m_deployMotor.GetOutputCurrent());    
 #endif
-
-
 }
 
 void IntakeSubsystem::RetractIntake()
 {
-#ifdef OVERUNDERXXX
+#ifdef OVERUNDER
     double turns = frc::SmartDashboard::GetNumber("DepRtctTurns", 0.0476);
     //double turns = 0.0476;
     printf("dep turns %.3f\n", turns);
-//    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
 #endif
 }
-#define WPI_UNIGNORE_DEPRECATED

@@ -25,7 +25,7 @@ void IntakeIngest::Execute()
 
 bool IntakeIngest::IsFinished()
 {
-  m_intake.IsNotePresent();
+  return m_intake.IsNotePresent();
 }
 
 void IntakeIngest::End(bool interrupted) 
