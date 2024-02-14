@@ -32,14 +32,13 @@ public:
     /// Drives the intake at a given speed
     /// \param speed         Desired motor speed to run, ranging from [-1, 1]
     void Set(double speed);
-
     /// Extends the intake out of the robot
     void ExtendIntake();
-
     // Retracts the intake into the robot
     void RetractIntake();
-
     bool IsNotePresent() { return m_photoEye.Get(); }
+    void EjectNote() { Set(kIngestSpeed); }
+    void Stop() { Set(0.0); }
 
 private:
     /// 775 that runs intake

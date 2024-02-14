@@ -7,6 +7,13 @@
 
 #include <frc/Preferences.h>
 
+constexpr double c_defaultIntakeP = 0.07;
+constexpr double c_defaultIntakeI = 0.0;
+constexpr double c_defaultIntakeD = 0.0;
+
+constexpr double c_defaultRetractTurns = 0.0476;
+constexpr double c_defaultExtendTurns = 13.3;
+
 using namespace frc;
 using namespace ctre::phoenix::motorcontrol;
 
@@ -24,14 +31,14 @@ IntakeSubsystem::IntakeSubsystem()
     m_deployMotor.SetClosedLoopRampRate(0.0);
     m_deployRelativeEnc.SetPosition(0.0);
 
-    frc::Preferences::InitDouble("kIntakeDeployP", 1.0);
-    frc::Preferences::InitDouble("kIntakeDeployI", 0.0);
-    frc::Preferences::InitDouble("kIntakeDeployD", 0.0);
+    frc::Preferences::InitDouble("kIntakeDeployP", c_defaultIntakeP);
+    frc::Preferences::InitDouble("kIntakeDeployI", c_defaultIntakeI);
+    frc::Preferences::InitDouble("kIntakeDeployD", c_defaultIntakeD);
 
     m_deployPIDController.SetOutputRange(kMinOut, kMaxOut);
 
-    frc::SmartDashboard::PutNumber("DepRtctTurns", 0.0476);
-    frc::SmartDashboard::PutNumber("DepExtTurns", 9.1);
+    frc::SmartDashboard::PutNumber("DepRtctTurns", c_defaultRetractTurns);
+    frc::SmartDashboard::PutNumber("DepExtTurns", c_defaultExtendTurns);
 #endif
 }
 
@@ -40,10 +47,11 @@ void IntakeSubsystem::Periodic()
   static int count = 0;
   if (count++ % 100 == 0)
   {
-    m_deployPIDController.SetP(frc::Preferences::GetDouble("kIntakeDeployP", 1.0));
-    m_deployPIDController.SetI(frc::Preferences::GetDouble("kIntakeDeployI", 0.0));
-    m_deployPIDController.SetD(frc::Preferences::GetDouble("kIntakeDeployD", 0.0));
+    m_deployPIDController.SetP(frc::Preferences::GetDouble("kIntakeDeployP", c_defaultIntakeP));
+    m_deployPIDController.SetI(frc::Preferences::GetDouble("kIntakeDeployI", c_defaultIntakeI));
+    m_deployPIDController.SetD(frc::Preferences::GetDouble("kIntakeDeployD", c_defaultIntakeD));
     frc::SmartDashboard::PutNumber("Deploy echo", m_deployRelativeEnc.GetPosition());
+    frc::SmartDashboard::PutBoolean("Intake PhotoEye", m_photoEye.Get());
   }
 }
 
@@ -55,7 +63,7 @@ void IntakeSubsystem::Set(double speed)
 void IntakeSubsystem::ExtendIntake()
 {
 #ifdef OVERUNDER
-    double turns = frc::SmartDashboard::GetNumber("DepExtTurns", 9.1);
+    double turns = frc::SmartDashboard::GetNumber("DepExtTurns", c_defaultExtendTurns);
     //double turns = 9.142;
     printf("dep turns %.3f\n", turns);
     m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
@@ -69,8 +77,7 @@ void IntakeSubsystem::ExtendIntake()
 void IntakeSubsystem::RetractIntake()
 {
 #ifdef OVERUNDER
-    double turns = frc::SmartDashboard::GetNumber("DepRtctTurns", 0.0476);
-    //double turns = 0.0476;
+    double turns = frc::SmartDashboard::GetNumber("DepRtctTurns", c_defaultRetractTurns);
     printf("dep turns %.3f\n", turns);
     m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
 #endif

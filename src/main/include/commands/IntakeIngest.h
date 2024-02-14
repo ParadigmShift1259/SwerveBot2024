@@ -16,6 +16,7 @@ public:
   void End(bool interrupted) override;
   
 private:
+  ShooterSubsystem& m_shooter;
   IntakeSubsystem& m_intake;
   
   wpi::log::BooleanLogEntry m_logStartCommand;

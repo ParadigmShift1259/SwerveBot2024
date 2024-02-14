@@ -178,14 +178,10 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
   // primary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
   primary.B().OnTrue(PreShootCommand(*this).ToPtr());
-  // primary.X().OnTrue(RetrieveGamePiece(*this).ToPtr());
-  // primary.Y().OnTrue(ReleaseCone(*this).ToPtr());
-  primary.X().WhileTrue(IntakeIngest(*this).ToPtr());
+  primary.X().OnTrue(IntakeIngest(*this).ToPtr());
   primary.Y().WhileTrue(IntakeStop(*this).ToPtr());
   // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   // primary.POVUp(loop).Rising().IfHigh([this] { ShootCommand(*this).Schedule(); });
-  
-  
 #endif
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
