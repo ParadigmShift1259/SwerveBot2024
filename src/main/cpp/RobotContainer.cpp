@@ -44,6 +44,8 @@ RobotContainer::RobotContainer()
     m_chooser.AddOption(m_pathPlannerLUT[i], (EAutoPath)i);
   }
   frc::SmartDashboard::PutData("Auto Path", &m_chooser);
+
+  frc::SmartDashboard::PutNumber("ShootDelay", m_shootDelayMs);
 }
 
 //#define USE_PATH_PLANNER_SWERVE_CMD
@@ -99,6 +101,14 @@ void RobotContainer::Periodic()
   if (count++ % 100 == 0)
   {
     SmartDashboard::PutBoolean("FieldRelative", m_fieldRelative);
+  }
+
+static double last = 0.0;
+  m_shootDelayMs = frc::SmartDashboard::GetNumber("ShootDelay", 0.5);
+  if (m_shootDelayMs != last)
+  {
+    printf("new deley %.3f last %.3f\n", m_shootDelayMs, last);
+    last = m_shootDelayMs;
   }
 }
 
@@ -168,9 +178,10 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // primary.Start().WhileTrue(&m_OverrideOn);
   // primary.Back().WhileTrue(&m_OverrideOff);
 #else
+
   primary.A().WhileTrue(frc2::SequentialCommandGroup{
       PreShootCommand(*this)
-    , frc2::WaitCommand(4.0_s)
+    , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
     , ShootCommand(*this)
   }.ToPtr());
 

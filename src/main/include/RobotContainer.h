@@ -89,6 +89,8 @@ private:
   ShooterSubsystem m_shooter;
   ClimberSubsystem m_climber;
   AmpSubsystem m_amp;
+  
+  double m_shootDelayMs = 0.7;
 
   CommandXboxController m_primaryController{0};
   CommandXboxController m_secondaryController{1};

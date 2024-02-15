@@ -9,6 +9,7 @@
 #include <hal/HAL.h>
 
 constexpr double c_defaultRPM = 4500.0;
+constexpr double c_defaultBackRPM = 1400.0;
 
 constexpr double c_defaultShootNeoP = 0.0005;
 constexpr double c_defaultShootNeoI = 0.0;
@@ -34,7 +35,6 @@ ShooterSubsystem::ShooterSubsystem()
   , m_ElevationEncoder(kElevationEncoderCANID)
   , m_elevationLimitFront(kElevationLimitFront)
   , m_elevationLimitRear(kElevationLimitRear)
-
 #endif
 {
   //m_OverWheels.RestoreFactoryDefaults();
@@ -102,7 +102,7 @@ ShooterSubsystem::ShooterSubsystem()
 
   frc::SmartDashboard::PutNumber("OverRPM",  c_defaultRPM);
   frc::SmartDashboard::PutNumber("UnderRPM", c_defaultRPM);
-  frc::SmartDashboard::PutNumber("BackRPM", -c_defaultRPM);
+  frc::SmartDashboard::PutNumber("BackRPM", -c_defaultBackRPM);
   frc::SmartDashboard::PutNumber("ElevationAngle", 44.0);
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
   frc::SmartDashboard::PutNumber("RelTurns", 0);
@@ -138,7 +138,7 @@ void ShooterSubsystem::Periodic()
   {
     m_overRPM = frc::SmartDashboard::GetNumber("OverRPM", c_defaultRPM);
     m_underRPM = frc::SmartDashboard::GetNumber("UnderRPM", c_defaultRPM);
-    m_backRPM = frc::SmartDashboard::GetNumber("BackRPM", -c_defaultRPM);
+    m_backRPM = frc::SmartDashboard::GetNumber("BackRPM", -c_defaultBackRPM);
 
 #ifdef OVERUNDER
     m_ElevationPIDController.SetP(frc::Preferences::GetDouble("kElevationP", c_defaultElevP));
@@ -194,6 +194,7 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
 void ShooterSubsystem::StartOverAndUnder()
 {
     double ffNeo = frc::Preferences::GetDouble("kShooterFF", c_defaultShootNeoFF);
+    double ffVtx = frc::Preferences::GetDouble("kShootVortexFF", c_defaultShootVortexFF);
     m_OverPIDController.SetFF(ffNeo);
     m_UnderPIDController.SetFF(ffNeo);
 
@@ -202,8 +203,10 @@ void ShooterSubsystem::StartOverAndUnder()
     m_UnderPIDController.SetReference(m_overRPM, rev::CANSparkBase::ControlType::kVelocity);
     //m_UnderPIDController.SetReference(m_underRPM, rev::CANSparkBase::ControlType::kVelocity);
 
-    m_BackPIDController.SetFF(0.0);
-    m_BackPIDController.SetReference(0.0, rev::CANSparkBase::ControlType::kVelocity);
+    // m_BackPIDController.SetFF(0.0);
+    // m_BackPIDController.SetReference(0.0, rev::CANSparkBase::ControlType::kVelocity);
+    m_BackPIDController.SetFF(ffVtx);
+    m_BackPIDController.SetReference(m_backRPM, rev::CANSparkBase::ControlType::kVelocity);
 }
 #endif
 
@@ -223,8 +226,8 @@ void ShooterSubsystem::Shoot(units::meter_t distance)
   //m_UnderPIDController.SetReference(m_underRPM, rev::CANSparkBase::ControlType::kVelocity);
 #ifdef OVERUNDER  
   m_BackPIDController.SetFF(ffVtx);
-  m_BackPIDController.SetReference(-m_overRPM, rev::CANSparkBase::ControlType::kVelocity);
-  //m_BackPIDController.SetReference(m_backRPM, rev::CANSparkBase::ControlType::kVelocity);
+  //m_BackPIDController.SetReference(-m_overRPM, rev::CANSparkBase::ControlType::kVelocity);
+  m_BackPIDController.SetReference(m_backRPM, rev::CANSparkBase::ControlType::kVelocity);
 #endif
 }
 
