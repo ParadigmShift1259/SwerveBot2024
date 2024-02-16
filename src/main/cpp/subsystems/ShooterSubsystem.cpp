@@ -198,7 +198,8 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   // 16.4   -68.88
   //  9.2   -77.431
   //  0     -84.02
-  double turns = -0.0196 * m_elevationAngle + 0.677;  // TODO Fit
+  // y = 1.1368x - 87.693      R² = 0.9999
+  double turns = 1.1368 * m_elevationAngle - 87.693;
 #endif
   // turns = frc::SmartDashboard::GetNumber("RelTurns", 0);
   printf("elev angle %.3f turns %.3f\n", m_elevationAngle, turns);
