@@ -90,6 +90,7 @@ private:
   ClimberSubsystem m_climber;
   AmpSubsystem m_amp;
   
+  units::degree_t m_closeAngle;
   double m_shootDelayMs = 0.7;
 
   CommandXboxController m_primaryController{0};

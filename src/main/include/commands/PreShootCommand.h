@@ -6,7 +6,7 @@
 class PreShootCommand: public frc2::CommandHelper<frc2::Command, PreShootCommand>
 {
     public:
-        explicit PreShootCommand(ISubsystemAccess& subsystemAccess);
+        explicit PreShootCommand(ISubsystemAccess& subsystemAccess, units::meter_t distance, units::degree_t elevationAngle);
 		
         void Initialize() override;
         void Execute() override;
@@ -16,5 +16,8 @@ class PreShootCommand: public frc2::CommandHelper<frc2::Command, PreShootCommand
     private:
         ShooterSubsystem& m_shooterSubsystem;
 		
+        units::meter_t m_distance;
+        units::degree_t m_elevationAngle;
+
 		wpi::log::BooleanLogEntry m_logStartPreShootCommand;
 };

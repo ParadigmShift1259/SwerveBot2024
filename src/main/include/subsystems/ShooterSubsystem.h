@@ -22,7 +22,7 @@ class ShooterSubsystem : public frc2::SubsystemBase
     ShooterSubsystem();
     void Periodic();
     void GoToElevation(units::degree_t angle);
-    void StartOverAndUnder();
+    void StartOverAndUnder(units::meter_t distance);
     void Shoot(units::meter_t distance);
     void Stop();
     bool GetLimitFront() const { return m_elevationLimitFront.Get(); }
@@ -63,6 +63,8 @@ class ShooterSubsystem : public frc2::SubsystemBase
     double m_overRPM;
     double m_underRPM;
     double m_backRPM;
+
+    int m_shootIndex;
 
 	wpi::log::DoubleLogEntry m_logOverRPM;
     wpi::log::DoubleLogEntry m_logUnderRPM;
