@@ -21,13 +21,14 @@ class ShooterSubsystem : public frc2::SubsystemBase
   public:
     ShooterSubsystem();
     void Periodic();
-    void GoToElevation(units::degree_t angle);
     void StartOverAndUnder();
     void Shoot(units::meter_t distance);
     void Stop();
+    void GoToElevation(units::degree_t angle);
+#ifdef OVERUNDER
     bool GetLimitFront() const { return m_elevationLimitFront.Get(); }
     bool GetLimitRear() const { return m_elevationLimitRear.Get(); }
-
+#endif
     
   private:
     double m_elevationAngle = 0.0;
@@ -39,26 +40,28 @@ class ShooterSubsystem : public frc2::SubsystemBase
 #ifdef OVERUNDER
     rev::CANSparkFlex m_BackWheels;
     rev::CANSparkFlex m_ElevationController; 
+#else
+    rev::CANSparkMax m_ElevationController;
 #endif
 
     rev::SparkPIDController m_OverPIDController = m_OverWheels.GetPIDController();
     rev::SparkPIDController m_UnderPIDController = m_UnderWheels.GetPIDController();
 #ifdef OVERUNDER
     rev::SparkPIDController m_BackPIDController = m_BackWheels.GetPIDController();
-    rev::SparkPIDController m_ElevationPIDController = m_ElevationController.GetPIDController();
 #endif
+    rev::SparkPIDController m_ElevationPIDController = m_ElevationController.GetPIDController();
 
     rev::SparkRelativeEncoder m_OverRelativeEnc = m_OverWheels.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);
     rev::SparkRelativeEncoder m_UnderRelativeEnc = m_UnderWheels.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);
 #ifdef OVERUNDER    
     rev::SparkRelativeEncoder m_BackRelativeEnc = m_BackWheels.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor);
-    rev::SparkRelativeEncoder m_ElevationRelativeEnc = m_ElevationController.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor);
 
     ctre::phoenix6::hardware::CANcoder m_ElevationEncoder;
     frc::DigitalInput m_elevationLimitFront;
     frc::DigitalInput m_elevationLimitRear;
     
 #endif    
+    rev::SparkRelativeEncoder m_ElevationRelativeEnc = m_ElevationController.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor);
 
     double m_overRPM;
     double m_underRPM;
@@ -68,8 +71,8 @@ class ShooterSubsystem : public frc2::SubsystemBase
     wpi::log::DoubleLogEntry m_logUnderRPM;
 #ifdef OVERUNDER
 	wpi::log::DoubleLogEntry m_logBackRPM;
+#endif
 	wpi::log::DoubleLogEntry m_logCurrentAngle;
 	wpi::log::DoubleLogEntry m_logCommandedAngle;
 	wpi::log::DoubleLogEntry m_logAbsoluteAngle;
-#endif
 };

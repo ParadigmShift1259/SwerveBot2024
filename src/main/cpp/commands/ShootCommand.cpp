@@ -31,7 +31,9 @@ void ShootCommand::End(bool interrupted)
 {
   m_shooterSubsystem.Stop();
   m_intakeSubsystem.Stop();
+#ifdef OVERUNDER
   m_shooterSubsystem.GoToElevation(25.0_deg);
+#endif
   m_logStartShootCommand.Append(false);
   printf("Shoot end \n");
 }

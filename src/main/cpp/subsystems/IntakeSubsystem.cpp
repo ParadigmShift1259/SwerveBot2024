@@ -20,13 +20,14 @@ using namespace ctre::phoenix::motorcontrol;
 IntakeSubsystem::IntakeSubsystem() 
     : m_motor(kIntakeRollerCANID)
     , m_photoEye(kIntakePhotoeye)
-#ifdef OVERUNDER
     , m_deployMotor(kIntakeDeployCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
+#ifndef OVERUNDER
+    , m_deployFollowMotor(kIntakeDeployFollowCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
 #endif
 {
   m_motor.SetNeutralMode(NeutralMode::Coast);
 
-#ifdef OVERUNDER
+
     m_deployMotor.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
     m_deployMotor.SetClosedLoopRampRate(0.0);
     m_deployRelativeEnc.SetPosition(0.0);
@@ -39,6 +40,10 @@ IntakeSubsystem::IntakeSubsystem()
 
     frc::SmartDashboard::PutNumber("DepRtctTurns", c_defaultRetractTurns);
     frc::SmartDashboard::PutNumber("DepExtTurns", c_defaultExtendTurns);
+#ifndef OVERUNDER
+    m_deployFollowMotor.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+    m_deployFollowMotor.SetClosedLoopRampRate(0.0);
+    m_deployFollowMotor.Follow(m_deployMotor, true);
 #endif
 }
 
@@ -62,7 +67,6 @@ void IntakeSubsystem::Set(double speed)
 
 void IntakeSubsystem::ExtendIntake()
 {
-#ifdef OVERUNDER
     double turns = frc::SmartDashboard::GetNumber("DepExtTurns", c_defaultExtendTurns);
     //double turns = 9.142;
     printf("dep turns %.3f\n", turns);
@@ -71,14 +75,11 @@ void IntakeSubsystem::ExtendIntake()
     frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());
     frc::SmartDashboard::PutNumber("DepTemp", m_deployMotor.GetMotorTemperature());
     frc::SmartDashboard::PutNumber("DepOutAmps", m_deployMotor.GetOutputCurrent());    
-#endif
 }
 
 void IntakeSubsystem::RetractIntake()
 {
-#ifdef OVERUNDER
     double turns = frc::SmartDashboard::GetNumber("DepRtctTurns", c_defaultRetractTurns);
     printf("dep turns %.3f\n", turns);
     m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
-#endif
 }

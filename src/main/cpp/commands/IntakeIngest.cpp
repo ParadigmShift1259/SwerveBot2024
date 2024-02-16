@@ -26,7 +26,9 @@ void IntakeIngest::Initialize()
 void IntakeIngest::Execute()
 {
   m_intake.ExtendIntake();
+#ifdef OVERUNDER  
   m_shooter.GoToElevation(25_deg);
+#endif
   frc2::WaitCommand(0.25_s); // Wait for backplate to extend and turntable motor to engage
   auto speed = frc::SmartDashboard::GetNumber("IntakeSpeed", c_defaultIntakeSpeed);
   m_intake.Set(speed);

@@ -46,10 +46,12 @@ private:
     frc::Timer m_timer;
     frc::DigitalInput m_photoEye;
 
-#ifdef OVERUNDER
+
     rev::CANSparkMax m_deployMotor;
     rev::SparkRelativeEncoder m_deployRelativeEnc = m_deployMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);    
     rev::SparkPIDController m_deployPIDController = m_deployMotor.GetPIDController();
+#ifndef OVERUNDER
+    rev::CANSparkMax m_deployFollowMotor;
 #endif
 
     static constexpr bool kIntakeExtend = true;
