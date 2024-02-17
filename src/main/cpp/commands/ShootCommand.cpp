@@ -15,7 +15,6 @@ void ShootCommand::Initialize()
   m_logStartShootCommand.Append(true);
   m_shooterSubsystem.Shoot(129_in);
   m_intakeSubsystem.EjectNote();
-  printf("Shoot initialized \n");
 }
 
 void ShootCommand::Execute()
@@ -35,5 +34,4 @@ void ShootCommand::End(bool interrupted)
   m_shooterSubsystem.GoToElevation(25.0_deg);
 #endif
   m_logStartShootCommand.Append(false);
-  printf("Shoot end \n");
 }

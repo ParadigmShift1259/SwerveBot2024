@@ -11,8 +11,13 @@ constexpr double c_defaultIntakeP = 0.07;
 constexpr double c_defaultIntakeI = 0.0;
 constexpr double c_defaultIntakeD = 0.0;
 
+#ifdef OVERUNDER
 constexpr double c_defaultRetractTurns = 0.0476;
 constexpr double c_defaultExtendTurns = 13.3;
+#else
+constexpr double c_defaultRetractTurns = 0.0;
+constexpr double c_defaultExtendTurns = 65.0;
+#endif
 
 using namespace frc;
 using namespace ctre::phoenix::motorcontrol;
@@ -25,8 +30,7 @@ IntakeSubsystem::IntakeSubsystem()
     , m_deployFollowMotor(kIntakeDeployFollowCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
 #endif
 {
-  m_motor.SetNeutralMode(NeutralMode::Coast);
-
+    m_motor.SetNeutralMode(NeutralMode::Coast);
 
     m_deployMotor.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
     m_deployMotor.SetClosedLoopRampRate(0.0);
@@ -50,7 +54,7 @@ IntakeSubsystem::IntakeSubsystem()
 void IntakeSubsystem::Periodic()
 {
   static int count = 0;
-  if (count++ % 100 == 0)
+  if (count++ % 50 == 0)
   {
     m_deployPIDController.SetP(frc::Preferences::GetDouble("kIntakeDeployP", c_defaultIntakeP));
     m_deployPIDController.SetI(frc::Preferences::GetDouble("kIntakeDeployI", c_defaultIntakeI));
@@ -68,13 +72,12 @@ void IntakeSubsystem::Set(double speed)
 void IntakeSubsystem::ExtendIntake()
 {
     double turns = frc::SmartDashboard::GetNumber("DepExtTurns", c_defaultExtendTurns);
-    //double turns = 9.142;
     printf("dep turns %.3f\n", turns);
     m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
-    frc::SmartDashboard::PutNumber("DepApplOut", m_deployMotor.GetAppliedOutput());
-    frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());
-    frc::SmartDashboard::PutNumber("DepTemp", m_deployMotor.GetMotorTemperature());
-    frc::SmartDashboard::PutNumber("DepOutAmps", m_deployMotor.GetOutputCurrent());    
+    // frc::SmartDashboard::PutNumber("DepApplOut", m_deployMotor.GetAppliedOutput());
+    // frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());
+    // frc::SmartDashboard::PutNumber("DepTemp", m_deployMotor.GetMotorTemperature());
+    // frc::SmartDashboard::PutNumber("DepOutAmps", m_deployMotor.GetOutputCurrent());    
 }
 
 void IntakeSubsystem::RetractIntake()

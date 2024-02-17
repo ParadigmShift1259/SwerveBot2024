@@ -18,7 +18,6 @@ void PreShootCommand::Initialize()
   m_shooterSubsystem.GoToElevation(units::degree_t{elevationAngle});
   //m_shooterSubsystem.GoToElevation(37.0_deg);
   m_shooterSubsystem.StartOverAndUnder();
-  printf("pre-shoot initialized \n");
 }
 
 void PreShootCommand::Execute()
@@ -33,5 +32,4 @@ bool PreShootCommand::IsFinished()
 void PreShootCommand::End(bool interrupted)
 {
   m_logStartPreShootCommand.Append(false);
-  printf("pre-shoot end \n");
 }

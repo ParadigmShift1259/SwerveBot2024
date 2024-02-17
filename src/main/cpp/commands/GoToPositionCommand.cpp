@@ -94,5 +94,4 @@ bool GoToPositionCommand::IsFinished()
 void GoToPositionCommand::End(bool interrupted)
 {
     m_driveSubsystem.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false);
-    printf("ending \n");
 }
