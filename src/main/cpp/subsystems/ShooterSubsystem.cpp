@@ -11,8 +11,12 @@
 #ifdef OVERUNDER  
 constexpr double c_defaultRPM = 4500.0;
 constexpr double c_defaultBackRPM = 1400.0;
+
+const units::degree_t c_pinPopAngle = 50_deg;
 #else
 constexpr double c_defaultRPM = 4500.0;
+
+const units::degree_t c_pinPopAngle = 37_deg;
 #endif
 
 constexpr double c_defaultShootNeoP = 0.0005;
@@ -130,7 +134,6 @@ ShooterSubsystem::ShooterSubsystem()
 
 void ShooterSubsystem::Periodic()
 {
-#ifdef OVERUNDER    
   if (m_poppedPin == false)
   {
     HAL_ControlWord cw;
@@ -139,12 +142,11 @@ void ShooterSubsystem::Periodic()
       if (cw.enabled)
       {
         printf("Popping the pin\n");
-        GoToElevation(50_deg);
+        GoToElevation(c_pinPopAngle);
         m_poppedPin = true;
       }
     }
   }
-#endif
 
   m_logOverRPM.Append(m_OverRelativeEnc.GetVelocity()); 
   m_logUnderRPM.Append(m_UnderRelativeEnc.GetVelocity());
