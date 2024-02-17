@@ -90,7 +90,11 @@ private:
   ClimberSubsystem m_climber;
   AmpSubsystem m_amp;
   
-  double m_shootDelayMs = 0.7;
+#ifdef OVERUNDER  
+  double m_shootDelayMs = 1.2;
+#else
+  double m_shootDelayMs = 1.0;
+#endif
 
   CommandXboxController m_primaryController{0};
   CommandXboxController m_secondaryController{1};

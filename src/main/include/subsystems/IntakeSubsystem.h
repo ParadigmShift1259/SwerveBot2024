@@ -34,6 +34,8 @@ public:
     void Set(double speed);
     /// Extends the intake out of the robot
     void ExtendIntake();
+    /// Adjusts the intake to allow for higher shooting angles
+    void AdjustIntake();
     // Retracts the intake into the robot
     void RetractIntake();
     bool IsNotePresent() { return m_photoEye.Get(); }

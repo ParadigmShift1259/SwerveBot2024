@@ -14,6 +14,7 @@ constexpr double c_defaultIntakeD = 0.0;
 #ifdef OVERUNDER
 constexpr double c_defaultRetractTurns = 0.0476;
 constexpr double c_defaultExtendTurns = 13.3;
+constexpr double c_defaultAdjustTurns = 1.5;
 #else
 constexpr double c_defaultRetractTurns = 0.0;
 constexpr double c_defaultExtendTurns = 105.0;
@@ -45,7 +46,9 @@ IntakeSubsystem::IntakeSubsystem()
     frc::SmartDashboard::PutNumber("DepRtctTurns", c_defaultRetractTurns);
     frc::SmartDashboard::PutNumber("DepExtTurns", c_defaultExtendTurns);
 
-#ifndef OVERUNDER
+#ifdef OVERUNDER
+    frc::SmartDashboard::PutNumber("DepAdjTurns", c_defaultAdjustTurns);
+#else
     m_deployFollowMotor.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
     m_deployFollowMotor.SetClosedLoopRampRate(0.0);
     m_deployFollowMotor.SetInverted(true);
@@ -91,6 +94,19 @@ void IntakeSubsystem::ExtendIntake()
     // frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());
     // frc::SmartDashboard::PutNumber("DepTemp", m_deployMotor.GetMotorTemperature());
     // frc::SmartDashboard::PutNumber("DepOutAmps", m_deployMotor.GetOutputCurrent());    
+}
+
+void IntakeSubsystem::AdjustIntake()
+{
+#ifdef OVERUNDER
+    double turns = frc::SmartDashboard::GetNumber("DepAdjTurns", c_defaultAdjustTurns);
+    printf("dep turns %.3f\n", turns);
+    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    frc::SmartDashboard::PutNumber("DepApplOut", m_deployMotor.GetAppliedOutput());
+    frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());
+    frc::SmartDashboard::PutNumber("DepTemp", m_deployMotor.GetMotorTemperature());
+    frc::SmartDashboard::PutNumber("DepOutAmps", m_deployMotor.GetOutputCurrent());    
+#endif
 }
 
 void IntakeSubsystem::RetractIntake()

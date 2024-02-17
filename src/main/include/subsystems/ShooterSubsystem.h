@@ -21,16 +21,20 @@ class ShooterSubsystem : public frc2::SubsystemBase
   public:
     ShooterSubsystem();
     void Periodic();
-    void StartOverAndUnder();
+    void GoToElevation(units::degree_t angle);
+    void GoToElevation(int shootIndex);
+    void StartOverAndUnder(units::meter_t distance);
     void Shoot(units::meter_t distance);
     void Stop();
-    void GoToElevation(units::degree_t angle);
 #ifdef OVERUNDER
     bool GetLimitFront() const { return m_elevationLimitFront.Get(); }
     bool GetLimitRear() const { return m_elevationLimitRear.Get(); }
 #endif
+    units::degree_t GetCloseAngle() const { return m_closeAngle; }
+    const std::vector<std::vector<double>> GetReferenceTable() const { return m_shootReference; }
     
   private:
+    units::degree_t m_closeAngle;
     double m_elevationAngle = 0.0;
     bool m_poppedPin = false;
     frc::Timer m_timer;
@@ -66,6 +70,26 @@ class ShooterSubsystem : public frc2::SubsystemBase
     double m_overRPM;
     double m_underRPM;
     double m_backRPM;
+
+    int m_shootIndex;
+
+#ifdef OVERUNDER
+    std::vector<std::vector<double>> m_shootReference = 
+    {
+        // Near    Far
+        { 5000.0,  5000.0}, // Over/Under (Left/Right) RPM
+        {-1000.0, -1700.0}, // Back wheels (not used in SxS) RPM
+        {   49.0,    32.0}  // Shot angle for Speaker and Podium
+    };
+#else
+    std::vector<std::vector<double>> m_shootReference = 
+    {
+        // Near    Far
+        { 3700.0,  3700.0}, // Over/Under (Left/Right) RPM
+        {    0.0,     0.0}, // Back wheels (not used in SxS) RPM
+        {   57.0,    34.0}  // Shot angle for Speaker and Podium
+    };
+#endif 
 
 	wpi::log::DoubleLogEntry m_logOverRPM;
     wpi::log::DoubleLogEntry m_logUnderRPM;

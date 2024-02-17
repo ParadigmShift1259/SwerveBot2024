@@ -156,7 +156,7 @@ void SwerveModule::Periodic()
   // frc::SmartDashboard::PutNumber("Abs Pos plus Offset" + m_id, angle);
   // frc::SmartDashboard::PutNumber("Offset" + m_id, m_offset);
 
-  // frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, -1.0 * m_turningEncoder.GetPosition());
+  frc::SmartDashboard::PutNumber("Turn Enc Pos" + m_id, -1.0 * m_turningEncoder.GetPosition());
   // frc::SmartDashboard::PutNumber("Turn Mot Pos" + m_id, -1.0 * m_turningEncoder.GetPosition() * kTurnMotorRevsPerWheelRev / (2 * std::numbers::pi));
 }
 
@@ -170,7 +170,7 @@ void SwerveModule::ResyncAbsRelEnc()
       angleInRad -= 2 * std::numbers::pi;
 
   m_turningEncoder.SetPosition(angleInRad);
-//#define PRINT_ABS_RESYNC
+#define PRINT_ABS_RESYNC
 #ifdef PRINT_ABS_RESYNC
   auto time = m_timer.Get();
   printf("Module %s %.3f AbsPos %.3f offset %.3f Set abs enc %.3f [rot] %.3f [rad] to rel enc %.3f [rad] mot pos %.3f [rot]\n"

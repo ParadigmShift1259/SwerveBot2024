@@ -6,6 +6,7 @@
 #include "commands/GoToPositionCommand.h"
 #include "commands/IntakeStop.h"
 #include "commands/IntakeRelease.h"
+#include "commands/IntakeAdjust.h"
 #include "commands/IntakeIngest.h"
 #include "commands/PreShootCommand.h"
 #include "commands/ShootCommand.h"
@@ -45,6 +46,7 @@ RobotContainer::RobotContainer()
   }
   frc::SmartDashboard::PutData("Auto Path", &m_chooser);
 
+  frc::SmartDashboard::PutNumber("CloseAngle", 49.0);
   frc::SmartDashboard::PutNumber("ShootDelay", m_shootDelayMs);
 }
 
@@ -123,8 +125,13 @@ void RobotContainer::SetDefaultCommands()
       {
         // const double kDeadband = 0.02;
         const double kDeadband = 0.1;
-        const auto xInput = ApplyDeadband(m_primaryController.GetLeftY(), kDeadband);
-        const auto yInput = ApplyDeadband(m_primaryController.GetLeftX(), kDeadband);
+#ifdef OVERUNDER
+		double direction = 1.0;
+#else
+		double direction = -1.0;
+#endif
+        const auto xInput = direction* ApplyDeadband(m_primaryController.GetLeftY(), kDeadband);
+        const auto yInput = direction * ApplyDeadband(m_primaryController.GetLeftX(), kDeadband);
         const auto rotInput = ApplyDeadband(m_primaryController.GetRightX(), kDeadband);      
         const auto rotXInput = ApplyDeadband(m_primaryController.GetRightY(), kDeadband);
         const auto rotYInput = ApplyDeadband(m_primaryController.GetRightX(), kDeadband);
@@ -180,15 +187,21 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 #else
 
   primary.A().WhileTrue(frc2::SequentialCommandGroup{
-      PreShootCommand(*this)
+      PreShootCommand(*this, 129_in)
     , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
-    , ShootCommand(*this)
+    , ShootCommand(*this, 129_in)
   }.ToPtr());
 
+  primary.B().WhileTrue(frc2::SequentialCommandGroup{
+      IntakeAdjust(*this)
+    , PreShootCommand(*this, 30_in)
+    , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
+    , ShootCommand(*this, 30_in)
+  }.ToPtr());
   //primary.A().WhileTrue(ShootCommand(*this).ToPtr());
   // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
   // primary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
-  primary.B().OnTrue(PreShootCommand(*this).ToPtr());
+  // primary.B().OnTrue(PreShootCommand(*this, 129_in, 32_deg).ToPtr());
   primary.X().OnTrue(IntakeIngest(*this).ToPtr());
   primary.Y().WhileTrue(IntakeStop(*this).ToPtr());
   // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
@@ -200,7 +213,7 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 
 void RobotContainer::ConfigSecondaryButtonBindings()
 {
-  //auto& secondary = m_secondaryController;
+  auto& secondary = m_secondaryController;
 
   // Keep the bindings in this order
   // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
@@ -219,6 +232,25 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // secondary.RightStick().OnTrue();                           
   // secondary.LeftTrigger().WhileTrue();
   // secondary.RightTrigger().WhileTrue();
+
+  secondary.A().WhileTrue(frc2::SequentialCommandGroup{
+      PreShootCommand(*this, 129_in)
+    , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
+    , ShootCommand(*this, 129_in)
+  }.ToPtr());
+
+  secondary.B().WhileTrue(frc2::SequentialCommandGroup{
+      IntakeAdjust(*this)
+    , PreShootCommand(*this, 30_in)
+    , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
+    , ShootCommand(*this, 30_in)
+  }.ToPtr());
+  //secondary.A().WhileTrue(ShootCommand(*this).ToPtr());
+  // secondary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
+  // secondary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
+  // secondary.B().OnTrue(PreShootCommand(*this, 129_in, 32_deg).ToPtr());
+  secondary.X().OnTrue(IntakeIngest(*this).ToPtr());
+  secondary.Y().WhileTrue(IntakeStop(*this).ToPtr());
 
   // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   // secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });

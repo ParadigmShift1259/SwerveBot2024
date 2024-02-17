@@ -14,7 +14,7 @@ constexpr double c_defaultBackRPM = 1400.0;
 
 const units::degree_t c_pinPopAngle = 50_deg;
 #else
-constexpr double c_defaultRPM = 4500.0;
+constexpr double c_defaultRPM = 3700.0;
 
 const units::degree_t c_pinPopAngle = 37_deg;
 #endif
@@ -117,15 +117,19 @@ ShooterSubsystem::ShooterSubsystem()
   m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", c_defaultElevD));
   m_ElevationPIDController.SetFF(frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF));
   m_ElevationPIDController.SetOutputRange(kMinOut, kMaxOut);
-
+  frc::SmartDashboard::PutNumber("ShotAngle", 37.0);
+  frc::SmartDashboard::PutNumber("ShotAngleClose", 57.0);
 #ifdef OVERUNDER
-  frc::SmartDashboard::PutNumber("OverRPM",  c_defaultRPM);
-  frc::SmartDashboard::PutNumber("UnderRPM", c_defaultRPM);
-  frc::SmartDashboard::PutNumber("BackRPM", -c_defaultBackRPM);
+  frc::SmartDashboard::PutNumber("OverRPM",  m_shootReference[0][1]);
+  frc::SmartDashboard::PutNumber("UnderRPM", m_shootReference[0][1]);
+  frc::SmartDashboard::PutNumber("BackRPM", m_shootReference[1][1]);
+  frc::SmartDashboard::PutNumber("OverRPMClose",  m_shootReference[0][0]);
+  frc::SmartDashboard::PutNumber("UnderRPMClose", m_shootReference[0][0]);
+  frc::SmartDashboard::PutNumber("BackRPMClose", m_shootReference[1][0]);
   frc::SmartDashboard::PutNumber("ElevationAngle", 44.0);
 #else
-  frc::SmartDashboard::PutNumber("OverRPM",  -c_defaultRPM);
-  frc::SmartDashboard::PutNumber("UnderRPM", c_defaultRPM);
+  frc::SmartDashboard::PutNumber("OverRPM",  m_shootReference[0][1]);
+  frc::SmartDashboard::PutNumber("UnderRPM", m_shootReference[0][1]);
   frc::SmartDashboard::PutNumber("ElevationAngle", 66.0);
 #endif
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
@@ -148,6 +152,8 @@ void ShooterSubsystem::Periodic()
     }
   }
 
+  //m_closeAngle = units::degree_t(frc::SmartDashboard::GetNumber("CloseAngle", 49.0));
+
   m_logOverRPM.Append(m_OverRelativeEnc.GetVelocity()); 
   m_logUnderRPM.Append(m_UnderRelativeEnc.GetVelocity());
 #ifdef OVERUNDER
@@ -158,15 +164,20 @@ void ShooterSubsystem::Periodic()
   m_logCommandedAngle.Append(m_elevationAngle);
 
   static int count = 0;
-  if (count++ % 100 == 0)
+  if (count++ % 20 == 0)
   {
+    m_shootReference[0][1] = frc::SmartDashboard::GetNumber("OverRPM",  -c_defaultRPM);
+    m_shootReference[0][1] = frc::SmartDashboard::GetNumber("UnderRPM", c_defaultRPM);
+
+    m_shootReference[0][0] = frc::SmartDashboard::GetNumber("OverRPMClose",  -c_defaultRPM);
+    m_shootReference[0][0] = frc::SmartDashboard::GetNumber("UnderRPMClose", c_defaultRPM);
+
+    m_shootReference[2][1] = frc::SmartDashboard::GetNumber("ShotAngle", 37.0);
+    m_shootReference[2][0] = frc::SmartDashboard::GetNumber("ShotAngleClose", 57.0);
+
 #ifdef OVERUNDER
-    m_overRPM = frc::SmartDashboard::GetNumber("OverRPM", c_defaultRPM);
-    m_underRPM = frc::SmartDashboard::GetNumber("UnderRPM", c_defaultRPM);
-    m_backRPM = frc::SmartDashboard::GetNumber("BackRPM", -c_defaultBackRPM);
-#else
-    m_overRPM = frc::SmartDashboard::GetNumber("OverRPM", -c_defaultRPM);
-    m_underRPM = frc::SmartDashboard::GetNumber("UnderRPM", c_defaultRPM);
+    m_shootReference[1][1] = frc::SmartDashboard::GetNumber("BackRPM", c_defaultBackRPM);
+    m_shootReference[1][0] = frc::SmartDashboard::GetNumber("BackRPMClose", c_defaultBackRPM);
 #endif
     m_ElevationPIDController.SetP(frc::Preferences::GetDouble("kElevationP", c_defaultElevP));
     m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", c_defaultElevI));
@@ -178,19 +189,20 @@ void ShooterSubsystem::Periodic()
 #ifdef OVERUNDER
     frc::SmartDashboard::PutNumber("BackRPM echo", m_BackRelativeEnc.GetVelocity());
     frc::SmartDashboard::PutNumber("ElevABS echo", m_ElevationEncoder.GetAbsolutePosition().GetValueAsDouble());
-#endif
-    frc::SmartDashboard::PutNumber("Elevation echo", m_ElevationRelativeEnc.GetPosition());
+#else
     auto ticks = m_ElevationRelativeEnc.GetPosition();
 //    double angle = ticks + 74 / 1.12;
     double angle = (ticks * 1.75 + 74) / 1.12;
     frc::SmartDashboard::PutNumber("ElevationAngleEcho", angle);
+#endif
+    frc::SmartDashboard::PutNumber("Elevation echo", m_ElevationRelativeEnc.GetPosition());
   }
 }
 
 void ShooterSubsystem::GoToElevation(units::degree_t angle)
 {
   m_elevationAngle = angle.to<double>();
-  m_elevationAngle = frc::SmartDashboard::GetNumber("ElevationAngle", 44.0);
+  //m_elevationAngle = frc::SmartDashboard::GetNumber("ElevationAngle", 44.0);
 
   if (angle < c_minElevAngle)
   {
@@ -253,8 +265,18 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   // frc::SmartDashboard::PutNumber("ElevOutAmps", m_ElevationController.GetOutputCurrent());
 }
 
-void ShooterSubsystem::StartOverAndUnder()
+void ShooterSubsystem::GoToElevation(int shootIndex)
 {
+  GoToElevation(units::degree_t(m_shootReference[2][m_shootIndex]));
+}
+
+void ShooterSubsystem::StartOverAndUnder(units::meter_t distance)
+{
+    m_shootIndex = distance < 2.0_m ? 0 : 1;
+
+    m_overRPM = -m_shootReference[0][m_shootIndex];
+    m_underRPM = m_shootReference[0][m_shootIndex];
+
     double ffNeo = frc::Preferences::GetDouble("kShooterFF", c_defaultShootNeoFF);
     double ffVtx = frc::Preferences::GetDouble("kShootVortexFF", c_defaultShootVortexFF);
     m_OverPIDController.SetFF(ffNeo);
@@ -264,8 +286,7 @@ void ShooterSubsystem::StartOverAndUnder()
     m_OverPIDController.SetReference(m_overRPM, rev::CANSparkBase::ControlType::kVelocity);
 #ifdef OVERUNDER
     m_UnderPIDController.SetReference(m_overRPM, rev::CANSparkBase::ControlType::kVelocity);
-    // m_BackPIDController.SetFF(0.0);
-    // m_BackPIDController.SetReference(0.0, rev::CANSparkBase::ControlType::kVelocity);
+    m_backRPM = m_shootReference[1][m_shootIndex];
     m_BackPIDController.SetFF(ffVtx);
     m_BackPIDController.SetReference(m_backRPM, rev::CANSparkBase::ControlType::kVelocity);
 #else
@@ -278,6 +299,11 @@ void ShooterSubsystem::Shoot(units::meter_t distance)
   //m_OverPIDController.SetIAccum(0);
   //m_UnderPIDController.SetIAccum(0);
   
+  m_shootIndex = distance < 2.0_m ? 0 : 1;
+
+  m_overRPM = -m_shootReference[0][m_shootIndex];
+  m_underRPM = m_shootReference[0][m_shootIndex];
+
   double ffNeo = frc::Preferences::GetDouble("kShooterFF", c_defaultShootNeoFF);
   m_OverPIDController.SetFF(ffNeo);
   m_UnderPIDController.SetFF(ffNeo);
@@ -287,6 +313,7 @@ void ShooterSubsystem::Shoot(units::meter_t distance)
 #ifdef OVERUNDER  
   m_UnderPIDController.SetReference(m_overRPM, rev::CANSparkBase::ControlType::kVelocity);
   double ffVtx = frc::Preferences::GetDouble("kShootVortexFF", c_defaultShootVortexFF);
+  m_backRPM = m_shootReference[1][m_shootIndex];
   m_BackPIDController.SetFF(ffVtx);
   //m_BackPIDController.SetReference(-m_overRPM, rev::CANSparkBase::ControlType::kVelocity);
   m_BackPIDController.SetReference(m_backRPM, rev::CANSparkBase::ControlType::kVelocity);
