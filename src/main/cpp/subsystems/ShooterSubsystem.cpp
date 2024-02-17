@@ -26,13 +26,6 @@ constexpr double c_defaultElevI = 0.0;
 constexpr double c_defaultElevD = 0.0;
 constexpr double c_defaultElevFF = 0.07;
 
-const std::vector<std::vector<double>> shootReference = 
-{
-  { 4500.0,  5000.0},
-  {-1200.0, -1400.0},
-  {   49.0,    32.0}
-};
-
 ShooterSubsystem::ShooterSubsystem()
   : m_OverWheels(kShooterOverWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
   , m_UnderWheels(kShooterUnderWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
@@ -107,9 +100,12 @@ ShooterSubsystem::ShooterSubsystem()
   m_ElevationPIDController.SetOutputRange(kMinOut, kMaxOut);
 #endif
 
-  frc::SmartDashboard::PutNumber("OverRPM",  c_defaultRPM);
-  frc::SmartDashboard::PutNumber("UnderRPM", c_defaultRPM);
-  frc::SmartDashboard::PutNumber("BackRPM", -c_defaultBackRPM);
+  frc::SmartDashboard::PutNumber("OverRPM",  m_shootReference[0][1]);
+  frc::SmartDashboard::PutNumber("UnderRPM", m_shootReference[0][1]);
+  frc::SmartDashboard::PutNumber("BackRPM", m_shootReference[1][1]);
+  frc::SmartDashboard::PutNumber("OverRPMClose",  m_shootReference[0][0]);
+  frc::SmartDashboard::PutNumber("UnderRPMClose", m_shootReference[0][0]);
+  frc::SmartDashboard::PutNumber("BackRPMClose", m_shootReference[1][0]);
   frc::SmartDashboard::PutNumber("ElevationAngle", 44.0);
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
   frc::SmartDashboard::PutNumber("RelTurns", 0);
@@ -131,6 +127,8 @@ void ShooterSubsystem::Periodic()
     }
   }
 
+  m_closeAngle = units::degree_t(frc::SmartDashboard::GetNumber("CloseAngle", 49.0));
+
   m_logOverRPM.Append(m_OverRelativeEnc.GetVelocity()); 
   m_logUnderRPM.Append(m_UnderRelativeEnc.GetVelocity());
 #ifdef OVERUNDER
@@ -141,11 +139,14 @@ void ShooterSubsystem::Periodic()
 #endif
 
   static int count = 0;
-  if (count++ % 100 == 0)
+  if (count++ % 20 == 0)
   {
-    m_overRPM = frc::SmartDashboard::GetNumber("OverRPM", shootReference[0][m_shootIndex]);
-    m_underRPM = frc::SmartDashboard::GetNumber("UnderRPM", shootReference[0][m_shootIndex]);
-    m_backRPM = frc::SmartDashboard::GetNumber("BackRPM", shootReference[1][m_shootIndex]);
+    m_shootReference[0][1] = frc::SmartDashboard::GetNumber("OverRPM",  c_defaultRPM);
+    m_shootReference[0][1] = frc::SmartDashboard::GetNumber("UnderRPM", c_defaultRPM);
+    m_shootReference[1][1] = frc::SmartDashboard::GetNumber("BackRPM", c_defaultBackRPM);
+    m_shootReference[0][0] = frc::SmartDashboard::GetNumber("OverRPMClose",  c_defaultRPM);
+    m_shootReference[0][0] = frc::SmartDashboard::GetNumber("UnderRPMClose", c_defaultRPM);
+    m_shootReference[1][0] = frc::SmartDashboard::GetNumber("BackRPMClose", c_defaultBackRPM);
 
 #ifdef OVERUNDER
     m_ElevationPIDController.SetP(frc::Preferences::GetDouble("kElevationP", c_defaultElevP));
@@ -199,13 +200,17 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   frc::SmartDashboard::PutNumber("ElevOutAmps", m_ElevationController.GetOutputCurrent());
 }
 
+void ShooterSubsystem::GoToElevation(int shootIndex)
+{
+  GoToElevation(units::degree_t(m_shootReference[2][m_shootIndex]));
+}
+
 void ShooterSubsystem::StartOverAndUnder(units::meter_t distance)
 {
-
     m_shootIndex = distance < 2.0_m ? 0 : 1;
 
-    m_overRPM = shootReference[0][m_shootIndex];
-    m_backRPM = shootReference[1][m_shootIndex];
+    m_overRPM = m_shootReference[0][m_shootIndex];
+    m_backRPM = m_shootReference[1][m_shootIndex];
 
     double ffNeo = frc::Preferences::GetDouble("kShooterFF", c_defaultShootNeoFF);
     double ffVtx = frc::Preferences::GetDouble("kShootVortexFF", c_defaultShootVortexFF);
@@ -231,8 +236,8 @@ void ShooterSubsystem::Shoot(units::meter_t distance)
   
   m_shootIndex = distance < 2.0_m ? 0 : 1;
 
-  m_overRPM = shootReference[0][m_shootIndex];
-  m_backRPM = shootReference[1][m_shootIndex];
+  m_overRPM = m_shootReference[0][m_shootIndex];
+  m_backRPM = m_shootReference[1][m_shootIndex];
 
   double ffNeo = frc::Preferences::GetDouble("kShooterFF", c_defaultShootNeoFF);
   double ffVtx = frc::Preferences::GetDouble("kShootVortexFF", c_defaultShootVortexFF);

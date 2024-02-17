@@ -107,7 +107,6 @@ void RobotContainer::Periodic()
 
 static double last = 0.0;
 
-  m_closeAngle = units::degree_t(frc::SmartDashboard::GetNumber("CloseAngle", 49.0));
   m_shootDelayMs = frc::SmartDashboard::GetNumber("ShootDelay", 0.5);
   if (m_shootDelayMs != last)
   {
@@ -184,16 +183,16 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 #else
 
   primary.A().WhileTrue(frc2::SequentialCommandGroup{
-      PreShootCommand(*this, 129_in, 32_deg)
+      PreShootCommand(*this, 129_in)
     , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
     , ShootCommand(*this, 129_in)
   }.ToPtr());
 
   primary.B().WhileTrue(frc2::SequentialCommandGroup{
       IntakeAdjust(*this)
-    , PreShootCommand(*this, 129_in, 49_deg)//m_closeAngle)
+    , PreShootCommand(*this, 30_in)
     , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
-    , ShootCommand(*this, 129_in)
+    , ShootCommand(*this, 30_in)
   }.ToPtr());
   //primary.A().WhileTrue(ShootCommand(*this).ToPtr());
   // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
@@ -231,16 +230,16 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // secondary.RightTrigger().WhileTrue();
 
   secondary.A().WhileTrue(frc2::SequentialCommandGroup{
-      PreShootCommand(*this, 129_in, 32_deg)
+      PreShootCommand(*this, 129_in)
     , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
     , ShootCommand(*this, 129_in)
   }.ToPtr());
 
   secondary.B().WhileTrue(frc2::SequentialCommandGroup{
       IntakeAdjust(*this)
-    , PreShootCommand(*this, 129_in, 49_deg)
+    , PreShootCommand(*this, 30_in)
     , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
-    , ShootCommand(*this, 129_in)
+    , ShootCommand(*this, 30_in)
   }.ToPtr());
   //primary.A().WhileTrue(ShootCommand(*this).ToPtr());
   // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());

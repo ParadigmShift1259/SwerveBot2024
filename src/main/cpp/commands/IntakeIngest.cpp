@@ -4,7 +4,7 @@
 
 #include <frc/SmartDashBoard/SmartDashboard.h>
 
-constexpr double c_defaultIntakeSpeed = 0.6;
+constexpr double c_defaultIntakeSpeed = 0.95;
 
 IntakeIngest::IntakeIngest(ISubsystemAccess& subsystemAccess) 
   : m_shooter(subsystemAccess.GetShooter())
