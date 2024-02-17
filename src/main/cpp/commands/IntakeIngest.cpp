@@ -40,6 +40,7 @@ bool IntakeIngest::IsFinished()
 
 void IntakeIngest::End(bool interrupted) 
 {
+  // frc2::WaitCommand(2.5_s);
   m_intake.RetractIntake();
   m_intake.Set(0.0);
   m_logStartCommand.Append(false);

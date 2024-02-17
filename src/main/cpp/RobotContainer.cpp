@@ -8,6 +8,7 @@
 #include "commands/IntakeRelease.h"
 #include "commands/IntakeAdjust.h"
 #include "commands/IntakeIngest.h"
+#include "commands/IntakeTransfer.h"
 #include "commands/PreShootCommand.h"
 #include "commands/ShootCommand.h"
 
@@ -198,7 +199,11 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
   // primary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
   // primary.B().OnTrue(PreShootCommand(*this, 129_in, 32_deg).ToPtr());
-  primary.X().OnTrue(IntakeIngest(*this).ToPtr());
+  primary.X().OnTrue(frc2::SequentialCommandGroup{
+      IntakeIngest(*this)
+    , IntakeTransfer(*this)
+  }.ToPtr());
+  // primary.X().OnTrue(IntakeIngest(*this).ToPtr());
   primary.Y().WhileTrue(IntakeStop(*this).ToPtr());
   // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   // primary.POVUp(loop).Rising().IfHigh([this] { ShootCommand(*this).Schedule(); });
@@ -245,8 +250,14 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
   // primary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
   // primary.B().OnTrue(PreShootCommand(*this, 129_in, 32_deg).ToPtr());
-  secondary.X().OnTrue(IntakeIngest(*this).ToPtr());
+  secondary.X().OnTrue(frc2::SequentialCommandGroup{
+      IntakeIngest(*this)
+    , IntakeTransfer(*this)
+  }.ToPtr());
+  // secondary.X().OnTrue(IntakeIngest(*this).ToPtr());
   secondary.Y().WhileTrue(IntakeStop(*this).ToPtr());
+  secondary.LeftBumper().WhileTrue(IntakeRelease(*this).ToPtr());
+  secondary.RightBumper().OnTrue(IntakeTransfer(*this).ToPtr());
 
   // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   // secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });

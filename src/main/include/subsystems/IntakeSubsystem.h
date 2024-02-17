@@ -8,6 +8,7 @@
 
 #include <frc/Timer.h>
 #include <frc2/command/SubsystemBase.h>
+#include <frc2/command/WaitCommand.h>
 
 #include <wpi/deprecated.h>
 WPI_IGNORE_DEPRECATED
@@ -18,7 +19,7 @@ WPI_UNIGNORE_DEPRECATED
 
 using namespace ctre::phoenix::motorcontrol::can;
 
-constexpr double kIngestSpeed = 1.0;
+constexpr double kIngestSpeed = 0.4;
 constexpr double kReleaseSpeed = -1.0;
 
 class IntakeSubsystem : public frc2::SubsystemBase
@@ -38,7 +39,7 @@ public:
     void AdjustIntake();
     // Retracts the intake into the robot
     void RetractIntake();
-    bool IsNotePresent() { return m_photoEye.Get(); }
+    bool IsNotePresent() { frc2::WaitCommand(0.25_s); return m_photoEye.Get(); }
     void EjectNote() { Set(kIngestSpeed); }
     void Stop() { Set(0.0); }
 

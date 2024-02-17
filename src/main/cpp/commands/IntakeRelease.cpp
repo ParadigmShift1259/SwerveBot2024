@@ -1,6 +1,8 @@
 
 #include "commands/IntakeRelease.h"
 
+constexpr double c_defaultIntakeReleaseSpeed = -1.0;
+
 IntakeRelease::IntakeRelease(ISubsystemAccess& subsystemAccess)
  : m_intake(subsystemAccess.GetIntake())
 {
@@ -17,13 +19,12 @@ void IntakeRelease::Initialize()
 
 void IntakeRelease::Execute()
 {
-  m_intake.ExtendIntake();
-  m_intake.Set(kReleaseSpeed);
+  m_intake.Set(c_defaultIntakeReleaseSpeed);
 }
 
 bool IntakeRelease::IsFinished()
 {
-  return true;
+  return false;
 }
 
 void IntakeRelease::End(bool interrupted) {

@@ -93,6 +93,8 @@ ShooterSubsystem::ShooterSubsystem()
   m_BackPIDController.SetD(frc::Preferences::GetDouble("kShootVortexD", c_defaultShootVortexD));
   m_BackPIDController.SetOutputRange(kMinOut, kMaxOut);
 
+  m_ElevationController.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+
   m_ElevationPIDController.SetP(frc::Preferences::GetDouble("kElevationP", c_defaultElevP));
   m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", c_defaultElevI));
   m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", c_defaultElevD));
