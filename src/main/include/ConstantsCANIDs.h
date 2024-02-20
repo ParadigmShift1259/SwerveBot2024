@@ -21,3 +21,6 @@ constexpr int kShooterUnderWheelsCANID = 12;
 constexpr int kShooterBackWheelsCANID = 22;
 constexpr int kShooterElevationControllerCANID = 23;
 constexpr int kElevationEncoderCANID = 1;
+
+constexpr int kDrivePigeonCANID = 1;
+constexpr int kShooterPigeonCANID = 2;

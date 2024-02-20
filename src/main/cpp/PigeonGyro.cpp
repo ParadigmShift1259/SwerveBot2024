@@ -1,7 +1,7 @@
 #include "PigeonGyro.h"
 
-PigeonGyro::PigeonGyro() :
-    m_gyro(1)
+PigeonGyro::PigeonGyro(int CANId) 
+    : m_gyro(CANId)
 {
 
 }
@@ -17,6 +17,16 @@ frc::Rotation2d PigeonGyro::GetRotation2d()
         retVal -= 360.0;
     return frc::Rotation2d(units::degree_t(retVal));
 }
+
+units::degree_t PigeonGyro::GetYaw()
+{
+#ifdef USE_PIGEON_2
+    return m_gyro.GetYaw().GetValue();
+#else
+    return m_gyro.GetFusedHeading();
+#endif
+}
+
 
 void PigeonGyro::Reset()
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Constants.h"
+#include "PigeonGyro.h"
 
 #include <wpi/DataLog.h>
 
@@ -37,8 +38,11 @@ class ShooterSubsystem : public frc2::SubsystemBase
     bool m_poppedPin = false;
     frc::Timer m_timer;
 
+    PigeonGyro m_gyro;
+
     rev::CANSparkMax m_OverWheels;
     rev::CANSparkMax m_UnderWheels;
+
 #ifdef OVERUNDER
     rev::CANSparkFlex m_BackWheels;
     rev::CANSparkFlex m_ElevationController; 

@@ -27,7 +27,8 @@ constexpr double c_defaultElevD = 0.0;
 constexpr double c_defaultElevFF = 0.07;
 
 ShooterSubsystem::ShooterSubsystem()
-  : m_OverWheels(kShooterOverWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
+  : m_gyro(kShooterPigeonCANID)
+  , m_OverWheels(kShooterOverWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
   , m_UnderWheels(kShooterUnderWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
 #ifdef OVERUNDER  
   , m_BackWheels(kShooterBackWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
@@ -142,7 +143,9 @@ void ShooterSubsystem::Periodic()
 
   static int count = 0;
   if (count++ % 20 == 0)
-  {
+  { 
+    frc::SmartDashboard::PutNumber("ShooterAngle", m_gyro.GetRoll().value());
+  // -126 + 14x - 0.225x^2 EQUATION
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("OverRPM",  c_defaultRPM);
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("UnderRPM", c_defaultRPM);
     m_shootReference[1][1] = frc::SmartDashboard::GetNumber("BackRPM", c_defaultBackRPM);
@@ -172,7 +175,7 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
 {
   m_elevationAngle = angle.to<double>();
   printf("elevation angle %.3f", m_elevationAngle);
-  //m_elevationAngle = frc::SmartDashboard::GetNumber("ElevationAngle", 44.0);
+  m_elevationAngle = frc::SmartDashboard::GetNumber("ElevationAngle", 44.0);
 
   if (angle < 25.0_deg)
   {
