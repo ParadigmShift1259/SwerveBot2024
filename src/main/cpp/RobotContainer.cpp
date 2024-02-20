@@ -252,6 +252,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.X().OnTrue(IntakeIngest(*this).ToPtr());
   secondary.Y().WhileTrue(IntakeStop(*this).ToPtr());
 
+  secondary.LeftBumper().OnTrue(&m_resetShooterToStart);
+
   // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   // secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });
   // secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });

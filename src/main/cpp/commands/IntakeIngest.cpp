@@ -17,6 +17,7 @@ IntakeIngest::IntakeIngest(ISubsystemAccess& subsystemAccess)
   AddRequirements({&subsystemAccess.GetShooter(), &subsystemAccess.GetIntake()});
 
   frc::SmartDashboard::PutNumber("IntakeSpeed", c_defaultIntakeSpeed);
+  frc::SmartDashboard::PutNumber("IntakeAngle", 39.0);
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeIngest/startCommand");
@@ -33,7 +34,8 @@ void IntakeIngest::Execute()
 #ifdef OVERUNDER  
   m_shooter.GoToElevation(25_deg);
 #else
-  m_shooter.GoToElevation(37_deg);
+  auto angle = frc::SmartDashboard::GetNumber("IntakeAngle", 39.0);
+  m_shooter.GoToElevation(units::degree_t(angle));
 #endif
   frc2::WaitCommand(0.25_s); // Wait for backplate to extend and turntable motor to engage
   auto speed = frc::SmartDashboard::GetNumber("IntakeSpeed", c_defaultIntakeSpeed);
