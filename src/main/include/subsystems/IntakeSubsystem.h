@@ -19,7 +19,7 @@ WPI_UNIGNORE_DEPRECATED
 
 using namespace ctre::phoenix::motorcontrol::can;
 
-constexpr double kIngestSpeed = 0.4;
+constexpr double kIngestSpeed = 0.6;
 constexpr double kReleaseSpeed = -1.0;
 
 class IntakeSubsystem : public frc2::SubsystemBase

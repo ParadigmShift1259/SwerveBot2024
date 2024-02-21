@@ -175,7 +175,7 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
 {
   m_elevationAngle = angle.to<double>();
   printf("elevation angle %.3f", m_elevationAngle);
-  m_elevationAngle = frc::SmartDashboard::GetNumber("ElevationAngle", 44.0);
+  // m_elevationAngle = frc::SmartDashboard::GetNumber("ElevationAngle", 44.0);
 
   if (angle < 25.0_deg)
   {
@@ -207,7 +207,7 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
 
 void ShooterSubsystem::GoToElevation(int shootIndex)
 {
-  GoToElevation(units::degree_t(m_shootReference[2][m_shootIndex]));
+  GoToElevation(units::degree_t(m_shootReference[2][shootIndex]));
 }
 
 void ShooterSubsystem::StartOverAndUnder(units::meter_t distance)
