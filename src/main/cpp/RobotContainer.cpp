@@ -8,6 +8,7 @@
 #include "commands/IntakeRelease.h"
 #include "commands/IntakeAdjust.h"
 #include "commands/IntakeIngest.h"
+#include "commands/StopAllCommand.h"
 #include "commands/PreShootCommand.h"
 #include "commands/ShootCommand.h"
 
@@ -204,8 +205,8 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // primary.B().OnTrue(PreShootCommand(*this, 129_in, 32_deg).ToPtr());
   primary.X().OnTrue(IntakeIngest(*this).ToPtr());
   primary.Y().WhileTrue(IntakeStop(*this).ToPtr());
-  // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-  // primary.POVUp(loop).Rising().IfHigh([this] { ShootCommand(*this).Schedule(); });
+  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  primary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
 #endif
   primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
@@ -254,8 +255,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   secondary.LeftBumper().OnTrue(&m_resetShooterToStart);
 
-  // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-  // secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });
+  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  secondary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
   // secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });
 }
 

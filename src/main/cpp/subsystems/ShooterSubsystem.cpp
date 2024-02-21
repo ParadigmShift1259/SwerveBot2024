@@ -67,6 +67,7 @@ ShooterSubsystem::ShooterSubsystem()
   m_logCurrentAngle = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/CurrentAngle");
   m_logCommandedAngle = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/CommandedAngle");
   m_logAbsoluteAngle = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/AbsoluteAngle");
+  m_logElevTurns = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/ElevTurns");
 #ifdef OVERUNDER
   auto result = m_ElevationEncoder.GetAbsolutePosition();
   m_ElevationRelativeEnc.SetPosition(result.GetValueAsDouble());
@@ -230,19 +231,6 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
 #else
   // Shoot  Rel
   // Angle  Enc
-  // 77.9     1.047
-  // 58.7   -21.095
-  // 48.6   -32.594
-  // 40.8   -41.523
-  // 31.9   -51.428
-  // 24.8   -59.167
-  // 16.4   -68.88
-  //  9.2   -77.431
-  //  0     -84.02
-  // y = 1.1368x - 87.693      R² = 0.9999
-
-  // Shoot  Rel
-  // Angle  Enc
   // 65.9   0
   // 60.4   -6.214
   // 52.1   -15.452
@@ -252,13 +240,16 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   // 11.2   -60.858
   // 0.2    -74.359
   // y = 1.12x - 74.0      R² = 1.0
-  double turns = (1.12 * m_elevationAngle - 74.0) / 1.75;
+  //double turns = (1.12 * m_elevationAngle - 74.0) / 1.75;
+  double turns = (1.13 * m_elevationAngle - 69.5) / 1.75;
 #endif
+  m_logElevTurns.Append(turns);
   // turns = frc::SmartDashboard::GetNumber("RelTurns", 0);
-  printf("elev angle %.3f turns %.3f\n", m_elevationAngle, turns);
+  //printf("elev angle %.3f turns %.3f\n", m_elevationAngle, turns);
   frc::SmartDashboard::PutNumber("ElevationTurns", turns);
   //turns = frc::SmartDashboard::GetNumber("ElevationTurns", -40.0);
   m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+
   // frc::SmartDashboard::PutNumber("ElevApplOut", m_ElevationController.GetAppliedOutput());
   // frc::SmartDashboard::PutNumber("ElevBusV", m_ElevationController.GetBusVoltage());
   // frc::SmartDashboard::PutNumber("ElevTemp", m_ElevationController.GetMotorTemperature());

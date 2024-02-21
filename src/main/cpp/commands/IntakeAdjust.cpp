@@ -6,7 +6,7 @@ IntakeAdjust::IntakeAdjust(ISubsystemAccess& subsystemAccess)
   AddRequirements({&subsystemAccess.GetIntake()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
-  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeDeploy/startCommand");
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeAdjust/startCommand");
 }
 
 void IntakeAdjust::Initialize()

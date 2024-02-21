@@ -99,4 +99,5 @@ class ShooterSubsystem : public frc2::SubsystemBase
 	wpi::log::DoubleLogEntry m_logCurrentAngle;
 	wpi::log::DoubleLogEntry m_logCommandedAngle;
 	wpi::log::DoubleLogEntry m_logAbsoluteAngle;
+    wpi::log::DoubleLogEntry m_logElevTurns;
 };

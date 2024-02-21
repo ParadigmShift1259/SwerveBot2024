@@ -17,7 +17,7 @@ constexpr double c_defaultExtendTurns = 13.3;
 constexpr double c_defaultAdjustTurns = 1.5;
 #else
 constexpr double c_defaultRetractTurns = 0.0;
-constexpr double c_defaultExtendTurns = 109.0;
+constexpr double c_defaultExtendTurns = 45.0;
 #endif
 
 using namespace frc;
