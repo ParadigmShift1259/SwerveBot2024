@@ -76,6 +76,7 @@ class ShooterSubsystem : public frc2::SubsystemBase
     std::vector<std::vector<double>> m_shootReference = 
     {
         { 5000.0,  5000.0},
+        { 5000.0,  5000.0},
         {-1000.0, -1700.0},
         {   49.0,    32.0}
     };
