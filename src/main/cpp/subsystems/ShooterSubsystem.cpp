@@ -157,10 +157,65 @@ void ShooterSubsystem::Periodic()
     m_shootReference[3][0] = frc::SmartDashboard::GetNumber("ElevationAngleClose", 49.0);
 
 #ifdef OVERUNDER
-    m_ElevationPIDController.SetP(frc::Preferences::GetDouble("kElevationP", c_defaultElevP));
-    m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", c_defaultElevI));
-    m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", c_defaultElevD));
-    m_ElevationPIDController.SetFF(frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF));
+    static double lastP = 0.0;
+    static double lastI = 0.0;
+    static double lastD = 0.0;
+    static double lastFF = 0.0;
+
+    auto p = frc::Preferences::GetDouble("kElevationP", c_defaultElevP);
+    auto i = frc::Preferences::GetDouble("kElevationI", c_defaultElevI);
+    auto d = frc::Preferences::GetDouble("kElevationD", c_defaultElevD);
+    auto ff = frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF);
+    if (p != lastP)
+    {
+        m_ElevationPIDController.SetP(p);
+    }
+    if (i != lastI)
+    {
+        m_ElevationPIDController.SetI(i);
+    }
+    if (d != lastD)
+    {
+        m_ElevationPIDController.SetD(d);
+    }
+    if (ff != lastFF)
+    {
+        m_ElevationPIDController.SetFF(ff);
+    }
+    lastP = p;
+    lastI = i;
+    lastD = d;
+    lastFF = ff;
+
+//#define USE_PIGEON_ADJUST
+#ifdef USE_PIGEON_ADJUST
+    auto shooterAngle = m_gyro.GetRoll().value();
+    double adjTurns = 0.0;
+    if (m_elevationAngle >= 35.0 && m_elevationAngle < 45.268)
+    {
+      adjTurns = 0.0527 * shooterAngle + -4.67;
+    }
+    else if (m_elevationAngle >= 45.268 && m_elevationAngle < 50.759)
+    {
+      adjTurns = 7.42E-03 * shooterAngle + -0.868;
+    }
+    else if (m_elevationAngle >= 50.759 && m_elevationAngle < 53.106)
+    {
+      adjTurns = 2.31E-03 * shooterAngle + -0.5;
+    }
+    else if (m_elevationAngle >= 53.106)
+    {
+      adjTurns = 6.13E-04 * shooterAngle + -0.395;
+    }
+
+    printf("elev turns %.3f adj turns %.3f\n", m_elevationTurns, adjTurns);
+    if (fabs(m_elevationTurns - adjTurns) > 0.01)
+    {
+      printf("***************elev turns %.3f adj turns %.3f\n", m_elevationTurns, adjTurns);
+      m_elevationTurns = adjTurns;
+      m_ElevationPIDController.SetReference(m_elevationTurns, rev::CANSparkBase::ControlType::kPosition);
+    }
+#endif  //def USE_PIGEON_ADJUST
 #endif
 
     frc::SmartDashboard::PutNumber("OverRPM echo", m_OverRelativeEnc.GetVelocity());
@@ -177,7 +232,6 @@ void ShooterSubsystem::Periodic()
 void ShooterSubsystem::GoToElevation(units::degree_t angle)
 {
   m_elevationAngle = angle.to<double>();
-  printf("elevation angle %.3f", m_elevationAngle);
   // m_elevationAngle = frc::SmartDashboard::GetNumber("ElevationAngle", 44.0);
 
   if (angle < 25.0_deg)
@@ -196,12 +250,12 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   // Hump       24          0.430    0.252
   // Min         1         -0.056    0.740
   // Linear fit
-  double turns = -0.0196 * m_elevationAngle + 0.677;
+  m_elevationTurns = -0.0196 * m_elevationAngle + 0.677;
   // double turns = -0.0204 * m_elevationAngle + 0.742;  
   // turns = frc::SmartDashboard::GetNumber("RelTurns", 0);
-  printf("elev angle %.3f turns %.3f\n", m_elevationAngle, turns);
-  frc::SmartDashboard::PutNumber("ElevationTurns", turns);
-  m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+  printf("elev angle %.3f pigeon %.3f turns %.3f\n", m_elevationAngle, m_gyro.GetRoll().value(), m_elevationTurns);
+  frc::SmartDashboard::PutNumber("ElevationTurns", m_elevationTurns);
+  m_ElevationPIDController.SetReference(m_elevationTurns, rev::CANSparkBase::ControlType::kPosition);
   frc::SmartDashboard::PutNumber("ElevApplOut", m_ElevationController.GetAppliedOutput());
   frc::SmartDashboard::PutNumber("ElevBusV", m_ElevationController.GetBusVoltage());
   frc::SmartDashboard::PutNumber("ElevTemp", m_ElevationController.GetMotorTemperature());

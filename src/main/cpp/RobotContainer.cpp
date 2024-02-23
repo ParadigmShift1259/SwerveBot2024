@@ -145,6 +145,8 @@ void RobotContainer::SetDefaultCommands()
           rot = 0.0_rad_per_s;
         }
 
+//#define DISABLE_DRIVING
+#ifndef DISABLE_DRIVING
         if (m_fieldRelative)
         {
           GetDrive().RotationDrive(xSpeed, ySpeed, rotX, rotY, m_fieldRelative);
@@ -153,6 +155,7 @@ void RobotContainer::SetDefaultCommands()
         {
           GetDrive().Drive(xSpeed, ySpeed, rot, m_fieldRelative);
         }
+#endif// DISABLE_DRIVING
       }
     },
     {&m_drive}
@@ -185,14 +188,14 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 
   primary.A().WhileTrue(frc2::SequentialCommandGroup{
       PreShootCommand(*this, 129_in)
-    , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
+    , frc2::WaitCommand(units::time::second_t(1.2))//m_shootDelayMs))
     , ShootCommand(*this, 129_in)
   }.ToPtr());
 
   primary.B().WhileTrue(frc2::SequentialCommandGroup{
       IntakeAdjust(*this)
     , PreShootCommand(*this, 30_in)
-    , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
+    , frc2::WaitCommand(units::time::second_t(1.2))//m_shootDelayMs))
     , ShootCommand(*this, 30_in)
   }.ToPtr());
   //primary.A().WhileTrue(ShootCommand(*this).ToPtr());
@@ -236,14 +239,14 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   secondary.A().WhileTrue(frc2::SequentialCommandGroup{
       PreShootCommand(*this, 129_in)
-    , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
+    , frc2::WaitCommand(units::time::second_t(1.2))//m_shootDelayMs))
     , ShootCommand(*this, 129_in)
   }.ToPtr());
 
   secondary.B().WhileTrue(frc2::SequentialCommandGroup{
       IntakeAdjust(*this)
     , PreShootCommand(*this, 30_in)
-    , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
+    , frc2::WaitCommand(units::time::second_t(1.2))//m_shootDelayMs))
     , ShootCommand(*this, 30_in)
   }.ToPtr());
   //primary.A().WhileTrue(ShootCommand(*this).ToPtr());
@@ -259,8 +262,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.LeftBumper().WhileTrue(IntakeRelease(*this).ToPtr());
   secondary.RightBumper().OnTrue(IntakeTransfer(*this).ToPtr());
 
-  // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-  // secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });
+  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  secondary.POVUp(loop).Rising().IfHigh([this] { m_goToElev.Schedule(); });
   // secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });
 }
 

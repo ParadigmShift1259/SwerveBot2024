@@ -35,6 +35,8 @@ class ShooterSubsystem : public frc2::SubsystemBase
   private:
     units::degree_t m_closeAngle;
     double m_elevationAngle = 0.0;
+    double m_elevationTurns = 0.0;
+
     bool m_poppedPin = false;
     frc::Timer m_timer;
 
