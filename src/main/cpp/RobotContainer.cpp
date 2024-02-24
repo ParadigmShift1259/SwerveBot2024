@@ -13,6 +13,7 @@
 #include "commands/ShootCommand.h"
 #include "commands/PlopperGoToPositionCommand.h"
 #include "commands/PlopperShootCommand.h"
+#include "commands/AmpIntakeCommand.h"
 
 #include <frc/MathUtil.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -51,6 +52,7 @@ RobotContainer::RobotContainer()
 
   frc::SmartDashboard::PutNumber("CloseAngle", 49.0);
   frc::SmartDashboard::PutNumber("ShootDelay", m_shootDelayMs);
+  frc::SmartDashboard::PutNumber("AmpIntakePercent", 0.0);
 
 }
 
@@ -173,7 +175,9 @@ void RobotContainer::ConfigureBindings()
 {
   ConfigPrimaryButtonBindings();
   ConfigSecondaryButtonBindings();
+#ifdef USE_BUTTON_BOX
   ConfigButtonBoxBindings();
+#endif
 }
 
 void RobotContainer::ConfigPrimaryButtonBindings()
@@ -240,6 +244,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // secondary.LeftTrigger().WhileTrue();
   // secondary.RightTrigger().WhileTrue();
 
+#define TEST_AMP_SHOT_WITH_INTAKE
+#ifndef TEST_AMP_SHOT_WITH_INTAKE
   secondary.A().WhileTrue(frc2::SequentialCommandGroup{
       PreShootCommand(*this, 129_in)
     , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
@@ -260,10 +266,15 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.Y().WhileTrue(IntakeStop(*this).ToPtr());
   secondary.LeftBumper().WhileTrue(IntakeRelease(*this).ToPtr());
   secondary.RightBumper().OnTrue(&m_resetShooterToStart);
+#else
+  secondary.RightBumper().OnTrue(AmpIntakeCommand(*this).ToPtr());
+#endif
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   secondary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
   secondary.POVDown(loop).Rising().IfHigh([this] { m_goToElev.Schedule(); });
+  //secondary.POVLeft(loop).Rising().IfHigh([this] { AmpIntakeCommand(*this).Schedule(); });
+  secondary.POVRight(loop).Rising().IfHigh([this] { m_ampShootIntake.Schedule(); });
 }
 
 void RobotContainer::ConfigButtonBoxBindings()

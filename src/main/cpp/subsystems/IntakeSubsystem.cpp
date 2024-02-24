@@ -7,7 +7,7 @@
 
 #include <frc/Preferences.h>
 
-constexpr double c_defaultIntakeP = 0.07;
+constexpr double c_defaultIntakeP = 0.03;//0.07;
 constexpr double c_defaultIntakeI = 0.0;
 constexpr double c_defaultIntakeD = 0.0;
 
@@ -41,6 +41,13 @@ IntakeSubsystem::IntakeSubsystem()
     frc::Preferences::InitDouble("kIntakeDeployI", c_defaultIntakeI);
     frc::Preferences::InitDouble("kIntakeDeployD", c_defaultIntakeD);
 
+#ifdef USE_SMART_MOTION_DEPLOY
+    frc::Preferences::InitDouble("kDeployMinVel", 0.0);     // rpm
+    frc::Preferences::InitDouble("kDeployMaxVel", 2000.0);  // rpm
+    frc::Preferences::InitDouble("kDeployMaxAcc", 1500.0);
+    frc::Preferences::InitDouble("kDeployAllowedErr", 0.0);
+#endif
+
     m_deployPIDController.SetOutputRange(kMinOut, kMaxOut);
 
     frc::SmartDashboard::PutNumber("DepRtctTurns", c_defaultRetractTurns);
@@ -56,45 +63,109 @@ IntakeSubsystem::IntakeSubsystem()
     m_deployFollowPIDController.SetOutputRange(kMinOut, kMaxOut);
     // m_deployFollowMotor.Follow(m_deployMotor, true);
 #endif
+
+#ifdef USE_SMART_MOTION_DEPLOY
+  // Smart Motion Coefficients
+  double minVel = frc::Preferences::GetDouble("kDeployMinVel", 0.0);     // rpm
+  double maxVel = frc::Preferences::GetDouble("kDeployMaxVel", 2000.0);  // rpm
+  double maxAcc = frc::Preferences::GetDouble("kDeployMaxAcc", 1500.0);
+  double allowedErr = frc::Preferences::GetDouble("kDeployAllowedErr", 0.0);
+
+  int smartMotionSlot = 0;
+  m_deployPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
+  m_deployPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+  m_deployPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
+  m_deployPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
+  //m_deployPIDController.SetSmartMotionAccelStrategy(rev::SparkMaxPIDController::AccelStrategy::kSCurve, smartMotionSlot); // Other accel strategy kTrapezoidal
+  m_deployPIDController.SetSmartMotionAccelStrategy(rev::SparkMaxPIDController::AccelStrategy::kTrapezoidal, smartMotionSlot); // Other accel strategy kTrapezoidal
+
+  m_deployFollowPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
+  m_deployFollowPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+  m_deployFollowPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
+  m_deployFollowPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
+  //m_deployFollowPIDController.SetSmartMotionAccelStrategy(rev::SparkMaxPIDController::AccelStrategy::kSCurve, smartMotionSlot); // Other accel strategy kTrapezoidal
+  m_deployFollowPIDController.SetSmartMotionAccelStrategy(rev::SparkMaxPIDController::AccelStrategy::kTrapezoidal, smartMotionSlot); // Other accel strategy kTrapezoidal
+#endif
 }
 
 void IntakeSubsystem::Periodic()
 {
-  static double lastP = 0.0;
-  static double lastI = 0.0;
-  static double lastD = 0.0;
+    LoadDeployPid();
+#ifdef USE_SMART_MOTION_DEPLOY
+    LoadDeploySmartmotion();
+#endif
 
-  static int count = 0;
-  if (count++ % 50 == 0)
-  {
+    frc::SmartDashboard::PutNumber("Deploy echo", m_deployRelativeEnc.GetPosition());
+#ifndef OVERUNDER
+    frc::SmartDashboard::PutNumber("Deploy Follow echo", m_deployFollowRelativeEnc.GetPosition());
+#endif
+    frc::SmartDashboard::PutBoolean("Intake PhotoEye", m_photoEye.Get());
+}
+
+void IntakeSubsystem::LoadDeployPid()
+{
+    static double lastP = 0.0;
+    static double lastI = 0.0;
+    static double lastD = 0.0;
+
     auto p = frc::Preferences::GetDouble("kIntakeDeployP", c_defaultIntakeP);
     auto i = frc::Preferences::GetDouble("kIntakeDeployI", c_defaultIntakeI);
     auto d = frc::Preferences::GetDouble("kIntakeDeployD", c_defaultIntakeD);
     if (p != lastP)
     {
         m_deployPIDController.SetP(p);
+#ifndef OVERUNDER
+        m_deployFollowPIDController.SetP(frc::Preferences::GetDouble("kIntakeDeployP", c_defaultIntakeP));
+#endif
     }
     if (i != lastI)
     {
         m_deployPIDController.SetI(i);
+#ifndef OVERUNDER
+        m_deployFollowPIDController.SetI(frc::Preferences::GetDouble("kIntakeDeployI", c_defaultIntakeI));
+#endif
     }
     if (d != lastD)
     {
         m_deployPIDController.SetD(d);
+#ifndef OVERUNDER
+        m_deployFollowPIDController.SetD(frc::Preferences::GetDouble("kIntakeDeployD", c_defaultIntakeD));
+#endif
     }
     lastP = p;
     lastI = i;
     lastD = d;
-    frc::SmartDashboard::PutNumber("Deploy echo", m_deployRelativeEnc.GetPosition());
+}
 
-#ifndef OVERUNDER
-    m_deployFollowPIDController.SetP(frc::Preferences::GetDouble("kIntakeDeployP", c_defaultIntakeP));
-    m_deployFollowPIDController.SetI(frc::Preferences::GetDouble("kIntakeDeployI", c_defaultIntakeI));
-    m_deployFollowPIDController.SetD(frc::Preferences::GetDouble("kIntakeDeployD", c_defaultIntakeD));
-    frc::SmartDashboard::PutNumber("Deploy Follow echo", m_deployFollowRelativeEnc.GetPosition());
-#endif
-    frc::SmartDashboard::PutBoolean("Intake PhotoEye", m_photoEye.Get());
-  }
+void IntakeSubsystem::LoadDeploySmartmotion()
+{
+    static double lastMaxVel = 0.0;
+    static double lastMaxAcc = 0.0;
+    static double lastAllowedErr = 0.0;
+    //double minVel = frc::Preferences::GetDouble("kElevMinVel", 0.0);     // rpm
+    //m_ElevationPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+    double maxVel = frc::Preferences::GetDouble("kElevMaxVel", 2000.0);  // rpm
+    double maxAcc = frc::Preferences::GetDouble("kElevMaxAcc", 1500.0);
+    double allowedErr = frc::Preferences::GetDouble("kElevAllowedErr", 0.0);
+    int smartMotionSlot = 0;
+    if (maxVel != lastMaxVel)
+    {
+      m_deployPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
+      m_deployFollowPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
+    }
+    if (maxAcc != lastMaxAcc)
+    {
+      m_deployPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
+      m_deployFollowPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
+    }
+    if (allowedErr != lastAllowedErr)
+    {
+      m_deployPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
+      m_deployFollowPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
+    }
+    lastMaxVel = maxVel;
+    lastMaxAcc = maxAcc;
+    lastAllowedErr = allowedErr;
 }
 
 void IntakeSubsystem::Set(double speed)
@@ -105,10 +176,20 @@ void IntakeSubsystem::Set(double speed)
 void IntakeSubsystem::ExtendIntake()
 {
     double turns = frc::SmartDashboard::GetNumber("DepExtTurns", c_defaultExtendTurns);
-    printf("dep turns %.3f\n", turns);
+    //printf("dep turns %.3f\n", turns);
+#ifdef USE_SMART_MOTION_DEPLOY
+    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
+#else
     m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+#endif
+
 #ifndef OVERUNDER
+
+#ifdef USE_SMART_MOTION_DEPLOY
+    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
+#else
     m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+#endif
 #endif
     // frc::SmartDashboard::PutNumber("DepApplOut", m_deployMotor.GetAppliedOutput()); 
     // frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());
@@ -120,8 +201,9 @@ void IntakeSubsystem::AdjustIntake()
 {
 #ifdef OVERUNDER
     double turns = frc::SmartDashboard::GetNumber("DepAdjTurns", c_defaultAdjustTurns);
-    printf("dep turns %.3f\n", turns);
-    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    //printf("dep turns %.3f\n", turns);
+    //m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
     frc::SmartDashboard::PutNumber("DepApplOut", m_deployMotor.GetAppliedOutput());
     frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());
     frc::SmartDashboard::PutNumber("DepTemp", m_deployMotor.GetMotorTemperature());
@@ -132,10 +214,21 @@ void IntakeSubsystem::AdjustIntake()
 void IntakeSubsystem::RetractIntake()
 {
     double turns = frc::SmartDashboard::GetNumber("DepRtctTurns", c_defaultRetractTurns);
-    printf("dep turns %.3f\n", turns);
+    //printf("dep turns %.3f\n", turns);
+#ifdef USE_SMART_MOTION_DEPLOY
+    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
+#else
     m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+#endif
+
 #ifndef OVERUNDER
+
+#ifdef USE_SMART_MOTION_DEPLOY
+    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
+#else
     m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+#endif
+
 #endif
 
 }

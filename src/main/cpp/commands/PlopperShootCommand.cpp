@@ -6,7 +6,7 @@ PlopperShootCommand::PlopperShootCommand(ISubsystemAccess& subsystemAccess)
 {
   AddRequirements({&subsystemAccess.GetAmp()});
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
-  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/ampShoot/startCommand");
+  m_logStartCommand = wpi::log::BooleanLogEntry(log, "/plopperShoot/startCommand");
 }
 
 void PlopperShootCommand::Initialize()

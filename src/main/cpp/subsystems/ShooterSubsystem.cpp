@@ -17,6 +17,7 @@ const units::degree_t c_pinPopAngle = 50_deg;
 constexpr double c_defaultRPM = 3700.0;
 
 const units::degree_t c_pinPopAngle = 37_deg;
+constexpr double c_elevStartAngle = 60.0;
 #endif
 
 constexpr double c_defaultShootNeoP = 0.0005;
@@ -38,12 +39,13 @@ constexpr double c_defaultElevFF = 0.07;
   const units::degree_t c_minElevAngle = 25.0_deg;
   const units::degree_t c_maxElevAngle = 60.0_deg;
 #else
-  const units::degree_t c_minElevAngle = 0.0_deg;
-  const units::degree_t c_maxElevAngle = 70.0_deg;
+  const units::degree_t c_minElevAngle = -180.0_deg;
+  const units::degree_t c_maxElevAngle = 100.0_deg;
 #endif
 
 ShooterSubsystem::ShooterSubsystem()
-  : m_gyro(kShooterPigeonCANID)
+  : m_elevationAngle(65.0)
+  , m_gyro(kShooterPigeonCANID)
   , m_OverWheels(kShooterOverWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
   , m_UnderWheels(kShooterUnderWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
 #ifdef OVERUNDER  
@@ -53,6 +55,7 @@ ShooterSubsystem::ShooterSubsystem()
   , m_elevationLimitRear(kElevationLimitRear)
 #endif
   , m_ElevationController(kShooterElevationControllerCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
+  
 {
   //m_OverWheels.RestoreFactoryDefaults();
   //m_UnderWheels.RestoreFactoryDefaults();
@@ -72,8 +75,9 @@ ShooterSubsystem::ShooterSubsystem()
 #ifdef OVERUNDER
   auto result = m_ElevationEncoder.GetAbsolutePosition();
   m_ElevationRelativeEnc.SetPosition(result.GetValueAsDouble());
-#endif
+#else
   m_ElevationRelativeEnc.SetPosition(0.0);
+#endif
   m_ElevationRelativeEnc.SetPositionConversionFactor(1.0);
 
   m_OverWheels.SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
@@ -87,6 +91,12 @@ ShooterSubsystem::ShooterSubsystem()
   frc::Preferences::InitDouble("kElevationI", c_defaultElevI);
   frc::Preferences::InitDouble("kElevationD", c_defaultElevD);
   frc::Preferences::InitDouble("kElevationFF", c_defaultElevFF);
+
+  // SmartMotion params
+  frc::Preferences::InitDouble("kElevMinVel", 0.0);
+  frc::Preferences::InitDouble("kElevMaxVel", 2000.0);
+  frc::Preferences::InitDouble("kElevMaxAcc", 1500.0);
+  frc::Preferences::InitDouble("kElevAllowedErr", 0.0);
   
   frc::Preferences::InitDouble("kShooterP", c_defaultShootNeoP);
   frc::Preferences::InitDouble("kShooterI", c_defaultShootNeoI);
@@ -115,11 +125,26 @@ ShooterSubsystem::ShooterSubsystem()
   m_BackPIDController.SetOutputRange(kMinOut, kMaxOut);
 #endif
   m_ElevationController.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
+
   m_ElevationPIDController.SetP(frc::Preferences::GetDouble("kElevationP", c_defaultElevP));
   m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", c_defaultElevI));
   m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", c_defaultElevD));
   m_ElevationPIDController.SetFF(frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF));
   m_ElevationPIDController.SetOutputRange(kMinOut, kMaxOut);
+
+  // Smart Motion Coefficients
+  double minVel = frc::Preferences::GetDouble("kElevMinVel", 0.0);     // rpm
+  double maxVel = frc::Preferences::GetDouble("kElevMaxVel", 2000.0);  // rpm
+  double maxAcc = frc::Preferences::GetDouble("kElevMaxAcc", 1500.0);
+  double allowedErr = frc::Preferences::GetDouble("kElevAllowedErr", 0.0);
+
+  int smartMotionSlot = 0;
+  m_ElevationPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
+  m_ElevationPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+  m_ElevationPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
+  m_ElevationPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
+  m_ElevationPIDController.SetSmartMotionAccelStrategy(rev::SparkMaxPIDController::AccelStrategy::kSCurve, smartMotionSlot); // Other accel strategy kTrapezoidal
+
   frc::SmartDashboard::PutNumber("ShotAngle", 37.0);
   frc::SmartDashboard::PutNumber("ShotAngleClose", 57.0);
 #ifdef OVERUNDER
@@ -137,22 +162,33 @@ ShooterSubsystem::ShooterSubsystem()
 #endif
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
   frc::SmartDashboard::PutNumber("RelTurns", 0);
+
+  m_elevationAngle = 65.0;
 }
 
 void ShooterSubsystem::Periodic()
 {
-  if (m_poppedPin == false)
+  // if (m_poppedPin == false)
+  // {
+  //   HAL_ControlWord cw;
+  //   if (HAL_GetControlWord(&cw) == 0)
+  //   {
+  //     if (cw.enabled)
+  //     {
+  //       printf("Popping the pin\n");
+  //       GoToElevation(c_pinPopAngle);
+  //       m_poppedPin = true;
+  //     }
+  //   }
+  // }
+
+  if (m_lastElevationTurns != m_elevationTurns && fabs(m_ElevationRelativeEnc.GetPosition() - frc::SmartDashboard::GetNumber("ElevationTurns", 0.0)) < 1.0)
   {
-    HAL_ControlWord cw;
-    if (HAL_GetControlWord(&cw) == 0)
-    {
-      if (cw.enabled)
-      {
-        printf("Popping the pin\n");
-        GoToElevation(c_pinPopAngle);
-        m_poppedPin = true;
-      }
-    }
+    m_lastElevationTurns = m_elevationTurns;
+    // //double adj = pitch - c_elevStartAngle;
+    // double turns = (1.13 * pitch - 69.5) / 1.75;
+    auto pitch = m_gyro.GetPitch();
+    printf("elev gyro angle %.3f rel enc %.3f turns %.3f\n", pitch, m_ElevationRelativeEnc.GetPosition(), m_elevationTurns);
   }
 
   //m_closeAngle = units::degree_t(frc::SmartDashboard::GetNumber("CloseAngle", 49.0));
@@ -169,7 +205,7 @@ void ShooterSubsystem::Periodic()
   static int count = 0;
   if (count++ % 20 == 0)
   {
-    frc::SmartDashboard::PutNumber("ShooterAngle", m_gyro.GetPitch().value());
+    frc::SmartDashboard::PutNumber("ShooterAngle", m_gyro.GetPitch());
 
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("OverRPM",  -c_defaultRPM);
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("UnderRPM", c_defaultRPM);
@@ -214,15 +250,48 @@ void ShooterSubsystem::Periodic()
     lastD = d;
     lastFF = ff;
 
+    static double lastMaxVel = 0.0;
+    static double lastMaxAcc = 0.0;
+    static double lastAllowedErr = 0.0;
+    //double minVel = frc::Preferences::GetDouble("kElevMinVel", 0.0);     // rpm
+    //m_ElevationPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+    double maxVel = frc::Preferences::GetDouble("kElevMaxVel", 2000.0);  // rpm
+    double maxAcc = frc::Preferences::GetDouble("kElevMaxAcc", 1500.0);
+    double allowedErr = frc::Preferences::GetDouble("kElevAllowedErr", 0.0);
+    int smartMotionSlot = 0;
+    if (maxVel != lastMaxVel)
+    {
+      m_ElevationPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
+    }
+    if (maxAcc != lastMaxAcc)
+    {
+      m_ElevationPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
+    }
+    if (allowedErr != lastAllowedErr)
+    {
+      m_ElevationPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
+    }
+    lastMaxVel = maxVel;
+    lastMaxAcc = maxAcc;
+    lastAllowedErr = allowedErr;
+
     frc::SmartDashboard::PutNumber("OverRPM echo", m_OverRelativeEnc.GetVelocity());
     frc::SmartDashboard::PutNumber("UnderRPM echo", m_UnderRelativeEnc.GetVelocity());
 #ifdef OVERUNDER
     frc::SmartDashboard::PutNumber("BackRPM echo", m_BackRelativeEnc.GetVelocity());
     frc::SmartDashboard::PutNumber("ElevABS echo", m_ElevationEncoder.GetAbsolutePosition().GetValueAsDouble());
 #else
+
+    auto pitch = m_gyro.GetPitch();
+    double adj = m_elevationAngle - pitch;
+    if (m_elevationAngle != 0.0 && fabs(adj) > 0.1)
+    {
+      GoToElevation(m_elevationAngle + adj);
+      printf("Setting elev from gyro angle pitch %.3f elev angle %.3f adj %.3f goto angle %.3f\n", pitch, m_elevationAngle, adj, m_elevationAngle + adj);
+    }
+
     auto ticks = m_ElevationRelativeEnc.GetPosition();
-//    double angle = ticks + 74 / 1.12;
-    double angle = (ticks * 1.75 + 74) / 1.12;
+    double angle = (ticks * 1.75 + 69.5) / 1.13;
     frc::SmartDashboard::PutNumber("ElevationAngleEcho", angle);
 #endif
     frc::SmartDashboard::PutNumber("Elevation echo", m_ElevationRelativeEnc.GetPosition());
@@ -269,15 +338,17 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   // 11.2   -60.858
   // 0.2    -74.359
   // y = 1.12x - 74.0      R² = 1.0
-  //double turns = (1.12 * m_elevationAngle - 74.0) / 1.75;
-  double turns = (1.13 * m_elevationAngle - 69.5) / 1.75;
+  //double turns = (1.13 * m_elevationAngle - 69.5) / 1.75;
+  double turns = (1.09 * m_elevationAngle - 69.7);
 #endif
-  m_logElevTurns.Append(turns);
   // turns = frc::SmartDashboard::GetNumber("RelTurns", 0);
-  //printf("elev angle %.3f turns %.3f\n", m_elevationAngle, turns);
+  printf("elev angle %.3f turns %.3f\n", m_elevationAngle, turns);
   frc::SmartDashboard::PutNumber("ElevationTurns", turns);
-  //turns = frc::SmartDashboard::GetNumber("ElevationTurns", -40.0);
-  m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+  //turns = frc::SmartDashboard::GetNumber("ElevationTurns", 0.0);
+  m_elevationTurns = turns;  // For calibration
+  m_logElevTurns.Append(turns);
+  //m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+  m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
 
   // frc::SmartDashboard::PutNumber("ElevApplOut", m_ElevationController.GetAppliedOutput());
   // frc::SmartDashboard::PutNumber("ElevBusV", m_ElevationController.GetBusVoltage());
@@ -298,7 +369,6 @@ void ShooterSubsystem::StartOverAndUnder(units::meter_t distance)
     m_underRPM = m_shootReference[0][m_shootIndex];
 
     double ffNeo = frc::Preferences::GetDouble("kShooterFF", c_defaultShootNeoFF);
-    double ffVtx = frc::Preferences::GetDouble("kShootVortexFF", c_defaultShootVortexFF);
     m_OverPIDController.SetFF(ffNeo);
     m_UnderPIDController.SetFF(ffNeo);
 
@@ -307,6 +377,7 @@ void ShooterSubsystem::StartOverAndUnder(units::meter_t distance)
 #ifdef OVERUNDER
     m_UnderPIDController.SetReference(m_overRPM, rev::CANSparkBase::ControlType::kVelocity);
     m_backRPM = m_shootReference[1][m_shootIndex];
+    double ffVtx = frc::Preferences::GetDouble("kShootVortexFF", c_defaultShootVortexFF);
     m_BackPIDController.SetFF(ffVtx);
     m_BackPIDController.SetReference(m_backRPM, rev::CANSparkBase::ControlType::kVelocity);
 #else

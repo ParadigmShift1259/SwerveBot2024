@@ -98,7 +98,10 @@ private:
 
   CommandXboxController m_primaryController{0};
   CommandXboxController m_secondaryController{1};
+#define USE_BUTTON_BOX
+#ifdef USE_BUTTON_BOX
   CommandXboxController m_buttonBoxController{2};
+#endif
   // SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
   // SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
   SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s, -3 / 2_s};
@@ -116,6 +119,12 @@ private:
   { 
     units::degree_t angle{frc::SmartDashboard::GetNumber("ElevationAngle", 44.0)};
     m_shooter.GoToElevation(angle);
+  }, {} };
+
+  InstantCommand m_ampShootIntake{[this]
+  { 
+    m_intake.ExtendIntake();
+    m_intake.Set(frc::SmartDashboard::GetNumber("AmpShotPercent", -0.6));
   }, {} };
 
 #ifdef USE_TEST_BUTTONS

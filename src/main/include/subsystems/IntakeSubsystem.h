@@ -43,6 +43,9 @@ public:
     void Stop() { Set(0.0); }
 
 private:
+    void LoadDeployPid();
+    void LoadDeploySmartmotion();
+
     /// 775 that runs intake
     TalonSRX m_motor;
     frc::Timer m_timer;
