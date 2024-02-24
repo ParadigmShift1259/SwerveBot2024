@@ -131,7 +131,7 @@ ShooterSubsystem::ShooterSubsystem()
 #else
   frc::SmartDashboard::PutNumber("OverRPM",  m_shootReference[0][1]);
   frc::SmartDashboard::PutNumber("UnderRPM", m_shootReference[0][1]);
-  frc::SmartDashboard::PutNumber("ElevationAngle", 66.0);
+  frc::SmartDashboard::PutNumber("ElevationAngle", 70.0);
 #endif
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
   frc::SmartDashboard::PutNumber("RelTurns", 0);

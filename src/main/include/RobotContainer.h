@@ -76,7 +76,7 @@ private:
   void ConfigureBindings();
   void ConfigPrimaryButtonBindings();
   void ConfigSecondaryButtonBindings();
-  void ConfigSecondaryButtonBindingsNewWay();
+  void ConfigButtonBoxBindings();
   SwerveControllerCommand<4>* GetSwerveCommandPath(Trajectory trajectory); 
   void PrintTrajectory(Trajectory& trajectory);
 
@@ -98,6 +98,7 @@ private:
 
   CommandXboxController m_primaryController{0};
   CommandXboxController m_secondaryController{1};
+  CommandXboxController m_buttonBoxController{2};
   // SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s};
   // SlewRateLimiter<units::scalar> m_yspeedLimiter{3 / 1_s};
   SlewRateLimiter<units::scalar> m_xspeedLimiter{3 / 1_s, -3 / 2_s};

@@ -31,4 +31,8 @@ constexpr int kShooterElevationControllerCANID = 23;
 constexpr int kElevationEncoderCANID = 1;
 #else
 constexpr int kShooterElevationControllerCANID = 15;
+
+constexpr int kPlopperElevationControllerCANID = 23; // SparkMax
+
+constexpr int kPlopperRollerCANID     = 12;       // TalonSRX
 #endif

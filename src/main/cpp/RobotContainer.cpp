@@ -11,6 +11,8 @@
 #include "commands/StopAllCommand.h"
 #include "commands/PreShootCommand.h"
 #include "commands/ShootCommand.h"
+#include "commands/PlopperGoToPositionCommand.h"
+#include "commands/PlopperShootCommand.h"
 
 #include <frc/MathUtil.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -49,6 +51,7 @@ RobotContainer::RobotContainer()
 
   frc::SmartDashboard::PutNumber("CloseAngle", 49.0);
   frc::SmartDashboard::PutNumber("ShootDelay", m_shootDelayMs);
+
 }
 
 //#define USE_PATH_PLANNER_SWERVE_CMD
@@ -167,7 +170,7 @@ void RobotContainer::ConfigureBindings()
 {
   ConfigPrimaryButtonBindings();
   ConfigSecondaryButtonBindings();
-  // ConfigSecondaryButtonBindingsNewWay();
+  ConfigButtonBoxBindings();
 }
 
 void RobotContainer::ConfigPrimaryButtonBindings()
@@ -260,36 +263,36 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });
 }
 
-void RobotContainer::ConfigSecondaryButtonBindingsNewWay()
+void RobotContainer::ConfigButtonBoxBindings()
 {
-  //auto& secondary = m_secondaryController;
+  auto& buttonBox = m_buttonBoxController;
   // Raspberry PI Pico with gp2040 firmware Button Box
   //
   // Row	Black			    Blue			    Green				      Yellow				      Red
   // 1	  Back			    Start			    Left Stick Button	Right Stick Button	Left Bumper
   // 2	  Right Trigger	Left Trigger	X					        Y					          Right Bumper
   // 3	  B				      A				      POV Left			    POV Right			      POV Up
-  // secondary.A().WhileTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
-  // secondary.A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
-  // secondary.B().OnTrue(PlaceLow(*this).ToPtr());                                 // Black  row 3
-  // secondary.X().OnTrue(PlaceHigh(*this).ToPtr());                                // Green  row 2
-  // secondary.Y().OnTrue(RetrieveGamePiece(*this).ToPtr());                        // Yellow row 2
+  // buttonBox.A().WhileTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
+  // buttonBox.A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
+  buttonBox.Start().OnTrue(PlopperGoToPositionCommand(*this).ToPtr());                                 // Black  row 3
+  buttonBox.LeftStick().WhileTrue(PlopperShootCommand(*this).ToPtr());                                // Green  row 2
+  // buttonBox.Y().OnTrue(RetrieveGamePiece(*this).ToPtr());                        // Yellow row 2
 
-  // secondary.LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
-  // secondary.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
-  // secondary.Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
-  // secondary.Back().WhileTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
+  // buttonBox.LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
+  // buttonBox.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
+  // buttonBox.Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
+  // buttonBox.Back().WhileTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
 
-  // secondary.LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
-  // secondary.RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
-  // secondary.LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
-  // secondary.RightTrigger().WhileTrue(&m_toggleClaw);                      // Black  row 2
+  // buttonBox.LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
+  // buttonBox.RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
+  // buttonBox.LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
+  // buttonBox.RightTrigger().WhileTrue(&m_toggleClaw);                      // Black  row 2
 
   // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-  // secondary.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3
-  // secondary.POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractBackPlate(); });// Yellow row 3
-  //secondary.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });      // Red    row 3
-  //secondary.POVUp(loop).Rising().IfHigh(RotateTurntableCW(*this).ToPtr()});      // Red    row 3
+  // buttonBox.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3
+  // buttonBox.POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractBackPlate(); });// Yellow row 3
+  // buttonBox.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });      // Red    row 3
+  // buttonBox.POVUp(loop).Rising().IfHigh(RotateTurntableCW(*this).ToPtr()});      // Red    row 3
 }
 
 const TrapezoidProfile<units::radians>::Constraints
