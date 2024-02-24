@@ -112,6 +112,11 @@ private:
   InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
   // frc2::InstantCommand m_runCompressor{[this] { m_compressor.EnableDigital(); m_bRunningCompressor = true;}, {} };
   InstantCommand m_resetShooterToStart{[this] { m_shooter.GoToElevation(66_deg); }, {}};
+  InstantCommand m_goToElev{[this]
+  { 
+    units::degree_t angle{frc::SmartDashboard::GetNumber("ElevationAngle", 44.0)};
+    m_shooter.GoToElevation(angle);
+  }, {} };
 
 #ifdef USE_TEST_BUTTONS
   InstantCommand m_toggleDriveStraight{[this] 

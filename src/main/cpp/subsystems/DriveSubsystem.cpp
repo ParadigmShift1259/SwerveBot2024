@@ -7,6 +7,7 @@
 #include <units/math.h>
 
 DriveSubsystem::DriveSubsystem()
+  : m_gyro(kDrivePigeonCANID)
 {
   m_gyro.Reset();
 

@@ -152,6 +152,8 @@ void RobotContainer::SetDefaultCommands()
           rot = 0.0_rad_per_s;
         }
 
+//#define DISABLE_DRIVING
+#ifndef DISABLE_DRIVING
         if (m_fieldRelative)
         {
           GetDrive().RotationDrive(xSpeed, ySpeed, rotX, rotY, m_fieldRelative);
@@ -160,6 +162,7 @@ void RobotContainer::SetDefaultCommands()
         {
           GetDrive().Drive(xSpeed, ySpeed, rot, m_fieldRelative);
         }
+#endif// DISABLE_DRIVING
       }
     },
     {&m_drive}
@@ -255,12 +258,12 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // secondary.B().OnTrue(PreShootCommand(*this, 129_in, 32_deg).ToPtr());
   secondary.X().OnTrue(IntakeIngest(*this).ToPtr());
   secondary.Y().WhileTrue(IntakeStop(*this).ToPtr());
-
-  secondary.LeftBumper().OnTrue(&m_resetShooterToStart);
+  secondary.LeftBumper().WhileTrue(IntakeRelease(*this).ToPtr());
+  secondary.RightBumper().OnTrue(&m_resetShooterToStart);
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   secondary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
-  // secondary.POVDown(loop).Rising().IfHigh([this] { IntakeRelease(*this).ToPtr(); });
+  secondary.POVDown(loop).Rising().IfHigh([this] { m_goToElev.Schedule(); });
 }
 
 void RobotContainer::ConfigButtonBoxBindings()

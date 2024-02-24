@@ -170,7 +170,7 @@ void SwerveModule::ResyncAbsRelEnc()
       angleInRad -= 2 * std::numbers::pi;
 
   m_turningEncoder.SetPosition(angleInRad);
-#define PRINT_ABS_RESYNC
+//#define PRINT_ABS_RESYNC
 #ifdef PRINT_ABS_RESYNC
   auto time = m_timer.Get();
   printf("Module %s %.3f AbsPos %.3f offset %.3f Set abs enc %.3f [rot] %.3f [rad] to rel enc %.3f [rad] mot pos %.3f [rot]\n"

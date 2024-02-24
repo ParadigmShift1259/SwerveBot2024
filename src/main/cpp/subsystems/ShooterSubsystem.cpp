@@ -43,7 +43,8 @@ constexpr double c_defaultElevFF = 0.07;
 #endif
 
 ShooterSubsystem::ShooterSubsystem()
-  : m_OverWheels(kShooterOverWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
+  : m_gyro(kShooterPigeonCANID)
+  , m_OverWheels(kShooterOverWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
   , m_UnderWheels(kShooterUnderWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
 #ifdef OVERUNDER  
   , m_BackWheels(kShooterBackWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
@@ -113,6 +114,7 @@ ShooterSubsystem::ShooterSubsystem()
   m_BackPIDController.SetD(frc::Preferences::GetDouble("kShootVortexD", c_defaultShootVortexD));
   m_BackPIDController.SetOutputRange(kMinOut, kMaxOut);
 #endif
+  m_ElevationController.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
   m_ElevationPIDController.SetP(frc::Preferences::GetDouble("kElevationP", c_defaultElevP));
   m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", c_defaultElevI));
   m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", c_defaultElevD));
@@ -167,6 +169,8 @@ void ShooterSubsystem::Periodic()
   static int count = 0;
   if (count++ % 20 == 0)
   {
+    frc::SmartDashboard::PutNumber("ShooterAngle", m_gyro.GetPitch().value());
+
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("OverRPM",  -c_defaultRPM);
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("UnderRPM", c_defaultRPM);
 
@@ -180,10 +184,35 @@ void ShooterSubsystem::Periodic()
     m_shootReference[1][1] = frc::SmartDashboard::GetNumber("BackRPM", c_defaultBackRPM);
     m_shootReference[1][0] = frc::SmartDashboard::GetNumber("BackRPMClose", c_defaultBackRPM);
 #endif
-    m_ElevationPIDController.SetP(frc::Preferences::GetDouble("kElevationP", c_defaultElevP));
-    m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", c_defaultElevI));
-    m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", c_defaultElevD));
-    m_ElevationPIDController.SetFF(frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF));
+    static double lastP = 0.0;
+    static double lastI = 0.0;
+    static double lastD = 0.0;
+    static double lastFF = 0.0;
+
+    auto p = frc::Preferences::GetDouble("kElevationP", c_defaultElevP);
+    auto i = frc::Preferences::GetDouble("kElevationI", c_defaultElevI);
+    auto d = frc::Preferences::GetDouble("kElevationD", c_defaultElevD);
+    auto ff = frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF);
+    if (p != lastP)
+    {
+        m_ElevationPIDController.SetP(p);
+    }
+    if (i != lastI)
+    {
+        m_ElevationPIDController.SetI(i);
+    }
+    if (d != lastD)
+    {
+        m_ElevationPIDController.SetD(d);
+    }
+    if (ff != lastFF)
+    {
+        m_ElevationPIDController.SetFF(ff);
+    }
+    lastP = p;
+    lastI = i;
+    lastD = d;
+    lastFF = ff;
 
     frc::SmartDashboard::PutNumber("OverRPM echo", m_OverRelativeEnc.GetVelocity());
     frc::SmartDashboard::PutNumber("UnderRPM echo", m_UnderRelativeEnc.GetVelocity());

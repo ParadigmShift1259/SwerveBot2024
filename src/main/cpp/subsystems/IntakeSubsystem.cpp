@@ -60,13 +60,33 @@ IntakeSubsystem::IntakeSubsystem()
 
 void IntakeSubsystem::Periodic()
 {
+  static double lastP = 0.0;
+  static double lastI = 0.0;
+  static double lastD = 0.0;
+
   static int count = 0;
   if (count++ % 50 == 0)
   {
-    m_deployPIDController.SetP(frc::Preferences::GetDouble("kIntakeDeployP", c_defaultIntakeP));
-    m_deployPIDController.SetI(frc::Preferences::GetDouble("kIntakeDeployI", c_defaultIntakeI));
-    m_deployPIDController.SetD(frc::Preferences::GetDouble("kIntakeDeployD", c_defaultIntakeD));
+    auto p = frc::Preferences::GetDouble("kIntakeDeployP", c_defaultIntakeP);
+    auto i = frc::Preferences::GetDouble("kIntakeDeployI", c_defaultIntakeI);
+    auto d = frc::Preferences::GetDouble("kIntakeDeployD", c_defaultIntakeD);
+    if (p != lastP)
+    {
+        m_deployPIDController.SetP(p);
+    }
+    if (i != lastI)
+    {
+        m_deployPIDController.SetI(i);
+    }
+    if (d != lastD)
+    {
+        m_deployPIDController.SetD(d);
+    }
+    lastP = p;
+    lastI = i;
+    lastD = d;
     frc::SmartDashboard::PutNumber("Deploy echo", m_deployRelativeEnc.GetPosition());
+
 #ifndef OVERUNDER
     m_deployFollowPIDController.SetP(frc::Preferences::GetDouble("kIntakeDeployP", c_defaultIntakeP));
     m_deployFollowPIDController.SetI(frc::Preferences::GetDouble("kIntakeDeployI", c_defaultIntakeI));
