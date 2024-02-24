@@ -258,7 +258,7 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
 
 void ShooterSubsystem::GoToElevation(int shootIndex)
 {
-  GoToElevation(units::degree_t(m_shootReference[2][m_shootIndex]));
+  GoToElevation(units::degree_t(m_shootReference[2][shootIndex]));
 }
 
 void ShooterSubsystem::StartOverAndUnder(units::meter_t distance)
