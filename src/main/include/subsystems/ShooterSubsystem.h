@@ -11,8 +11,8 @@
 #include <frc/Timer.h>
 
 #include <rev/CANSparkFlex.h>
-#include <ctre/phoenix6/CANcoder.hpp>
 #include <rev/CANSparkMax.h>
+#include <ctre/phoenix6/CANcoder.hpp>
 
 #include <units/angle.h>
 #include <units/length.h>

@@ -8,6 +8,8 @@
 
 #include <hal/HAL.h>
 
+#include <wpi/deprecated.h>
+
 #ifdef OVERUNDER  
 constexpr double c_defaultRPM = 4500.0;
 constexpr double c_defaultBackRPM = 1400.0;
@@ -143,7 +145,9 @@ ShooterSubsystem::ShooterSubsystem()
   m_ElevationPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
   m_ElevationPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
   m_ElevationPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
+WPI_IGNORE_DEPRECATED
   m_ElevationPIDController.SetSmartMotionAccelStrategy(rev::SparkMaxPIDController::AccelStrategy::kSCurve, smartMotionSlot); // Other accel strategy kTrapezoidal
+WPI_UNIGNORE_DEPRECATED
 
   frc::SmartDashboard::PutNumber("ShotAngle", 37.0);
   frc::SmartDashboard::PutNumber("ShotAngleClose", 57.0);

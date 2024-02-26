@@ -131,7 +131,6 @@ void SwerveModule::Periodic()
 
   // Log relative encoder and absolute encoder positions (radians)
   auto absPos = m_absEnc.GetAbsolutePosition();
-  auto angle = fmod(1 + m_offset - absPos, 1.0);
   m_logTurningEncoderPosition.Append(m_turningEncoder.GetPosition());
   //m_logAbsoluteEncoderPosition.Append(absPos * 2 * std::numbers::pi);
   m_logAbsoluteEncoderPosition.Append(((1 + m_offset - absPos) * 2 * std::numbers::pi) - (m_turningEncoder.GetPosition()));
@@ -153,6 +152,7 @@ void SwerveModule::Periodic()
   // }
 
   frc::SmartDashboard::PutNumber("Abs Pos" + m_id, absPos);
+  //auto angle = fmod(1 + m_offset - absPos, 1.0);
   // frc::SmartDashboard::PutNumber("Abs Pos plus Offset" + m_id, angle);
   // frc::SmartDashboard::PutNumber("Offset" + m_id, m_offset);
 
