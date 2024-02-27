@@ -121,6 +121,12 @@ private:
     m_shooter.GoToElevation(angle);
   }, {} };
 
+  InstantCommand m_ampPositionIntake{[this]
+  { 
+    double turns = frc::SmartDashboard::GetNumber("AmpShotTurns", 21);
+    m_intake.ExtendIntake(turns);
+  }, {} };
+
   InstantCommand m_ampShootIntake{[this]
   { 
     m_intake.ExtendIntake();

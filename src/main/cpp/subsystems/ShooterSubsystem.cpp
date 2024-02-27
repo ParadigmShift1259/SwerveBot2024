@@ -19,7 +19,7 @@ const units::degree_t c_pinPopAngle = 50_deg;
 constexpr double c_defaultRPM = 3700.0;
 
 const units::degree_t c_pinPopAngle = 37_deg;
-constexpr double c_elevStartAngle = 60.0;
+constexpr double c_elevStartAngle = 65.0;
 #endif
 
 constexpr double c_defaultShootNeoP = 0.0005;
@@ -46,7 +46,7 @@ constexpr double c_defaultElevFF = 0.07;
 #endif
 
 ShooterSubsystem::ShooterSubsystem()
-  : m_elevationAngle(65.0)
+  : m_elevationAngle(c_elevStartAngle)
   , m_gyro(kShooterPigeonCANID)
   , m_OverWheels(kShooterOverWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
   , m_UnderWheels(kShooterUnderWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
@@ -74,12 +74,7 @@ ShooterSubsystem::ShooterSubsystem()
   m_logCommandedAngle = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/CommandedAngle");
   m_logAbsoluteAngle = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/AbsoluteAngle");
   m_logElevTurns = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/ElevTurns");
-#ifdef OVERUNDER
-  auto result = m_ElevationEncoder.GetAbsolutePosition();
-  m_ElevationRelativeEnc.SetPosition(result.GetValueAsDouble());
-#else
-  m_ElevationRelativeEnc.SetPosition(0.0);
-#endif
+
   m_ElevationRelativeEnc.SetPositionConversionFactor(1.0);
 
   m_OverWheels.SetIdleMode(rev::CANSparkMax::IdleMode::kCoast);
@@ -167,7 +162,15 @@ WPI_UNIGNORE_DEPRECATED
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
   frc::SmartDashboard::PutNumber("RelTurns", 0);
 
-  m_elevationAngle = 65.0;
+#ifdef OVERUNDER
+  auto result = m_ElevationEncoder.GetAbsolutePosition();
+  m_ElevationRelativeEnc.SetPosition(result.GetValueAsDouble());
+#else
+  auto pitch = m_gyro.GetPitch();
+  double turns = (1.09 * pitch - 69.7);
+  printf("gyro angle pitch %.3f gyro turns %.3f\n", pitch, turns);
+  m_ElevationRelativeEnc.SetPosition(turns);
+#endif
 }
 
 void ShooterSubsystem::Periodic()
@@ -186,14 +189,14 @@ void ShooterSubsystem::Periodic()
   //   }
   // }
 
-  if (m_lastElevationTurns != m_elevationTurns && fabs(m_ElevationRelativeEnc.GetPosition() - frc::SmartDashboard::GetNumber("ElevationTurns", 0.0)) < 1.0)
-  {
-    m_lastElevationTurns = m_elevationTurns;
-    // //double adj = pitch - c_elevStartAngle;
-    // double turns = (1.13 * pitch - 69.5) / 1.75;
-    auto pitch = m_gyro.GetPitch();
-    printf("elev gyro angle %.3f rel enc %.3f turns %.3f\n", pitch, m_ElevationRelativeEnc.GetPosition(), m_elevationTurns);
-  }
+  // if (m_lastElevationTurns != m_elevationTurns && fabs(m_ElevationRelativeEnc.GetPosition() - frc::SmartDashboard::GetNumber("ElevationTurns", 0.0)) < 1.0)
+  // {
+  //   m_lastElevationTurns = m_elevationTurns;
+  //   // //double adj = pitch - c_elevStartAngle;
+  //   // double turns = (1.13 * pitch - 69.5) / 1.75;
+  //   auto pitch = m_gyro.GetPitch();
+  //   printf("elev gyro angle %.3f rel enc %.3f turns %.3f\n", pitch, m_ElevationRelativeEnc.GetPosition(), m_elevationTurns);
+  // }
 
   //m_closeAngle = units::degree_t(frc::SmartDashboard::GetNumber("CloseAngle", 49.0));
 
@@ -209,7 +212,21 @@ void ShooterSubsystem::Periodic()
   static int count = 0;
   if (count++ % 20 == 0)
   {
-    frc::SmartDashboard::PutNumber("ShooterAngle", m_gyro.GetPitch());
+    auto pitch = m_gyro.GetPitch();
+    auto ticks = m_ElevationRelativeEnc.GetPosition();
+    double angle = (ticks + 69.7) / 1.09;
+    frc::SmartDashboard::PutNumber("ElevationAngleEcho", angle);
+    frc::SmartDashboard::PutNumber("ShooterAngle", pitch);
+    // double turns = (1.09 * pitch - 69.7);
+    // double adj = m_elevationTurns - turns;
+    // printf("elev from gyro angle pitch %.3f elev angle %.3f adj %.3f goto angle %.3f gyro turns %.3f elev turns %.3f\n", pitch, angle, adj, angle + adj, turns, m_elevationTurns);
+    // if (m_elevationTurns != 0.0 && fabs(adj) < 0.5)
+    // {
+    //   printf("Setting elev from gyro angle pitch %.3f elev angle %.3f adj %.3f goto angle %.3f gyro turns %.3f elev turns %.3f\n", pitch, angle, adj, angle + adj, turns, m_elevationTurns);
+    //   angle = ((m_elevationTurns - adj) + 69.7) / 1.09;
+    //   GoToElevation(units::degree_t(angle));
+    //   m_elevationTurns = 0.0;
+    // }
 
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("OverRPM",  -c_defaultRPM);
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("UnderRPM", c_defaultRPM);
@@ -285,18 +302,6 @@ void ShooterSubsystem::Periodic()
     frc::SmartDashboard::PutNumber("BackRPM echo", m_BackRelativeEnc.GetVelocity());
     frc::SmartDashboard::PutNumber("ElevABS echo", m_ElevationEncoder.GetAbsolutePosition().GetValueAsDouble());
 #else
-
-    auto pitch = m_gyro.GetPitch();
-    double adj = m_elevationAngle - pitch;
-    if (m_elevationAngle != 0.0 && fabs(adj) > 0.1)
-    {
-      GoToElevation(m_elevationAngle + adj);
-      printf("Setting elev from gyro angle pitch %.3f elev angle %.3f adj %.3f goto angle %.3f\n", pitch, m_elevationAngle, adj, m_elevationAngle + adj);
-    }
-
-    auto ticks = m_ElevationRelativeEnc.GetPosition();
-    double angle = (ticks * 1.75 + 69.5) / 1.13;
-    frc::SmartDashboard::PutNumber("ElevationAngleEcho", angle);
 #endif
     frc::SmartDashboard::PutNumber("Elevation echo", m_ElevationRelativeEnc.GetPosition());
   }

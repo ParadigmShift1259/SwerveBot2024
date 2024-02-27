@@ -34,6 +34,7 @@ public:
     void Set(double speed);
     /// Extends the intake out of the robot
     void ExtendIntake();
+    void ExtendIntake(double turns);
     /// Adjusts the intake to allow for higher shooting angles
     void AdjustIntake();
     // Retracts the intake into the robot

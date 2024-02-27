@@ -11,6 +11,9 @@ constexpr double c_defaultIntakeP = 0.03;//0.07;
 constexpr double c_defaultIntakeI = 0.0;
 constexpr double c_defaultIntakeD = 0.0;
 
+constexpr double c_defaultIntakeMin = -0.5;
+constexpr double c_defaultIntakeMax = 0.5;
+
 #ifdef OVERUNDER
 constexpr double c_defaultRetractTurns = 0.0476;
 constexpr double c_defaultExtendTurns = 13.3;
@@ -41,6 +44,9 @@ IntakeSubsystem::IntakeSubsystem()
     frc::Preferences::InitDouble("kIntakeDeployI", c_defaultIntakeI);
     frc::Preferences::InitDouble("kIntakeDeployD", c_defaultIntakeD);
 
+    frc::Preferences::InitDouble("kIntakeDeployMin", c_defaultIntakeMin);
+    frc::Preferences::InitDouble("kIntakeDeployMax", c_defaultIntakeMax);
+
 #ifdef USE_SMART_MOTION_DEPLOY
     frc::Preferences::InitDouble("kDeployMinVel", 0.0);     // rpm
     frc::Preferences::InitDouble("kDeployMaxVel", 2000.0);  // rpm
@@ -48,7 +54,8 @@ IntakeSubsystem::IntakeSubsystem()
     frc::Preferences::InitDouble("kDeployAllowedErr", 0.0);
 #endif
 
-    m_deployPIDController.SetOutputRange(kMinOut, kMaxOut);
+    //m_deployPIDController.SetOutputRange(kMinOut, kMaxOut);
+    m_deployPIDController.SetOutputRange(-0.5, 0.5);
 
     frc::SmartDashboard::PutNumber("DepRtctTurns", c_defaultRetractTurns);
     frc::SmartDashboard::PutNumber("DepExtTurns", c_defaultExtendTurns);
@@ -60,7 +67,8 @@ IntakeSubsystem::IntakeSubsystem()
     m_deployFollowMotor.SetClosedLoopRampRate(0.0);
     m_deployFollowMotor.SetInverted(true);
     m_deployFollowRelativeEnc.SetPosition(0.0);
-    m_deployFollowPIDController.SetOutputRange(kMinOut, kMaxOut);
+    //m_deployFollowPIDController.SetOutputRange(kMinOut, kMaxOut);
+    m_deployFollowPIDController.SetOutputRange(-0.5, 0.5);
     // m_deployFollowMotor.Follow(m_deployMotor, true);
 #endif
 
@@ -135,6 +143,18 @@ void IntakeSubsystem::LoadDeployPid()
     lastP = p;
     lastI = i;
     lastD = d;
+
+    static double lastMin = 0.0;
+    static double lastMax = 0.0;
+    auto min = frc::Preferences::GetDouble("kIntakeDeployMin", c_defaultIntakeMin);
+    auto max = frc::Preferences::GetDouble("kIntakeDeployMax", c_defaultIntakeMax);
+    if (min != lastMin || max != lastMax)
+    {
+        m_deployPIDController.SetOutputRange(min, max);
+        m_deployFollowPIDController.SetOutputRange(min, max);
+    }
+    lastMin = min;
+    lastMax = max;
 }
 
 void IntakeSubsystem::LoadDeploySmartmotion()
@@ -195,6 +215,12 @@ void IntakeSubsystem::ExtendIntake()
     // frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());
     // frc::SmartDashboard::PutNumber("DepTemp", m_deployMotor.GetMotorTemperature());
     // frc::SmartDashboard::PutNumber("DepOutAmps", m_deployMotor.GetOutputCurrent());    
+}
+
+void IntakeSubsystem::ExtendIntake(double turns)
+{
+    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
 }
 
 void IntakeSubsystem::AdjustIntake()

@@ -52,6 +52,7 @@ RobotContainer::RobotContainer()
 
   frc::SmartDashboard::PutNumber("CloseAngle", 49.0);
   frc::SmartDashboard::PutNumber("ShootDelay", m_shootDelayMs);
+  frc::SmartDashboard::PutNumber("AmpShotTurns", 21);
   frc::SmartDashboard::PutNumber("AmpIntakePercent", 0.0);
 
 }
@@ -267,6 +268,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.LeftBumper().WhileTrue(IntakeRelease(*this).ToPtr());
   secondary.RightBumper().OnTrue(&m_resetShooterToStart);
 #else
+  secondary.B().OnTrue(&m_ampPositionIntake);
   secondary.RightBumper().OnTrue(AmpIntakeCommand(*this).ToPtr());
 #endif
 
