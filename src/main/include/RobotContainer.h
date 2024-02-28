@@ -129,7 +129,7 @@ private:
 
   InstantCommand m_ampShootIntake{[this]
   { 
-    m_intake.ExtendIntake();
+    // m_intake.ExtendIntake();
     m_intake.Set(frc::SmartDashboard::GetNumber("AmpShotPercent", -0.6));
   }, {} };
 

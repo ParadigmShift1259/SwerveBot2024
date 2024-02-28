@@ -14,6 +14,9 @@
 #include "commands/PlopperGoToPositionCommand.h"
 #include "commands/PlopperShootCommand.h"
 #include "commands/AmpIntakeCommand.h"
+#include "commands/GoToElevationCommand.h"
+#include "commands/IntakeGoToPositionCommand.h"
+#include "commands/IntakeTransfer.h"
 
 #include <frc/MathUtil.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -245,6 +248,20 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // secondary.LeftTrigger().WhileTrue();
   // secondary.RightTrigger().WhileTrue();
 
+    secondary.A().OnTrue(frc2::SequentialCommandGroup{
+      IntakeStop(*this)
+    , frc2::WaitCommand(0.5_s)
+    , GoToElevationCommand(*this, 0.0_deg)
+    , frc2::WaitCommand(1.0_s)
+    , IntakeGoToPositionCommand(*this, 24.0)
+    , frc2::WaitCommand(1.0_s)
+    , GoToElevationCommand(*this, -60.0_deg)
+    , frc2::WaitCommand(1.0_s)
+    , IntakeGoToPositionCommand(*this, 16.0)
+    , frc2::WaitCommand(1.0_s)
+    , IntakeTransfer(*this)
+  }.ToPtr());
+  secondary.X().OnTrue(IntakeTransfer(*this).ToPtr());
 #define TEST_AMP_SHOT_WITH_INTAKE
 #ifndef TEST_AMP_SHOT_WITH_INTAKE
   secondary.A().WhileTrue(frc2::SequentialCommandGroup{

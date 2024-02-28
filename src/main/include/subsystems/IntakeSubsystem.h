@@ -39,6 +39,7 @@ public:
     void AdjustIntake();
     // Retracts the intake into the robot
     void RetractIntake();
+    void GoToPosition(double turns);
     bool IsNotePresent() { return m_photoEye.Get(); }
     void EjectNote() { Set(kIngestSpeed); }
     void Stop() { Set(0.0); }

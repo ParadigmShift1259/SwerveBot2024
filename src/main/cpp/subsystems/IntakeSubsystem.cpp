@@ -241,20 +241,16 @@ void IntakeSubsystem::RetractIntake()
 {
     double turns = frc::SmartDashboard::GetNumber("DepRtctTurns", c_defaultRetractTurns);
     //printf("dep turns %.3f\n", turns);
-#ifdef USE_SMART_MOTION_DEPLOY
-    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
-#else
+
     m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
-#endif
 
-#ifndef OVERUNDER
-
-#ifdef USE_SMART_MOTION_DEPLOY
-    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
-#else
     m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
-#endif
+}
 
-#endif
+void IntakeSubsystem::GoToPosition(double turns)
+{
+    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
 
+    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    
 }

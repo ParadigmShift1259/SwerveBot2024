@@ -127,7 +127,7 @@ ShooterSubsystem::ShooterSubsystem()
   m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", c_defaultElevI));
   m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", c_defaultElevD));
   m_ElevationPIDController.SetFF(frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF));
-  m_ElevationPIDController.SetOutputRange(kMinOut, kMaxOut);
+  m_ElevationPIDController.SetOutputRange(-1.0, 1.0);
 
   // Smart Motion Coefficients
   double minVel = frc::Preferences::GetDouble("kElevMinVel", 0.0);     // rpm
@@ -135,14 +135,14 @@ ShooterSubsystem::ShooterSubsystem()
   double maxAcc = frc::Preferences::GetDouble("kElevMaxAcc", 1500.0);
   double allowedErr = frc::Preferences::GetDouble("kElevAllowedErr", 0.0);
 
-  int smartMotionSlot = 0;
-  m_ElevationPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
-  m_ElevationPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
-  m_ElevationPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
-  m_ElevationPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
-WPI_IGNORE_DEPRECATED
-  m_ElevationPIDController.SetSmartMotionAccelStrategy(rev::SparkMaxPIDController::AccelStrategy::kSCurve, smartMotionSlot); // Other accel strategy kTrapezoidal
-WPI_UNIGNORE_DEPRECATED
+  // int smartMotionSlot = 0;
+  // m_ElevationPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
+  // m_ElevationPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+  // m_ElevationPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
+//   // m_ElevationPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
+// WPI_IGNORE_DEPRECATED
+//   m_ElevationPIDController.SetSmartMotionAccelStrategy(rev::SparkMaxPIDController::AccelStrategy::kSCurve, smartMotionSlot); // Other accel strategy kTrapezoidal
+// WPI_UNIGNORE_DEPRECATED
 
   frc::SmartDashboard::PutNumber("ShotAngle", 37.0);
   frc::SmartDashboard::PutNumber("ShotAngleClose", 57.0);
@@ -356,8 +356,8 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   //turns = frc::SmartDashboard::GetNumber("ElevationTurns", 0.0);
   m_elevationTurns = turns;  // For calibration
   m_logElevTurns.Append(turns);
-  //m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
-  m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
+  m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+  // m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
 
   // frc::SmartDashboard::PutNumber("ElevApplOut", m_ElevationController.GetAppliedOutput());
   // frc::SmartDashboard::PutNumber("ElevBusV", m_ElevationController.GetBusVoltage());
