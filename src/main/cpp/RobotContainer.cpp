@@ -17,6 +17,7 @@
 #include "commands/GoToElevationCommand.h"
 #include "commands/IntakeGoToPositionCommand.h"
 #include "commands/IntakeTransfer.h"
+#include "commands/AmpShootCommand.h"
 
 #include <frc/MathUtil.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -42,6 +43,7 @@ using namespace pathplanner;
 
 RobotContainer::RobotContainer() 
   : m_drive()
+  , m_orchestra("output.chrp")
 {
   SetDefaultCommands();
   ConfigureBindings();
@@ -57,6 +59,8 @@ RobotContainer::RobotContainer()
   frc::SmartDashboard::PutNumber("ShootDelay", m_shootDelayMs);
   frc::SmartDashboard::PutNumber("AmpShotTurns", 21);
   frc::SmartDashboard::PutNumber("AmpIntakePercent", 0.0);
+
+  m_orchestra.AddInstrument(GetDrive().GetTalon());
 
 }
 
@@ -250,18 +254,26 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
     secondary.A().OnTrue(frc2::SequentialCommandGroup{
       IntakeStop(*this)
-    , frc2::WaitCommand(0.5_s)
+    , IntakeTransfer(*this)
+    , GoToElevationCommand(*this, 0.0_deg)
+    , frc2::WaitCommand(0.4_s)
+    , IntakeGoToPositionCommand(*this, 24.0)
+    , frc2::WaitCommand(0.8_s)
+    , GoToElevationCommand(*this, -60.0_deg)
+    , frc2::WaitCommand(0.4_s)
+    , IntakeGoToPositionCommand(*this, 16.0)
+  }.ToPtr());
+    secondary.Y().OnTrue(frc2::SequentialCommandGroup{
+      IntakeGoToPositionCommand(*this, 24.0)
+    , frc2::WaitCommand(1.0_s)
     , GoToElevationCommand(*this, 0.0_deg)
     , frc2::WaitCommand(1.0_s)
-    , IntakeGoToPositionCommand(*this, 24.0)
-    , frc2::WaitCommand(1.0_s)
-    , GoToElevationCommand(*this, -60.0_deg)
-    , frc2::WaitCommand(1.0_s)
-    , IntakeGoToPositionCommand(*this, 16.0)
-    , frc2::WaitCommand(1.0_s)
-    , IntakeTransfer(*this)
+    , IntakeGoToPositionCommand(*this, 0.0)
   }.ToPtr());
   secondary.X().OnTrue(IntakeTransfer(*this).ToPtr());
+  // secondary.X().OnTrue(&m_startOrchestra);
+  // secondary.Y().OnTrue(&m_endOrchestra);
+
 #define TEST_AMP_SHOT_WITH_INTAKE
 #ifndef TEST_AMP_SHOT_WITH_INTAKE
   secondary.A().WhileTrue(frc2::SequentialCommandGroup{
@@ -285,7 +297,17 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.LeftBumper().WhileTrue(IntakeRelease(*this).ToPtr());
   secondary.RightBumper().OnTrue(&m_resetShooterToStart);
 #else
-  secondary.B().OnTrue(&m_ampPositionIntake);
+  secondary.B().OnTrue(frc2::SequentialCommandGroup
+    {
+      AmpShootCommand(*this)
+    , frc2::WaitCommand(0.5_s)
+    , IntakeGoToPositionCommand(*this, 24.0)
+    , frc2::WaitCommand(0.5_s)
+    , GoToElevationCommand(*this, 0.0_deg)
+    , frc2::WaitCommand(0.4_s)
+    , IntakeGoToPositionCommand(*this, 0.0)
+    // , GoToElevationCommand(*this, 60.0_deg)
+    }.ToPtr());
   secondary.RightBumper().OnTrue(AmpIntakeCommand(*this).ToPtr());
 #endif
 
@@ -293,7 +315,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
   secondary.POVDown(loop).Rising().IfHigh([this] { m_goToElev.Schedule(); });
   //secondary.POVLeft(loop).Rising().IfHigh([this] { AmpIntakeCommand(*this).Schedule(); });
-  secondary.POVRight(loop).Rising().IfHigh([this] { m_ampShootIntake.Schedule(); });
+  //secondary.POVRight(loop).Rising().IfHigh([this] { AmpShootCommand(*this).Schedule(); });
 }
 
 void RobotContainer::ConfigButtonBoxBindings()

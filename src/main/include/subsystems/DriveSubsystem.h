@@ -67,6 +67,8 @@ public:
   void WheelsBackward() override;
   void WheelsRight() override;
 
+  TalonFX& GetTalon() { return m_frontLeft.GetTalon(); };
+
   void ToggleSlowSpeed() override
   { 
     m_currentMaxSpeed = (m_currentMaxSpeed == kMaxSpeed ? kLowSpeed : kMaxSpeed);

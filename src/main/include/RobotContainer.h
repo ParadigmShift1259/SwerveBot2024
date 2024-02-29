@@ -18,6 +18,8 @@
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/WaitCommand.h>
 
+#include <ctre/phoenix6/Orchestra.hpp>
+
 #include <pathplanner/lib/auto/AutoBuilder.h>
 // #include <pathplanner/lib/commands/PPSwerveControllerCommand.h>
 #include <unordered_map>
@@ -150,6 +152,11 @@ private:
   InstantCommand m_OverrideOff{[this] { GetDrive().SetOverrideXboxInput(false); }, {&m_drive} };
   // std::unordered_map<std::string, std::shared_ptr<frc2::Command>> m_eventMap;
   // SwerveAutoBuilder m_autoBuilder;
+
+  ctre::phoenix6::Orchestra m_orchestra;	
+
+  InstantCommand m_startOrchestra{[this] { m_orchestra.Play(); }, {} };
+  InstantCommand m_endOrchestra{[this] { m_orchestra.Stop(); }, {} };
 
   bool m_isAutoRunning = false;
   bool m_DriveStraightHook = false;

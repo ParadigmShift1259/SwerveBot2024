@@ -42,6 +42,7 @@ public:
     void Periodic();
     void ResyncAbsRelEnc();
     void SetMaxSpeed(units::meters_per_second_t newMaxSpeed) { m_currentMaxSpeed = newMaxSpeed; }
+    TalonFX& GetTalon() { return m_driveMotor; };
 
 private:
     units::meters_per_second_t CalcMetersPerSec();
