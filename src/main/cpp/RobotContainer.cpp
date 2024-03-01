@@ -8,6 +8,7 @@
 #include "commands/IntakeRelease.h"
 #include "commands/IntakeAdjust.h"
 #include "commands/IntakeIngest.h"
+#include "commands/IntakeDeploy.h"
 #include "commands/StopAllCommand.h"
 #include "commands/PreShootCommand.h"
 #include "commands/ShootCommand.h"
@@ -60,7 +61,11 @@ RobotContainer::RobotContainer()
   frc::SmartDashboard::PutNumber("AmpShotTurns", 21);
   frc::SmartDashboard::PutNumber("AmpIntakePercent", 0.0);
 
-  m_orchestra.AddInstrument(GetDrive().GetTalon());
+  // for (int moduleNumber = 0; moduleNumber < 4; moduleNumber++)
+  // {
+  //   m_orchestra.AddInstrument(GetDrive().GetTalon(moduleNumber));
+  // }
+  
 
 }
 
@@ -205,17 +210,20 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // primary.Back().WhileTrue(&m_OverrideOff);
 #else
 
+  /* -------- Drive Practice Preparation -------- */
+
+
   primary.A().WhileTrue(frc2::SequentialCommandGroup{
       PreShootCommand(*this, 129_in)
     , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
-    , ShootCommand(*this, 129_in)
+    , ShootCommand(*this)
   }.ToPtr());
 
   primary.B().WhileTrue(frc2::SequentialCommandGroup{
       IntakeAdjust(*this)
     , PreShootCommand(*this, 30_in)
     , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
-    , ShootCommand(*this, 30_in)
+    , ShootCommand(*this)
   }.ToPtr());
   //primary.A().WhileTrue(ShootCommand(*this).ToPtr());
   // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
@@ -252,10 +260,21 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // secondary.LeftTrigger().WhileTrue();
   // secondary.RightTrigger().WhileTrue();
 
-    secondary.A().OnTrue(frc2::SequentialCommandGroup{
+#define DRIVE_PRACTICE_SECONDARY
+#ifdef DRIVE_PRACTICE_SECONDARY
+  /* -------- Drive Practice Preparation -------- */
+
+  secondary.A().OnTrue(IntakeIngest(*this).ToPtr());                          
+  secondary.B().WhileTrue(frc2::SequentialCommandGroup{
+      IntakeDeploy(*this)
+    , IntakeRelease(*this) 
+  }.ToPtr());     
+  secondary.X().OnTrue(frc2::SequentialCommandGroup{
       IntakeStop(*this)
     , IntakeTransfer(*this)
-    , GoToElevationCommand(*this, 0.0_deg)
+    , IntakeGoToPositionCommand(*this, 9.0)
+    , frc2::WaitCommand(0.4_s)
+    , GoToElevationCommand(*this, 40.0_deg)
     , frc2::WaitCommand(0.4_s)
     , IntakeGoToPositionCommand(*this, 24.0)
     , frc2::WaitCommand(0.8_s)
@@ -263,14 +282,34 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , frc2::WaitCommand(0.4_s)
     , IntakeGoToPositionCommand(*this, 16.0)
   }.ToPtr());
-    secondary.Y().OnTrue(frc2::SequentialCommandGroup{
-      IntakeGoToPositionCommand(*this, 24.0)
+  secondary.Y().OnTrue(frc2::SequentialCommandGroup{
+      AmpShootCommand(*this)
+    , frc2::WaitCommand(0.5_s)
+    , IntakeGoToPositionCommand(*this, 24.0)
     , frc2::WaitCommand(1.0_s)
-    , GoToElevationCommand(*this, 0.0_deg)
+    , GoToElevationCommand(*this, 40.0_deg)
+    , frc2::WaitCommand(1.0_s)
+    , IntakeGoToPositionCommand(*this, 9.0)
+    , frc2::WaitCommand(1.0_s)
+    , GoToElevationCommand(*this, 66.0_deg)
     , frc2::WaitCommand(1.0_s)
     , IntakeGoToPositionCommand(*this, 0.0)
   }.ToPtr());
-  secondary.X().OnTrue(IntakeTransfer(*this).ToPtr());
+
+  secondary.RightBumper().OnTrue(PreShootCommand(*this, 129_in).ToPtr());
+  secondary.LeftBumper().OnTrue(PreShootCommand(*this, 30_in).ToPtr());
+
+  secondary.Back().OnTrue(GoToElevationCommand(*this, 66.0_deg).ToPtr());
+
+  secondary.RightTrigger(0.9).WhileTrue(ShootCommand(*this).ToPtr());
+
+  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  secondary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
+  secondary.POVRight(loop).Rising().IfHigh([this] { IntakeRelease(*this).Schedule(); });
+  secondary.POVLeft(loop).Rising().IfHigh([this] { IntakeDeploy(*this).Schedule(); });
+  secondary.POVDown(loop).Rising().IfHigh([this] { IntakeStop(*this).Schedule(); });
+#endif
+
   // secondary.X().OnTrue(&m_startOrchestra);
   // secondary.Y().OnTrue(&m_endOrchestra);
 
@@ -291,29 +330,27 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   //secondary.A().WhileTrue(ShootCommand(*this).ToPtr());
   // secondary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
   // secondary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
-  // secondary.B().OnTrue(PreShootCommand(*this, 129_in, 32_deg).ToPtr());
+  secondary.B().OnTrue(PreShootCommand(*this, 129_in, 32_deg).ToPtr());
   secondary.X().OnTrue(IntakeIngest(*this).ToPtr());
   secondary.Y().WhileTrue(IntakeStop(*this).ToPtr());
   secondary.LeftBumper().WhileTrue(IntakeRelease(*this).ToPtr());
   secondary.RightBumper().OnTrue(&m_resetShooterToStart);
 #else
-  secondary.B().OnTrue(frc2::SequentialCommandGroup
-    {
-      AmpShootCommand(*this)
-    , frc2::WaitCommand(0.5_s)
-    , IntakeGoToPositionCommand(*this, 24.0)
-    , frc2::WaitCommand(0.5_s)
-    , GoToElevationCommand(*this, 0.0_deg)
-    , frc2::WaitCommand(0.4_s)
-    , IntakeGoToPositionCommand(*this, 0.0)
-    // , GoToElevationCommand(*this, 60.0_deg)
-    }.ToPtr());
-  secondary.RightBumper().OnTrue(AmpIntakeCommand(*this).ToPtr());
+  // secondary.B().OnTrue(frc2::SequentialCommandGroup
+  //   {
+  //     AmpShootCommand(*this)
+  //   , frc2::WaitCommand(0.5_s)
+  //   , IntakeGoToPositionCommand(*this, 24.0)
+  //   , frc2::WaitCommand(0.5_s)
+  //   , GoToElevationCommand(*this, 0.0_deg)
+  //   , frc2::WaitCommand(0.4_s)
+  //   , IntakeGoToPositionCommand(*this, 0.0)
+  //   , frc2::WaitCommand(0.4_s)
+  //   , GoToElevationCommand(*this, 65.9_deg)
+  //   }.ToPtr());
+  // secondary.RightBumper().OnTrue(AmpIntakeCommand(*this).ToPtr());
 #endif
 
-  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-  secondary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
-  secondary.POVDown(loop).Rising().IfHigh([this] { m_goToElev.Schedule(); });
   //secondary.POVLeft(loop).Rising().IfHigh([this] { AmpIntakeCommand(*this).Schedule(); });
   //secondary.POVRight(loop).Rising().IfHigh([this] { AmpShootCommand(*this).Schedule(); });
 }
@@ -327,10 +364,12 @@ void RobotContainer::ConfigButtonBoxBindings()
   // 1	  Back			    Start			    Left Stick Button	Right Stick Button	Left Bumper
   // 2	  Right Trigger	Left Trigger	X					        Y					          Right Bumper
   // 3	  B				      A				      POV Left			    POV Right			      POV Up
-  // buttonBox.A().WhileTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
-  // buttonBox.A().OnFalse(IntakeStop(*this).ToPtr());                              // Blue   row 3
+  buttonBox.A().OnTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
+  buttonBox.B().WhileTrue(IntakeRelease(*this).ToPtr());                              // Blue   row 3
   buttonBox.Start().OnTrue(PlopperGoToPositionCommand(*this).ToPtr());                                 // Black  row 3
-  buttonBox.LeftStick().WhileTrue(PlopperShootCommand(*this).ToPtr());                                // Green  row 2
+  buttonBox.LeftStick().WhileTrue(PlopperShootCommand(*this).ToPtr());    
+  buttonBox.Back().OnTrue(GoToElevationCommand(*this, 66.0_deg).ToPtr());
+  // Green  row 2
   // buttonBox.Y().OnTrue(RetrieveGamePiece(*this).ToPtr());                        // Yellow row 2
 
   // buttonBox.LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1

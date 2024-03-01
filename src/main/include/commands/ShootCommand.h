@@ -6,7 +6,7 @@
 class ShootCommand: public frc2::CommandHelper<frc2::Command, ShootCommand>
 {
     public:
-        explicit ShootCommand(ISubsystemAccess& subsystemAccess, units::meter_t distance);
+        explicit ShootCommand(ISubsystemAccess& subsystemAccess);
 		
         void Initialize() override;
         void Execute() override;
@@ -16,8 +16,6 @@ class ShootCommand: public frc2::CommandHelper<frc2::Command, ShootCommand>
     private:
         ShooterSubsystem& m_shooterSubsystem;
         IntakeSubsystem& m_intakeSubsystem;
-		
-        units::meter_t m_distance;
 
 		wpi::log::BooleanLogEntry m_logStartShootCommand;
 };

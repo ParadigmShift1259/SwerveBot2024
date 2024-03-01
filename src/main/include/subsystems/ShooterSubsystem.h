@@ -92,7 +92,7 @@ class ShooterSubsystem : public frc2::SubsystemBase
         // Near    Far
         { 3700.0,  3700.0}, // Over/Under (Left/Right) RPM
         {    0.0,     0.0}, // Back wheels (not used in SxS) RPM
-        {   57.0,    34.0}  // Shot angle for Speaker and Podium
+        {   57.0,    40.0}  // Shot angle for Speaker and Podium
     };
 #endif 
 

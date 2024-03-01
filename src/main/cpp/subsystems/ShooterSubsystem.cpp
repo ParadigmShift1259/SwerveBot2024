@@ -18,7 +18,7 @@ const units::degree_t c_pinPopAngle = 50_deg;
 #else
 constexpr double c_defaultRPM = 3700.0;
 
-const units::degree_t c_pinPopAngle = 37_deg;
+const units::degree_t c_pinPopAngle = 40_deg;
 constexpr double c_elevStartAngle = 65.0;
 #endif
 
@@ -144,7 +144,7 @@ ShooterSubsystem::ShooterSubsystem()
 //   m_ElevationPIDController.SetSmartMotionAccelStrategy(rev::SparkMaxPIDController::AccelStrategy::kSCurve, smartMotionSlot); // Other accel strategy kTrapezoidal
 // WPI_UNIGNORE_DEPRECATED
 
-  frc::SmartDashboard::PutNumber("ShotAngle", 37.0);
+  frc::SmartDashboard::PutNumber("ShotAngle", 40.0);
   frc::SmartDashboard::PutNumber("ShotAngleClose", 57.0);
 #ifdef OVERUNDER
   frc::SmartDashboard::PutNumber("OverRPM",  m_shootReference[0][1]);
@@ -234,7 +234,7 @@ void ShooterSubsystem::Periodic()
     m_shootReference[0][0] = frc::SmartDashboard::GetNumber("OverRPMClose",  -c_defaultRPM);
     m_shootReference[0][0] = frc::SmartDashboard::GetNumber("UnderRPMClose", c_defaultRPM);
 
-    m_shootReference[2][1] = frc::SmartDashboard::GetNumber("ShotAngle", 37.0);
+    m_shootReference[2][1] = frc::SmartDashboard::GetNumber("ShotAngle", 40.0);
     m_shootReference[2][0] = frc::SmartDashboard::GetNumber("ShotAngleClose", 57.0);
 
 #ifdef OVERUNDER

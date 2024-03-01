@@ -67,7 +67,7 @@ public:
   void WheelsBackward() override;
   void WheelsRight() override;
 
-  TalonFX& GetTalon() { return m_frontLeft.GetTalon(); };
+  TalonFX& GetTalon(int module);
 
   void ToggleSlowSpeed() override
   { 

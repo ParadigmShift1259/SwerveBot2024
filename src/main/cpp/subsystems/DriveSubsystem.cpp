@@ -262,3 +262,21 @@ void DriveSubsystem::SetModuleStates(SwerveModuleStates desiredStates)
   m_rearRight.SetDesiredState(desiredStates[3]);
   m_rearLeft.SetDesiredState(desiredStates[2]);
 }
+
+TalonFX& DriveSubsystem::GetTalon(int module)
+{
+  switch (module) {
+    case 0:
+      return m_frontLeft.GetTalon(); 
+      break;
+    case 1:
+      return m_frontRight.GetTalon();
+      break;
+    case 2:
+      return m_rearRight.GetTalon();
+      break;
+    default:
+      return m_rearLeft.GetTalon();
+      break;
+  }
+}

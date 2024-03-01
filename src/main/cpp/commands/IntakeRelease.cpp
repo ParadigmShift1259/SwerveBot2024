@@ -17,7 +17,7 @@ void IntakeRelease::Initialize()
 
 void IntakeRelease::Execute()
 {
-  m_intake.ExtendIntake();
+  // m_intake.ExtendIntake();
   m_intake.Set(kReleaseSpeed);
 }
 
