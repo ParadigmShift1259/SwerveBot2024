@@ -144,11 +144,7 @@ void RobotContainer::SetDefaultCommands()
       {
         // const double kDeadband = 0.02;
         const double kDeadband = 0.1;
-#ifdef OVERUNDER
-		double direction = 1.0;
-#else
-		double direction = -1.0;
-#endif
+		    const double direction = -1.0;
         const auto xInput = direction* ApplyDeadband(m_primaryController.GetLeftY(), kDeadband);
         const auto yInput = direction * ApplyDeadband(m_primaryController.GetLeftX(), kDeadband);
         const auto rotInput = ApplyDeadband(m_primaryController.GetRightX(), kDeadband);      
@@ -260,7 +256,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // secondary.LeftTrigger().WhileTrue();
   // secondary.RightTrigger().WhileTrue();
 
-#define DRIVE_PRACTICE_SECONDARY
+//#define DRIVE_PRACTICE_SECONDARY
 #ifdef DRIVE_PRACTICE_SECONDARY
   /* -------- Drive Practice Preparation -------- */
 
@@ -351,8 +347,9 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // secondary.RightBumper().OnTrue(AmpIntakeCommand(*this).ToPtr());
 #endif
 
-  //secondary.POVLeft(loop).Rising().IfHigh([this] { AmpIntakeCommand(*this).Schedule(); });
-  //secondary.POVRight(loop).Rising().IfHigh([this] { AmpShootCommand(*this).Schedule(); });
+  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  secondary.POVDown(loop).Rising().IfHigh([this] { m_goToElev.Schedule(); });
+  secondary.POVRight(loop).Rising().IfHigh([this] { m_ampPositionIntake.Schedule(); });
 }
 
 void RobotContainer::ConfigButtonBoxBindings()

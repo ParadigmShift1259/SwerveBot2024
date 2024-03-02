@@ -56,11 +56,9 @@ private:
     rev::CANSparkMax m_deployMotor;
     rev::SparkRelativeEncoder m_deployRelativeEnc = m_deployMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);    
     rev::SparkPIDController m_deployPIDController = m_deployMotor.GetPIDController();
-#ifndef OVERUNDER
     rev::CANSparkMax m_deployFollowMotor;
     rev::SparkRelativeEncoder m_deployFollowRelativeEnc = m_deployFollowMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);    
     rev::SparkPIDController m_deployFollowPIDController = m_deployFollowMotor.GetPIDController();
-#endif
 
     static constexpr bool kIntakeExtend = true;
     static constexpr bool kIntakeRetract = false;

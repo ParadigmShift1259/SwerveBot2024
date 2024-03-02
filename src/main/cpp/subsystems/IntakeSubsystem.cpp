@@ -14,14 +14,8 @@ constexpr double c_defaultIntakeD = 0.0;
 constexpr double c_defaultIntakeMin = -0.5;
 constexpr double c_defaultIntakeMax = 0.5;
 
-#ifdef OVERUNDER
-constexpr double c_defaultRetractTurns = 0.0476;
-constexpr double c_defaultExtendTurns = 13.3;
-constexpr double c_defaultAdjustTurns = 1.5;
-#else
 constexpr double c_defaultRetractTurns = 0.0;
 constexpr double c_defaultExtendTurns = 45.0;
-#endif
 
 using namespace frc;
 using namespace ctre::phoenix::motorcontrol;
@@ -30,9 +24,7 @@ IntakeSubsystem::IntakeSubsystem()
     : m_motor(kIntakeRollerCANID)
     , m_photoEye(kIntakePhotoeye)
     , m_deployMotor(kIntakeDeployCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
-#ifndef OVERUNDER
     , m_deployFollowMotor(kIntakeDeployFollowCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
-#endif
 {
     m_motor.SetNeutralMode(NeutralMode::Coast);
 
@@ -60,9 +52,6 @@ IntakeSubsystem::IntakeSubsystem()
     frc::SmartDashboard::PutNumber("DepRtctTurns", c_defaultRetractTurns);
     frc::SmartDashboard::PutNumber("DepExtTurns", c_defaultExtendTurns);
 
-#ifdef OVERUNDER
-    frc::SmartDashboard::PutNumber("DepAdjTurns", c_defaultAdjustTurns);
-#else
     m_deployFollowMotor.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
     m_deployFollowMotor.SetClosedLoopRampRate(0.0);
     m_deployFollowMotor.SetInverted(true);
@@ -70,7 +59,6 @@ IntakeSubsystem::IntakeSubsystem()
     //m_deployFollowPIDController.SetOutputRange(kMinOut, kMaxOut);
     m_deployFollowPIDController.SetOutputRange(-0.5, 0.5);
     // m_deployFollowMotor.Follow(m_deployMotor, true);
-#endif
 
 #ifdef USE_SMART_MOTION_DEPLOY
   // Smart Motion Coefficients
@@ -104,9 +92,7 @@ void IntakeSubsystem::Periodic()
 #endif
 
     frc::SmartDashboard::PutNumber("Deploy echo", m_deployRelativeEnc.GetPosition());
-#ifndef OVERUNDER
     frc::SmartDashboard::PutNumber("Deploy Follow echo", m_deployFollowRelativeEnc.GetPosition());
-#endif
     frc::SmartDashboard::PutBoolean("Intake PhotoEye", m_photoEye.Get());
 }
 
@@ -122,23 +108,17 @@ void IntakeSubsystem::LoadDeployPid()
     if (p != lastP)
     {
         m_deployPIDController.SetP(p);
-#ifndef OVERUNDER
         m_deployFollowPIDController.SetP(frc::Preferences::GetDouble("kIntakeDeployP", c_defaultIntakeP));
-#endif
     }
     if (i != lastI)
     {
         m_deployPIDController.SetI(i);
-#ifndef OVERUNDER
         m_deployFollowPIDController.SetI(frc::Preferences::GetDouble("kIntakeDeployI", c_defaultIntakeI));
-#endif
     }
     if (d != lastD)
     {
         m_deployPIDController.SetD(d);
-#ifndef OVERUNDER
         m_deployFollowPIDController.SetD(frc::Preferences::GetDouble("kIntakeDeployD", c_defaultIntakeD));
-#endif
     }
     lastP = p;
     lastI = i;
@@ -203,13 +183,10 @@ void IntakeSubsystem::ExtendIntake()
     m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
 #endif
 
-#ifndef OVERUNDER
-
 #ifdef USE_SMART_MOTION_DEPLOY
     m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
 #else
     m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
-#endif
 #endif
     // frc::SmartDashboard::PutNumber("DepApplOut", m_deployMotor.GetAppliedOutput()); 
     // frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());

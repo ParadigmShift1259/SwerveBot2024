@@ -20,12 +20,15 @@ using namespace ctre::phoenix::motorcontrol;
 AmpSubsystem::AmpSubsystem()
     : m_motor(kPlopperRollerCANID)
     // , m_photoEye(kIntakePhotoeye)
+#ifdef THING1
     , m_liftMotor(kPlopperElevationControllerCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
+#endif
 {
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
   m_motor.SetNeutralMode(NeutralMode::Coast);
 
+#ifdef THING1
   m_liftMotor.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
   m_liftMotor.SetClosedLoopRampRate(0.0);
   m_liftRelativeEnc.SetPosition(0.0);
@@ -35,6 +38,7 @@ AmpSubsystem::AmpSubsystem()
   frc::Preferences::InitDouble("kPlopperPosD", c_defaultPlopperD);
 
   m_liftPIDController.SetOutputRange(kMinOut, kMaxOut);
+#endif
 
   frc::SmartDashboard::PutNumber("LiftAmpTurns", c_defaultAmpTurns);
   frc::SmartDashboard::PutNumber("LiftParkTurns", c_defaultParkTurns);
@@ -50,22 +54,20 @@ AmpSubsystem::AmpSubsystem()
 void AmpSubsystem::Periodic()
 {
   // m_log.Append(add_data_here);
-  static int count = 0;
-  if (count++ % 50 == 0)
-  {
-    m_liftPIDController.SetP(frc::Preferences::GetDouble("kPlopperPosP", c_defaultPlopperP));
-    m_liftPIDController.SetI(frc::Preferences::GetDouble("kPlopperPosI", c_defaultPlopperI));
-    m_liftPIDController.SetD(frc::Preferences::GetDouble("kPlopperPosD", c_defaultPlopperD));
-    frc::SmartDashboard::PutNumber("Plopper echo", m_liftRelativeEnc.GetPosition());
+#ifdef THING1
+  m_liftPIDController.SetP(frc::Preferences::GetDouble("kPlopperPosP", c_defaultPlopperP));
+  m_liftPIDController.SetI(frc::Preferences::GetDouble("kPlopperPosI", c_defaultPlopperI));
+  m_liftPIDController.SetD(frc::Preferences::GetDouble("kPlopperPosD", c_defaultPlopperD));
+  frc::SmartDashboard::PutNumber("Plopper echo", m_liftRelativeEnc.GetPosition());
+#endif
 
-    m_AmpTurns      = frc::SmartDashboard::GetNumber("LiftAmpTurns", c_defaultAmpTurns);
-    m_ParkTurns     = frc::SmartDashboard::GetNumber("LiftParkTurns", c_defaultParkTurns);
-    m_TransferTurns = frc::SmartDashboard::GetNumber("LiftXfrTurns", c_defaultTransferTurns);
-    m_TrapTurns     = frc::SmartDashboard::GetNumber("LiftTrapTurns", c_defaultTrapTurns);
+  m_AmpTurns      = frc::SmartDashboard::GetNumber("LiftAmpTurns", c_defaultAmpTurns);
+  m_ParkTurns     = frc::SmartDashboard::GetNumber("LiftParkTurns", c_defaultParkTurns);
+  m_TransferTurns = frc::SmartDashboard::GetNumber("LiftXfrTurns", c_defaultTransferTurns);
+  m_TrapTurns     = frc::SmartDashboard::GetNumber("LiftTrapTurns", c_defaultTrapTurns);
 
-    m_plopperPosition = frc::SmartDashboard::GetNumber("PlopperPosition", 1.0);
-    m_plopperSpeed = frc::SmartDashboard::GetNumber("PlopperSpeed", 0.0);
-  }
+  m_plopperPosition = frc::SmartDashboard::GetNumber("PlopperPosition", 1.0);
+  m_plopperSpeed = frc::SmartDashboard::GetNumber("PlopperSpeed", 0.0);
   // frc::SmartDashboard::PutBoolean("Plopper PhotoEye", m_photoEye.Get());
 }
 
@@ -80,6 +82,8 @@ void AmpSubsystem::GoToPosition(double position)
 
   double turns = m_plopperPosition;
   printf("plopper turns %.3f\n", turns);
+#ifdef THING1
   m_liftPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+#endif
 }
 

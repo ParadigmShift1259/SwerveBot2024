@@ -15,27 +15,17 @@ constexpr int kRearLeftTurningCANID   = 8;       //!< Rear Left Turn CAN ID (Spa
 
 
 constexpr int kIntakeRollerCANID     = 11;       // TalonSRX
-#ifdef OVERUNDER
-constexpr int kIntakeDeployCANID      = 15;       // SparkMax
-#else
 constexpr int kIntakeDeployCANID      = 14;       // SparkMax
 constexpr int kIntakeDeployFollowCANID = 16;       // SparkMax
-#endif
 
 constexpr int kShooterOverWheelsCANID  = 13;
 constexpr int kShooterUnderWheelsCANID = 12;
 
-#ifdef OVERUNDER
-constexpr int kShooterBackWheelsCANID = 22;
-constexpr int kShooterElevationControllerCANID = 23;
-constexpr int kElevationEncoderCANID = 1;
-#else
 constexpr int kShooterElevationControllerCANID = 15;
 
 constexpr int kPlopperElevationControllerCANID = 23; // SparkMax
 
 constexpr int kPlopperRollerCANID     = 12;       // TalonSRX
-#endif
 
 constexpr int kDrivePigeonCANID = 1;
 constexpr int kShooterPigeonCANID = 2;

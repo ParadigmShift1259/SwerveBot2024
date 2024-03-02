@@ -45,9 +45,11 @@ class AmpSubsystem : public frc2::SubsystemBase
 
     TalonSRX m_motor;
 
+#ifdef THING1  
     rev::CANSparkMax m_liftMotor;
     rev::SparkRelativeEncoder m_liftRelativeEnc = m_liftMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);    
     rev::SparkPIDController m_liftPIDController = m_liftMotor.GetPIDController();
+#endif
 
     double m_AmpTurns;    
     double m_ParkTurns;   

@@ -1,6 +1,6 @@
 #pragma once
 
-//#define OVERUNDER
+//#define THING1
 
 constexpr double kMinOut = -1.0;
 constexpr double kMaxOut = 1.0;

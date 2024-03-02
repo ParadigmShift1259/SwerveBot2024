@@ -27,10 +27,6 @@ class ShooterSubsystem : public frc2::SubsystemBase
     void StartOverAndUnder(units::meter_t distance);
     void Shoot(units::meter_t distance);
     void Stop();
-#ifdef OVERUNDER
-    bool GetLimitFront() const { return m_elevationLimitFront.Get(); }
-    bool GetLimitRear() const { return m_elevationLimitRear.Get(); }
-#endif
     units::degree_t GetCloseAngle() const { return m_closeAngle; }
     const std::vector<std::vector<double>> GetReferenceTable() const { return m_shootReference; }
     
@@ -44,32 +40,22 @@ class ShooterSubsystem : public frc2::SubsystemBase
 
     PigeonGyro m_gyro;
 
+#ifdef THING1
     rev::CANSparkMax m_OverWheels;
     rev::CANSparkMax m_UnderWheels;
-#ifdef OVERUNDER
-    rev::CANSparkFlex m_BackWheels;
-    rev::CANSparkFlex m_ElevationController; 
 #else
-    rev::CANSparkMax m_ElevationController;
+    rev::CANSparkFlex m_OverWheels;
+    rev::CANSparkFlex m_UnderWheels; 
 #endif
+
+    rev::CANSparkMax m_ElevationController;
 
     rev::SparkPIDController m_OverPIDController = m_OverWheels.GetPIDController();
     rev::SparkPIDController m_UnderPIDController = m_UnderWheels.GetPIDController();
-#ifdef OVERUNDER
-    rev::SparkPIDController m_BackPIDController = m_BackWheels.GetPIDController();
-#endif
     rev::SparkPIDController m_ElevationPIDController = m_ElevationController.GetPIDController();
 
     rev::SparkRelativeEncoder m_OverRelativeEnc = m_OverWheels.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);
     rev::SparkRelativeEncoder m_UnderRelativeEnc = m_UnderWheels.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);
-#ifdef OVERUNDER    
-    rev::SparkRelativeEncoder m_BackRelativeEnc = m_BackWheels.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor);
-
-    ctre::phoenix6::hardware::CANcoder m_ElevationEncoder;
-    frc::DigitalInput m_elevationLimitFront;
-    frc::DigitalInput m_elevationLimitRear;
-    
-#endif    
     rev::SparkRelativeEncoder m_ElevationRelativeEnc = m_ElevationController.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor);
 
     double m_overRPM;
@@ -78,15 +64,6 @@ class ShooterSubsystem : public frc2::SubsystemBase
 
     int m_shootIndex;
 
-#ifdef OVERUNDER
-    std::vector<std::vector<double>> m_shootReference = 
-    {
-        // Near    Far
-        { 5000.0,  5000.0}, // Over/Under (Left/Right) RPM
-        {-1000.0, -1700.0}, // Back wheels (not used in SxS) RPM
-        {   49.0,    32.0}  // Shot angle for Speaker and Podium
-    };
-#else
     std::vector<std::vector<double>> m_shootReference = 
     {
         // Near    Far
@@ -94,13 +71,9 @@ class ShooterSubsystem : public frc2::SubsystemBase
         {    0.0,     0.0}, // Back wheels (not used in SxS) RPM
         {   57.0,    40.0}  // Shot angle for Speaker and Podium
     };
-#endif 
 
 	wpi::log::DoubleLogEntry m_logOverRPM;
     wpi::log::DoubleLogEntry m_logUnderRPM;
-#ifdef OVERUNDER
-	wpi::log::DoubleLogEntry m_logBackRPM;
-#endif
 	wpi::log::DoubleLogEntry m_logCurrentAngle;
 	wpi::log::DoubleLogEntry m_logCommandedAngle;
 	wpi::log::DoubleLogEntry m_logAbsoluteAngle;
