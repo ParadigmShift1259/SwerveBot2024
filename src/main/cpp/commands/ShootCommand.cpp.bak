@@ -29,6 +29,6 @@ void ShootCommand::End(bool interrupted)
 {
   m_shooterSubsystem.Stop();
   m_intakeSubsystem.Stop();
-  m_shooterSubsystem.GoToElevation(33.0_deg);
+  m_shooterSubsystem.GoToElevation(40.0_deg);
   m_logStartShootCommand.Append(false);
 }

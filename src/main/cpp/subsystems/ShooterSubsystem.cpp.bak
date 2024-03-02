@@ -13,7 +13,7 @@
 constexpr double c_defaultRPM = 3700.0;
 
 const units::degree_t c_pinPopAngle = 40_deg;
-constexpr double c_elevStartAngle = 55.0;
+constexpr double c_elevStartAngle = 65.0;
 
 constexpr double c_elevSlope = 1.09;
 constexpr double c_elevOffset = -69.7;
@@ -103,7 +103,8 @@ ShooterSubsystem::ShooterSubsystem()
   m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", c_defaultElevI));
   m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", c_defaultElevD));
   m_ElevationPIDController.SetFF(frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF));
-  m_ElevationPIDController.SetOutputRange(-1.0, 1.0);
+  //m_ElevationPIDController.SetOutputRange(-1.0, 1.0);
+  m_ElevationPIDController.SetOutputRange(-0.3, 0.3);
 
   // Smart Motion Coefficients
   // double minVel = frc::Preferences::GetDouble("kElevMinVel", 0.0);     // rpm
@@ -120,11 +121,11 @@ ShooterSubsystem::ShooterSubsystem()
 //   m_ElevationPIDController.SetSmartMotionAccelStrategy(rev::SparkMaxPIDController::AccelStrategy::kSCurve, smartMotionSlot); // Other accel strategy kTrapezoidal
 // WPI_UNIGNORE_DEPRECATED
 
-  frc::SmartDashboard::PutNumber("ShotAngle", 37.0);
+  frc::SmartDashboard::PutNumber("ShotAngle", 40.0);
   frc::SmartDashboard::PutNumber("ShotAngleClose", 57.0);
   frc::SmartDashboard::PutNumber("OverRPM",  m_shootReference[0][1]);
   frc::SmartDashboard::PutNumber("UnderRPM", m_shootReference[0][1]);
-  frc::SmartDashboard::PutNumber("ElevationAngle", 33.0);
+  frc::SmartDashboard::PutNumber("ElevationAngle", 70.0);
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
   frc::SmartDashboard::PutBoolean("SetElevRef", false);
 
@@ -191,7 +192,7 @@ void ShooterSubsystem::Periodic()
     m_shootReference[0][0] = frc::SmartDashboard::GetNumber("OverRPMClose",  -c_defaultRPM);
     m_shootReference[0][0] = frc::SmartDashboard::GetNumber("UnderRPMClose", c_defaultRPM);
 
-    m_shootReference[2][1] = frc::SmartDashboard::GetNumber("ShotAngle", 37.0);
+    m_shootReference[2][1] = frc::SmartDashboard::GetNumber("ShotAngle", 40.0);
     m_shootReference[2][0] = frc::SmartDashboard::GetNumber("ShotAngleClose", 57.0);
 
     static double lastP = 0.0;
