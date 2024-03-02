@@ -36,7 +36,7 @@ class ShooterSubsystem : public frc2::SubsystemBase
     
   private:
     units::degree_t m_closeAngle;
-    double m_elevationAngle = 65.0;
+    double m_elevationAngle = 55.0;
     double m_elevationTurns = 0.0;  // For calibration
     double m_lastElevationTurns = 0.0;  // For calibration
     bool m_poppedPin = false;
@@ -92,7 +92,7 @@ class ShooterSubsystem : public frc2::SubsystemBase
         // Near    Far
         { 3700.0,  3700.0}, // Over/Under (Left/Right) RPM
         {    0.0,     0.0}, // Back wheels (not used in SxS) RPM
-        {   57.0,    40.0}  // Shot angle for Speaker and Podium
+        {   57.0,    37.0}  // Shot angle for Speaker and Podium
     };
 #endif 
 

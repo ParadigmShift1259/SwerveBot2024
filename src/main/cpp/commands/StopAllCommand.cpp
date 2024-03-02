@@ -31,7 +31,7 @@ void StopAllCommand::End(bool interrupted)
 // #ifdef OVERUNDER
 //   m_shooterSubsystem.GoToElevation(25.0_deg);
 // #else
-//   m_shooterSubsystem.GoToElevation(40.0_deg);
+//   m_shooterSubsystem.GoToElevation(37.0_deg);
 // #endif
   m_logStartCommand.Append(false);
 }

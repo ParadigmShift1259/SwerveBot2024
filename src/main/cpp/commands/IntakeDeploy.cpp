@@ -1,7 +1,10 @@
 #include "commands/IntakeDeploy.h"
 
+#include <frc/SmartDashBoard/SmartDashboard.h>
+
 IntakeDeploy::IntakeDeploy(ISubsystemAccess& subsystemAccess) 
   : m_intake(subsystemAccess.GetIntake())
+  , m_shooter(subsystemAccess.GetShooter())
 {
   AddRequirements({&subsystemAccess.GetIntake()});
 
@@ -17,6 +20,8 @@ void IntakeDeploy::Initialize()
 void IntakeDeploy::Execute() 
 {
   m_intake.ExtendIntake();
+  auto angle = frc::SmartDashboard::GetNumber("IntakeAngle", 42.0);
+  m_shooter.GoToElevation(units::degree_t(angle));
 }
 
 bool IntakeDeploy::IsFinished()

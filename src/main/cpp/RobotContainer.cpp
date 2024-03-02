@@ -264,13 +264,17 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 #ifdef DRIVE_PRACTICE_SECONDARY
   /* -------- Drive Practice Preparation -------- */
 
-  secondary.A().OnTrue(IntakeIngest(*this).ToPtr());                          
+  secondary.A().OnTrue(frc2::SequentialCommandGroup{
+      IntakeIngest(*this)
+    , frc2::WaitCommand(0.25_s)
+    , IntakeTransfer(*this)
+  }.ToPtr());                          
   secondary.B().WhileTrue(frc2::SequentialCommandGroup{
       IntakeDeploy(*this)
     , IntakeRelease(*this) 
   }.ToPtr());     
   secondary.X().OnTrue(frc2::SequentialCommandGroup{
-      IntakeStop(*this)
+    /*  IntakeStop(*this)
     , IntakeTransfer(*this)
     , IntakeGoToPositionCommand(*this, 9.0)
     , frc2::WaitCommand(0.4_s)
@@ -280,12 +284,20 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , frc2::WaitCommand(0.8_s)
     , GoToElevationCommand(*this, -60.0_deg)
     , frc2::WaitCommand(0.4_s)
+    , IntakeGoToPositionCommand(*this, 16.0)*/
+      IntakeStop(*this)
+    , GoToElevationCommand(*this, 0.0_deg)
+    , frc2::WaitCommand(0.4_s)
+    , IntakeGoToPositionCommand(*this, 24.0)
+    , frc2::WaitCommand(0.8_s)
+    , GoToElevationCommand(*this, -60.0_deg)
+    , frc2::WaitCommand(0.4_s)
     , IntakeGoToPositionCommand(*this, 16.0)
   }.ToPtr());
   secondary.Y().OnTrue(frc2::SequentialCommandGroup{
       AmpShootCommand(*this)
-    , frc2::WaitCommand(0.5_s)
-    , IntakeGoToPositionCommand(*this, 24.0)
+    , frc2::WaitCommand(0.7_s)
+    /*, IntakeGoToPositionCommand(*this, 24.0)
     , frc2::WaitCommand(1.0_s)
     , GoToElevationCommand(*this, 40.0_deg)
     , frc2::WaitCommand(1.0_s)
@@ -293,7 +305,14 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , frc2::WaitCommand(1.0_s)
     , GoToElevationCommand(*this, 66.0_deg)
     , frc2::WaitCommand(1.0_s)
+    , IntakeGoToPositionCommand(*this, 0.0)*/
+    , IntakeGoToPositionCommand(*this, 24.0)
+    , frc2::WaitCommand(0.4_s)
+    , GoToElevationCommand(*this, 0.0_deg)
+    , frc2::WaitCommand(0.5_s)
     , IntakeGoToPositionCommand(*this, 0.0)
+    , frc2::WaitCommand(0.4_s)
+    , GoToElevationCommand(*this, 33.0_deg)
   }.ToPtr());
 
   secondary.RightBumper().OnTrue(PreShootCommand(*this, 129_in).ToPtr());

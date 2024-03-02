@@ -23,7 +23,7 @@ void IntakeRelease::Execute()
 
 bool IntakeRelease::IsFinished()
 {
-  return true;
+  return false;
 }
 
 void IntakeRelease::End(bool interrupted) {

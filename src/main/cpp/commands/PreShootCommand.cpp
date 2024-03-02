@@ -10,9 +10,7 @@ PreShootCommand::PreShootCommand(ISubsystemAccess& subsystemAccess, units::meter
 	
     m_distance = distance;
     m_elevationAngle = m_shooterSubsystem.GetCloseAngle();
-
-    frc::SmartDashboard::PutNumber("ShotAngle", 39.0);
-
+    
     wpi::log::DataLog& log = subsystemAccess.GetLogger();
     m_logStartPreShootCommand = wpi::log::BooleanLogEntry(log, "/PreShootCommand/startCommand");
 }

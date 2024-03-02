@@ -16,6 +16,7 @@ public:
   
 private:
   IntakeSubsystem& m_intake;
+  ShooterSubsystem& m_shooter;
 
   wpi::log::BooleanLogEntry m_logStartCommand;
 };
