@@ -37,6 +37,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                        units::meters_per_second_t ySpeed,
                        units::radians_per_second_t rot, bool fieldRelative)
 {
+  //printf("DriveSubsystem::Drive xspd %.3f yspd %.3f rot %.3f fldrel %d\n", xSpeed.value(), ySpeed.value(), rot.value(), fieldRelative);
   m_logDriveInputX.Append(xSpeed.to<double>());
   m_logDriveInputY.Append(ySpeed.to<double>());
   m_logDriveInputRot.Append(rot.to<double>());
@@ -170,15 +171,22 @@ void DriveSubsystem::Periodic()
 frc::Pose2d DriveSubsystem::GetPose()
 {
   auto pose = m_odometry.GetPose();
-  frc::SmartDashboard::PutNumber("X", pose.X().to<double>());
-  frc::SmartDashboard::PutNumber("Y", pose.Y().to<double>());
-  frc::SmartDashboard::PutNumber("Rot", pose.Rotation().Degrees().to<double>());
+  //printf("DriveSubsystem::GetPose x %.3f y %.3f rot %.3f\n", pose.X().value(), pose.Y().value(), pose.Rotation().Degrees().value());
+
+  // frc::SmartDashboard::PutNumber("X", pose.X().to<double>());
+  // frc::SmartDashboard::PutNumber("Y", pose.Y().to<double>());
+  // frc::SmartDashboard::PutNumber("Rot", pose.Rotation().Degrees().to<double>());
 
   return m_odometry.GetPose();
 }
 
 frc::ChassisSpeeds DriveSubsystem::GetChassisSpeeds()
 {
+  //printf("DriveSubsystem::GetChassisSpeeds fl %.3f fr %.3f rl %.3f rr %.3f\n"
+  // , m_frontLeft.GetState().speed.value()
+  // , m_frontRight.GetState().speed.value()
+  // , m_rearLeft.GetState().speed.value()
+  // , m_rearRight.GetState().speed.value());
   return m_kinematics.ToChassisSpeeds({m_frontLeft.GetState(), m_frontRight.GetState(), m_rearLeft.GetState(), m_rearRight.GetState()});
 }
 
@@ -202,6 +210,7 @@ void DriveSubsystem::ResetOdometry(frc::Pose2d pose)
   // frc::SmartDashboard::PutNumber("ResetX", pose.X().to<double>());
   // frc::SmartDashboard::PutNumber("Resety", pose.Y().to<double>());
   // frc::SmartDashboard::PutNumber("ResetRot", pose.Rotation().Degrees().to<double>());
+  //printf ("resetx %.3f resety %.3f resetrot %.3f\n", pose.X().value(), pose.Y().value(), pose.Rotation().Degrees().value());
 
   SwerveModulePositions modulePositions = {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
                                            m_rearLeft.GetPosition(), m_rearRight.GetPosition()};

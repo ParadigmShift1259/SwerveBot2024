@@ -16,6 +16,7 @@ class ShootCommand: public frc2::CommandHelper<frc2::Command, ShootCommand>
     private:
         ShooterSubsystem& m_shooterSubsystem;
         IntakeSubsystem& m_intakeSubsystem;
-
+        frc::Timer m_timer;
+        
 		wpi::log::BooleanLogEntry m_logStartShootCommand;
 };

@@ -50,12 +50,12 @@ public:
   };
   std::vector<std::string> m_pathPlannerLUT
   { 
-      "Four Note" 
-    , "Three Note"
-    , "Two Note" 
-    , "One Note"
-    , "Exit Zone" 
-    , "Do Nothing"       // These strings are the names of the PathPlanner .path files
+      "Four Note Auto" 
+    , "Three Note Auto"
+    , "Two Note Auto" 
+    , "One Note Auto"
+    , "Exit Zone Auto" 
+    , "Do Nothing Auto"       // These strings are the names of the PathPlanner .path files
   };
   frc::SendableChooser<EAutoPath> m_chooser;
   void SetIsAutoRunning(bool isAutoRunning) { m_isAutoRunning = isAutoRunning; }

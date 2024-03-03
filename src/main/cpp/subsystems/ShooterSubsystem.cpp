@@ -287,7 +287,7 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   frc::SmartDashboard::PutNumber("ElevationTurns", turns);
 #endif
 
-  printf("elev angle %.3f turns %.3f\n", m_elevationAngle, turns);
+  //("elev angle %.3f turns %.3f\n", m_elevationAngle, turns);
   m_elevationTurns = turns;  // For calibration
   m_logElevTurns.Append(turns);
 

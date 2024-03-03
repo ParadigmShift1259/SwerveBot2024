@@ -41,12 +41,13 @@ void Robot::AutonomousInit()
   // Record both DS control and joystick data
   frc::DriverStation::StartDataLog(frc::DataLogManager::GetLog());
 
-  //m_container.SetIsAutoRunning(true);
+  m_container.SetIsAutoRunning(true);
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
-  // if (m_autonomousCommand) {
-  //   m_autonomousCommand->Schedule();
-  // }
+  if (m_autonomousCommand)
+  {
+     m_autonomousCommand->Schedule();
+  }
 }
 
 void Robot::AutonomousPeriodic()

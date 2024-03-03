@@ -38,7 +38,7 @@
 #include <pathplanner/lib/util/HolonomicPathFollowerConfig.h>
 #include <pathplanner/lib/util/PIDConstants.h>
 #include <pathplanner/lib/util/ReplanningConfig.h>
-
+#include <pathplanner/lib/auto/NamedCommands.h>
 
 using namespace pathplanner;
 
@@ -46,6 +46,33 @@ RobotContainer::RobotContainer()
   : m_drive()
   , m_orchestra("output.chrp")
 {
+  // NamedCommands::registerCommand("PreShootClose", std::move(PreShootCommand(*this, 1_m).ToPtr()));
+  // NamedCommands::registerCommand("ShootClose", std::move(ShootCommand(*this).ToPtr()));
+
+  NamedCommands::registerCommand("ShootClose", std::move(
+    frc2::SequentialCommandGroup{
+        PreShootCommand(*this, 1_m)
+      , frc2::WaitCommand(0.25_s)
+      , ShootCommand(*this)
+    }.ToPtr()));
+
+  NamedCommands::registerCommand("ShootStop", std::move(StopAllCommand(*this).ToPtr()));
+
+  NamedCommands::registerCommand("ShootFar", std::move(
+    frc2::SequentialCommandGroup{
+        frc2::WaitCommand(0.25_s)
+      ,  PreShootCommand(*this, 5_m)
+      , frc2::WaitCommand(1.0_s)
+      , ShootCommand(*this)
+    }.ToPtr()));
+
+  NamedCommands::registerCommand("Intake Note", std::move(
+    frc2::SequentialCommandGroup{
+        IntakeIngest(*this)
+      , frc2::WaitCommand(0.25_s)
+      , IntakeTransfer(*this)
+    }.ToPtr()));
+
   SetDefaultCommands();
   ConfigureBindings();
 
@@ -65,8 +92,6 @@ RobotContainer::RobotContainer()
   // {
   //   m_orchestra.AddInstrument(GetDrive().GetTalon(moduleNumber));
   // }
-  
-
 }
 
 //#define USE_PATH_PLANNER_SWERVE_CMD
@@ -84,33 +109,31 @@ Command* RobotContainer::GetAutonomousCommand()
 CommandPtr RobotContainer::GetAutonomousCommand()
 {
   auto autoPath = m_chooser.GetSelected();
-  auto pathFile = m_pathPlannerLUT[autoPath];
-  std::shared_ptr<PathPlannerPath> path = PathPlannerPath::fromPathFile(pathFile);
+  auto autoFile = m_pathPlannerLUT[autoPath];
+  printf("loading auto path %s\n", autoFile.c_str());
+  //std::shared_ptr<PathPlannerAuto> ppAuto = PathPlannerAuto::	getPathGroupFromAutoFile(autoFile);
 
-  static std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
-  //eventMap.emplace("Shoot", std::make_shared<Shoot>(m_drive, *this));
-  //eventMap.emplace("Intake Note", std::make_shared<Intake>(m_drive, *this));
-
-  // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this could be in RobotContainer along with your subsystems
-  static AutoBuilder autoBuilder;
-  
-  PIDConstants translationConstants = PIDConstants(5.0, 0.0, 0.0);
+  PIDConstants translationConstants = PIDConstants(0.5, 0.0, 0.0);
   PIDConstants rotationConstants = PIDConstants(0.5, 0.0, 0.0);
-  units::meters_per_second_t maxModuleSpeed = 2_mps; //	Max speed of an individual drive module in meters/sec
+  units::meters_per_second_t maxModuleSpeed = 1_mps; //	Max speed of an individual drive module in meters/sec
   units::meter_t driveBaseRadius = 20.86_in; // Distance from the center of the robot to the farthest swerve module 
-  ReplanningConfig replanningConfig;
+  ReplanningConfig replanningConfig;//(false, false);
 
-  autoBuilder.configureHolonomic(
+  AutoBuilder::configureHolonomic(
       [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
       [this](auto initPose) { GetDrive().ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
       [this]() { return GetDrive().GetChassisSpeeds(); },
-      [this](ChassisSpeeds speeds) { GetDrive().Drive(speeds.vx, speeds.vy, speeds.omega, true); }, // Output function that accepts field relative ChassisSpeeds
-      HolonomicPathFollowerConfig( translationConstants, rotationConstants, maxModuleSpeed, driveBaseRadius, replanningConfig ),
-      [this]() { return true; }, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+      [this](ChassisSpeeds speeds) { GetDrive().Drive(-speeds.vx, -speeds.vy, -speeds.omega, false); }, // Output function that accepts field relative ChassisSpeeds
+      HolonomicPathFollowerConfig(translationConstants
+                                , rotationConstants
+                                , maxModuleSpeed
+                                , driveBaseRadius
+                                , replanningConfig ),
+      [this]() { return false; }, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
       &m_drive // Drive requirements, usually just a single drive subsystem
   );
 
-  return AutoBuilder::followPath(path);
+  return AutoBuilder::buildAuto(autoFile);
 }
 #endif
 
@@ -382,11 +405,15 @@ void RobotContainer::ConfigButtonBoxBindings()
   // 1	  Back			    Start			    Left Stick Button	Right Stick Button	Left Bumper
   // 2	  Right Trigger	Left Trigger	X					        Y					          Right Bumper
   // 3	  B				      A				      POV Left			    POV Right			      POV Up
-  buttonBox.A().OnTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
-  buttonBox.B().WhileTrue(IntakeRelease(*this).ToPtr());                              // Blue   row 3
-  buttonBox.Start().OnTrue(PlopperGoToPositionCommand(*this).ToPtr());                                 // Black  row 3
-  buttonBox.LeftStick().WhileTrue(PlopperShootCommand(*this).ToPtr());    
-  buttonBox.Back().OnTrue(GoToElevationCommand(*this, 66.0_deg).ToPtr());
+  //buttonBox.A().OnTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
+  //buttonBox.B().WhileTrue(IntakeRelease(*this).ToPtr());                              // Blue   row 3
+  //buttonBox.Start().OnTrue(PlopperGoToPositionCommand(*this).ToPtr());                                 // Black  row 3
+  //buttonBox.LeftStick().WhileTrue(PlopperShootCommand(*this).ToPtr());    
+  //buttonBox.Back().OnTrue(GoToElevationCommand(*this, 66.0_deg).ToPtr());
+
+  buttonBox.X().OnTrue(&m_goToElev);
+  buttonBox.Y().OnTrue(&m_ampPositionIntake);
+
   // Green  row 2
   // buttonBox.Y().OnTrue(RetrieveGamePiece(*this).ToPtr());                        // Yellow row 2
 
