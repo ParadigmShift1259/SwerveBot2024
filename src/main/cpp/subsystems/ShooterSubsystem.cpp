@@ -42,7 +42,6 @@ ShooterSubsystem::ShooterSubsystem()
   , m_OverWheels(kShooterOverWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
   , m_UnderWheels(kShooterUnderWheelsCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
   , m_ElevationController(kShooterElevationControllerCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
-  
 {
   //m_OverWheels.RestoreFactoryDefaults();
   //m_UnderWheels.RestoreFactoryDefaults();
@@ -103,7 +102,8 @@ ShooterSubsystem::ShooterSubsystem()
   m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", c_defaultElevI));
   m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", c_defaultElevD));
   m_ElevationPIDController.SetFF(frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF));
-  m_ElevationPIDController.SetOutputRange(-1.0, 1.0);
+//  m_ElevationPIDController.SetOutputRange(-1.0, 1.0);
+  m_ElevationPIDController.SetOutputRange(-0.3, 0.3);
 
   // Smart Motion Coefficients
   // double minVel = frc::Preferences::GetDouble("kElevMinVel", 0.0);     // rpm
@@ -224,30 +224,30 @@ void ShooterSubsystem::Periodic()
     lastD = d;
     lastFF = ff;
 
-    static double lastMaxVel = 0.0;
-    static double lastMaxAcc = 0.0;
-    static double lastAllowedErr = 0.0;
-    //double minVel = frc::Preferences::GetDouble("kElevMinVel", 0.0);     // rpm
-    //m_ElevationPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
-    double maxVel = frc::Preferences::GetDouble("kElevMaxVel", 2000.0);  // rpm
-    double maxAcc = frc::Preferences::GetDouble("kElevMaxAcc", 1500.0);
-    double allowedErr = frc::Preferences::GetDouble("kElevAllowedErr", 0.0);
-    int smartMotionSlot = 0;
-    if (maxVel != lastMaxVel)
-    {
-      m_ElevationPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
-    }
-    if (maxAcc != lastMaxAcc)
-    {
-      m_ElevationPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
-    }
-    if (allowedErr != lastAllowedErr)
-    {
-      m_ElevationPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
-    }
-    lastMaxVel = maxVel;
-    lastMaxAcc = maxAcc;
-    lastAllowedErr = allowedErr;
+    // static double lastMaxVel = 0.0;
+    // static double lastMaxAcc = 0.0;
+    // static double lastAllowedErr = 0.0;
+    // //double minVel = frc::Preferences::GetDouble("kElevMinVel", 0.0);     // rpm
+    // //m_ElevationPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+    // double maxVel = frc::Preferences::GetDouble("kElevMaxVel", 2000.0);  // rpm
+    // double maxAcc = frc::Preferences::GetDouble("kElevMaxAcc", 1500.0);
+    // double allowedErr = frc::Preferences::GetDouble("kElevAllowedErr", 0.0);
+    // int smartMotionSlot = 0;
+    // if (maxVel != lastMaxVel)
+    // {
+    //   m_ElevationPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
+    // }
+    // if (maxAcc != lastMaxAcc)
+    // {
+    //   m_ElevationPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
+    // }
+    // if (allowedErr != lastAllowedErr)
+    // {
+    //   m_ElevationPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
+    // }
+    // lastMaxVel = maxVel;
+    // lastMaxAcc = maxAcc;
+    // lastAllowedErr = allowedErr;
 
     frc::SmartDashboard::PutNumber("OverRPM echo", m_OverRelativeEnc.GetVelocity());
     frc::SmartDashboard::PutNumber("UnderRPM echo", m_UnderRelativeEnc.GetVelocity());
@@ -287,7 +287,7 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   frc::SmartDashboard::PutNumber("ElevationTurns", turns);
 #endif
 
-  //("elev angle %.3f turns %.3f\n", m_elevationAngle, turns);
+  //printf("elev angle %.3f turns %.3f\n", m_elevationAngle, turns);
   m_elevationTurns = turns;  // For calibration
   m_logElevTurns.Append(turns);
 
