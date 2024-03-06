@@ -170,7 +170,7 @@ void DriveSubsystem::Periodic()
 
 frc::Pose2d DriveSubsystem::GetPose()
 {
-  auto pose = m_odometry.GetPose();
+  //auto pose = m_odometry.GetPose();
   //printf("DriveSubsystem::GetPose x %.3f y %.3f rot %.3f\n", pose.X().value(), pose.Y().value(), pose.Rotation().Degrees().value());
 
   // frc::SmartDashboard::PutNumber("X", pose.X().to<double>());

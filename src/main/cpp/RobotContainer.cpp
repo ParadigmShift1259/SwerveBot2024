@@ -421,6 +421,7 @@ void RobotContainer::ConfigButtonBoxBindings()
 
   buttonBox.X().OnTrue(&m_goToElev);
   buttonBox.Y().OnTrue(&m_ampPositionIntake);
+  buttonBox.LeftStick().OnTrue(IntakeIngest(*this).ToPtr());
 
   // Green  row 2
   // buttonBox.Y().OnTrue(RetrieveGamePiece(*this).ToPtr());                        // Yellow row 2
