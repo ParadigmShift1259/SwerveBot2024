@@ -29,6 +29,7 @@ bool AmpShootCommand::IsFinished()
 
 void AmpShootCommand::End(bool interrupted)
 {
+  m_intakeSubsystem.SetTransferFinished(false);
   m_intakeSubsystem.Stop();
   m_logStartAmpShootCommand.Append(false);
 }

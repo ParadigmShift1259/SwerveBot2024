@@ -26,10 +26,10 @@
 
 static constexpr units::meters_per_second_t kMaxSpeed = 18.0_fps;  // L3 Gear Ratio Falcon Max Speed
 static constexpr units::meters_per_second_t kLowSpeed = 4.0_fps;  // L3 Gear Ratio Falcon Max Speed
-static constexpr units::radians_per_second_t kMaxAngularSpeed{2.0 * std::numbers::pi};  // 1/2 rotation per second
-static constexpr units::radians_per_second_squared_t kMaxAngularAcceleration{8.0 * std::numbers::pi};  // 4 rotations per second squared
-static constexpr units::radians_per_second_t kRotationDriveMaxSpeed = 6.5_rad_per_s;
-static constexpr units::radians_per_second_t kRotationDriveDirectionLimit = 6.0_rad_per_s;
+static constexpr units::radians_per_second_t kMaxAngularSpeed{2.5 * std::numbers::pi};  // 1/2 rotation per second
+static constexpr units::radians_per_second_squared_t kMaxAngularAcceleration{10.0 * std::numbers::pi};  // 4 rotations per second squared
+static constexpr units::radians_per_second_t kRotationDriveMaxSpeed = 7.5_rad_per_s;
+static constexpr units::radians_per_second_t kRotationDriveDirectionLimit = 7.0_rad_per_s;
 
 /**
  * Represents a swerve drive style DriveSubsystem.

@@ -33,6 +33,7 @@ bool ShootCommand::IsFinished()
 
 void ShootCommand::End(bool interrupted)
 {
+  m_intakeSubsystem.SetTransferFinished(false);
   m_shooterSubsystem.Stop();
   m_intakeSubsystem.Stop();
   m_shooterSubsystem.GoToElevation(33.0_deg);

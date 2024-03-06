@@ -17,6 +17,7 @@ void IntakeStop::Initialize()
 
 void IntakeStop::Execute() {
   m_intake.Set(0);
+  m_intake.RetractIntake();
 }
 
 bool IntakeStop::IsFinished()
@@ -25,6 +26,5 @@ bool IntakeStop::IsFinished()
 }
 
 void IntakeStop::End(bool interrupted) {
-  m_intake.RetractIntake();
   m_logStartCommand.Append(false);
 }

@@ -42,6 +42,9 @@ bool IntakeIngest::IsFinished()
 
 void IntakeIngest::End(bool interrupted) 
 {
+#ifndef THING1
+  m_intake.SetTransferFinished(true);
+#endif
   m_intake.RetractIntake();
   m_intake.Set(0.0);
   m_logStartCommand.Append(false);

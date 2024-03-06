@@ -27,6 +27,7 @@
 
 #include <frc2/command/Commands.h>
 #include <frc2/command/ParallelDeadlineGroup.h>
+#include <frc2/command/ParallelCommandGroup.h>
 #include <frc2/command/WaitCommand.h>
 #include <frc2/command/WaitUntilCommand.h>
 #include <frc2/command/button/JoystickButton.h>
@@ -286,7 +287,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.A().OnTrue(frc2::SequentialCommandGroup{
       IntakeIngest(*this)
     , frc2::WaitCommand(0.25_s)
-    , IntakeTransfer(*this)
+    // , IntakeTransfer(*this)
   }.ToPtr());                          
   secondary.B().WhileTrue(frc2::SequentialCommandGroup{
       IntakeDeploy(*this)
@@ -304,13 +305,13 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , GoToElevationCommand(*this, -60.0_deg)
     , frc2::WaitCommand(0.4_s)
     , IntakeGoToPositionCommand(*this, 16.0)*/
-      IntakeStop(*this)
+      IntakeTransfer(*this)
     , GoToElevationCommand(*this, 0.0_deg)
-    , frc2::WaitCommand(0.4_s)
+    , frc2::WaitCommand(0.2_s)
     , IntakeGoToPositionCommand(*this, 24.0)
-    , frc2::WaitCommand(0.8_s)
+    , frc2::WaitCommand(0.45_s)
     , GoToElevationCommand(*this, -60.0_deg)
-    , frc2::WaitCommand(0.4_s)
+    , frc2::WaitCommand(0.25_s)
     , IntakeGoToPositionCommand(*this, 16.0)
   }.ToPtr());
   secondary.Y().OnTrue(frc2::SequentialCommandGroup{
@@ -326,18 +327,24 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , frc2::WaitCommand(1.0_s)
     , IntakeGoToPositionCommand(*this, 0.0)*/
     , IntakeGoToPositionCommand(*this, 24.0)
-    , frc2::WaitCommand(0.4_s)
+    , frc2::WaitCommand(0.35_s)
     , GoToElevationCommand(*this, 0.0_deg)
-    , frc2::WaitCommand(0.5_s)
+    , frc2::WaitCommand(0.3_s)
     , IntakeGoToPositionCommand(*this, 0.0)
-    , frc2::WaitCommand(0.4_s)
+    , frc2::WaitCommand(0.2_s)
     , GoToElevationCommand(*this, 33.0_deg)
   }.ToPtr());
 
-  secondary.RightBumper().OnTrue(PreShootCommand(*this, 129_in).ToPtr());
-  secondary.LeftBumper().OnTrue(PreShootCommand(*this, 30_in).ToPtr());
+  secondary.RightBumper().OnTrue(ParallelCommandGroup{
+      IntakeTransfer(*this)
+    , PreShootCommand(*this, 129_in)
+  }.ToPtr());
+  secondary.LeftBumper().OnTrue(ParallelCommandGroup{
+      IntakeTransfer(*this)
+    , PreShootCommand(*this, 30_in)
+  }.ToPtr());
 
-  secondary.Back().OnTrue(GoToElevationCommand(*this, 66.0_deg).ToPtr());
+  secondary.Back().OnTrue(GoToElevationCommand(*this, 33.0_deg).ToPtr());
 
   secondary.RightTrigger(0.9).WhileTrue(ShootCommand(*this).ToPtr());
 
@@ -396,6 +403,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 #endif
 }
 
+#ifdef USE_BUTTON_BOX
 void RobotContainer::ConfigButtonBoxBindings()
 {
   auto& buttonBox = m_buttonBoxController;
@@ -433,6 +441,7 @@ void RobotContainer::ConfigButtonBoxBindings()
   // buttonBox.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });      // Red    row 3
   // buttonBox.POVUp(loop).Rising().IfHigh(RotateTurntableCW(*this).ToPtr()});      // Red    row 3
 }
+#endif
 
 const TrapezoidProfile<units::radians>::Constraints
     kThetaControllerConstraints{kMaxAngularSpeed, kMaxAngularAcceleration};

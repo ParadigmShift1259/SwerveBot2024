@@ -32,7 +32,7 @@ void PreShootCommand::Execute()
 
 bool PreShootCommand::IsFinished()
 {
-    return true;
+  return true;
 }
 
 void PreShootCommand::End(bool interrupted)

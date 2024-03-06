@@ -94,6 +94,7 @@ void IntakeSubsystem::Periodic()
     frc::SmartDashboard::PutNumber("Deploy echo", m_deployRelativeEnc.GetPosition());
     frc::SmartDashboard::PutNumber("Deploy Follow echo", m_deployFollowRelativeEnc.GetPosition());
     frc::SmartDashboard::PutBoolean("Intake PhotoEye", m_photoEye.Get());
+    frc::SmartDashboard::PutBoolean("Transfer Complete", m_transferComplete);
 }
 
 void IntakeSubsystem::LoadDeployPid()
