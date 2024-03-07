@@ -117,7 +117,7 @@ CommandPtr RobotContainer::GetAutonomousCommand()
   PIDConstants translationConstants = PIDConstants(0.5, 0.0, 0.0);
   PIDConstants rotationConstants = PIDConstants(0.5, 0.0, 0.0);
   units::meters_per_second_t maxModuleSpeed = 1_mps; //	Max speed of an individual drive module in meters/sec
-  units::meter_t driveBaseRadius = 20.86_in; // Distance from the center of the robot to the farthest swerve module 
+  units::meter_t driveBaseRadius = 17.25_in; // Distance from the center of the robot to the farthest swerve module 
   ReplanningConfig replanningConfig;//(false, false);
 
   AutoBuilder::configureHolonomic(
@@ -305,8 +305,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , GoToElevationCommand(*this, -60.0_deg)
     , frc2::WaitCommand(0.4_s)
     , IntakeGoToPositionCommand(*this, 16.0)*/
-      IntakeTransfer(*this)
-    , GoToElevationCommand(*this, 0.0_deg)
+      /*IntakeTransfer(*this)
+    ,*/GoToElevationCommand(*this, 0.0_deg)
     , frc2::WaitCommand(0.2_s)
     , IntakeGoToPositionCommand(*this, 24.0)
     , frc2::WaitCommand(0.45_s)
@@ -335,14 +335,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , GoToElevationCommand(*this, 33.0_deg)
   }.ToPtr());
 
-  secondary.RightBumper().OnTrue(ParallelCommandGroup{
-      IntakeTransfer(*this)
-    , PreShootCommand(*this, 129_in)
-  }.ToPtr());
-  secondary.LeftBumper().OnTrue(ParallelCommandGroup{
-      IntakeTransfer(*this)
-    , PreShootCommand(*this, 30_in)
-  }.ToPtr());
+  secondary.RightBumper().OnTrue(PreShootCommand(*this, 129_in).ToPtr());
+  secondary.LeftBumper().OnTrue(PreShootCommand(*this, 30_in).ToPtr());
 
   secondary.Back().OnTrue(GoToElevationCommand(*this, 33.0_deg).ToPtr());
 

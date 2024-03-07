@@ -22,7 +22,7 @@ void IntakeTransfer::Initialize()
 
 void IntakeTransfer::Execute()
 {
-    if (!m_intake.IsTransferFinished()) {
+  if (!m_intake.IsTransferFinished()) {
     auto speed = c_defaultIntakeSpeed;
     m_intake.Set(-speed);
   }

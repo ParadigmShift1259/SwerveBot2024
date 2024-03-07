@@ -7,3 +7,4 @@ constexpr int kElevationLimitFront = 5;
 
 constexpr int kIntakePhotoeye      = 9;
 
+constexpr int kLEDPWMPort          = 11;
