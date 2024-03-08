@@ -29,3 +29,5 @@ constexpr int kPlopperRollerCANID     = 12;       // TalonSRX
 
 constexpr int kDrivePigeonCANID = 1;
 constexpr int kShooterPigeonCANID = 2;
+
+constexpr int kLEDCANID = 0;
