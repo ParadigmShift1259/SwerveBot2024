@@ -43,6 +43,11 @@
 
 using namespace pathplanner;
 
+
+constexpr double c_deployTurnsAmpClearance = 32.0;
+constexpr double c_deployTurnsAmpShoot = 16.0;
+constexpr units::degree_t c_elevAngleAmpShoot = -60.0_deg;
+
 RobotContainer::RobotContainer() 
   : m_drive()
   , m_orchestra("output.chrp")
@@ -114,10 +119,11 @@ CommandPtr RobotContainer::GetAutonomousCommand()
   printf("loading auto path %s\n", autoFile.c_str());
   //std::shared_ptr<PathPlannerAuto> ppAuto = PathPlannerAuto::	getPathGroupFromAutoFile(autoFile);
 
-  PIDConstants translationConstants = PIDConstants(0.5, 0.0, 0.0);
-  PIDConstants rotationConstants = PIDConstants(0.5, 0.0, 0.0);
+//  PIDConstants translationConstants = PIDConstants(0.5, 0.0, 0.0);
+  PIDConstants translationConstants = PIDConstants(0.005, 0.0, 0.0);
+  PIDConstants rotationConstants = PIDConstants(1, 0, 0.025);// 0.5, 0.0, 0.0);
   units::meters_per_second_t maxModuleSpeed = 1_mps; //	Max speed of an individual drive module in meters/sec
-  units::meter_t driveBaseRadius = 17.25_in; // Distance from the center of the robot to the farthest swerve module 
+  const units::meter_t driveBaseRadius = 17.25_in; // Distance from the center of the robot to the farthest swerve module 
   ReplanningConfig replanningConfig;//(false, false);
 
   AutoBuilder::configureHolonomic(
@@ -300,19 +306,19 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , frc2::WaitCommand(0.4_s)
     , GoToElevationCommand(*this, 40.0_deg)
     , frc2::WaitCommand(0.4_s)
-    , IntakeGoToPositionCommand(*this, 24.0)
+    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
     , frc2::WaitCommand(0.8_s)
-    , GoToElevationCommand(*this, -60.0_deg)
+    , GoToElevationCommand(*this, c_elevAngleAmpShoot)
     , frc2::WaitCommand(0.4_s)
-    , IntakeGoToPositionCommand(*this, 16.0)*/
+    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpShoot)*/
       /*IntakeTransfer(*this)
     ,*/GoToElevationCommand(*this, 0.0_deg)
     , frc2::WaitCommand(0.2_s)
-    , IntakeGoToPositionCommand(*this, 24.0)
+    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
     , frc2::WaitCommand(0.45_s)
-    , GoToElevationCommand(*this, -60.0_deg)
+    , GoToElevationCommand(*this, c_elevAngleAmpShoot)
     , frc2::WaitCommand(0.25_s)
-    , IntakeGoToPositionCommand(*this, 16.0)
+    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpShoot)
   }.ToPtr());
   secondary.Y().OnTrue(frc2::SequentialCommandGroup{
       AmpShootCommand(*this)
@@ -326,7 +332,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , GoToElevationCommand(*this, 66.0_deg)
     , frc2::WaitCommand(1.0_s)
     , IntakeGoToPositionCommand(*this, 0.0)*/
-    , IntakeGoToPositionCommand(*this, 24.0)
+    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
     , frc2::WaitCommand(0.35_s)
     , GoToElevationCommand(*this, 0.0_deg)
     , frc2::WaitCommand(0.3_s)
@@ -385,7 +391,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   //   {
   //     AmpShootCommand(*this)
   //   , frc2::WaitCommand(0.5_s)
-  //   , IntakeGoToPositionCommand(*this, 24.0)
+  //   , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
   //   , frc2::WaitCommand(0.5_s)
   //   , GoToElevationCommand(*this, 0.0_deg)
   //   , frc2::WaitCommand(0.4_s)

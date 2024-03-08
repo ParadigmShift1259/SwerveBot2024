@@ -177,7 +177,7 @@ void IntakeSubsystem::Set(double speed)
 void IntakeSubsystem::ExtendIntake()
 {
     double turns = frc::SmartDashboard::GetNumber("DepExtTurns", c_defaultExtendTurns);
-    printf("dep turns %.3f\n", turns);
+    //printf("dep turns %.3f\n", turns);
 #ifdef USE_SMART_MOTION_DEPLOY
     m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
 #else

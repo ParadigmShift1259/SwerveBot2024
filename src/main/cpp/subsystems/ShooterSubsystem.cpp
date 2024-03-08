@@ -102,8 +102,7 @@ ShooterSubsystem::ShooterSubsystem()
   m_ElevationPIDController.SetI(frc::Preferences::GetDouble("kElevationI", c_defaultElevI));
   m_ElevationPIDController.SetD(frc::Preferences::GetDouble("kElevationD", c_defaultElevD));
   m_ElevationPIDController.SetFF(frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF));
-//  m_ElevationPIDController.SetOutputRange(-1.0, 1.0);
-  m_ElevationPIDController.SetOutputRange(-0.3, 0.3);
+  m_ElevationPIDController.SetOutputRange(-1.0, 1.0);
 
   // Smart Motion Coefficients
   // double minVel = frc::Preferences::GetDouble("kElevMinVel", 0.0);     // rpm

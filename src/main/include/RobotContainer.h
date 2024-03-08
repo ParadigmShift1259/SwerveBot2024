@@ -96,7 +96,7 @@ private:
 
   CommandXboxController m_primaryController{0};
   CommandXboxController m_secondaryController{1};
-// #define USE_BUTTON_BOX
+#define USE_BUTTON_BOX
 #ifdef USE_BUTTON_BOX
   CommandXboxController m_buttonBoxController{2};
 #endif
