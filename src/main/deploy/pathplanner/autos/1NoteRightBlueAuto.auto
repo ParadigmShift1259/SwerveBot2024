@@ -2,37 +2,37 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 2.47,
-      "y": 5.56
+      "x": 0.6517072301625181,
+      "y": 4.435091311914034
     },
-    "rotation": 180.0
+    "rotation": 120.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Three Note PathSAVE"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
+            "name": "PreShootClose"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ShootFar"
+            "name": "ShootClose"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "ShootStop"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1NoteRightBluePath"
           }
         }
       ]

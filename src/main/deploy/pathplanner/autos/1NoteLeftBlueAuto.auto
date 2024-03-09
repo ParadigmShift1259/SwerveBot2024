@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.37,
-      "y": 5.56
+      "x": 0.6792441553806527,
+      "y": 6.647224304437511
     },
-    "rotation": 180.0
+    "rotation": -120.0
   },
   "command": {
     "type": "sequential",
@@ -14,31 +14,37 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootClose"
+            "name": "PreShootClose"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ShootStop"
+            "name": "ShootClose"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Two Note Path"
+            "pathName": "1NoteLeftBluePath"
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 1.0
+            "pathName": "1NoteLeftBlueShootPath"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "ShootFar"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootStop"
           }
         }
       ]

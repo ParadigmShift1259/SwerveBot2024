@@ -17,7 +17,8 @@
 #include <units/angle.h>
 #include <units/length.h>
 
-constexpr double c_defaultShootAngle = 36.0;
+constexpr double c_defaultShootFarAngle = 36.0;
+constexpr double c_defaultShootCloseAngle = 55.0;
 
 class ShooterSubsystem : public frc2::SubsystemBase
 {
@@ -71,7 +72,7 @@ class ShooterSubsystem : public frc2::SubsystemBase
         // Near    Far
         { 3800.0,  3800.0}, // Over/Under (Left/Right) RPM
         {    0.0,     0.0}, // Back wheels (not used in SxS) RPM
-        {   57.0,    c_defaultShootAngle}  // Shot angle for Speaker and Podium
+        {   c_defaultShootCloseAngle,    c_defaultShootFarAngle}  // Shot angle for Speaker and Podium
     };
 
 	wpi::log::DoubleLogEntry m_logOverRPM;

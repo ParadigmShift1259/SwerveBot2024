@@ -43,19 +43,19 @@ public:
     , kAutoPathFourNote = kAutoPathDefault
     , kAutoPathThreeNote
     , kAutoPathTwoNote
-    , kAutoPathOneNote
-    , kAutoPathExitZone
+    , kAutoPathOneNoteLeft
+    , kAutoPathOneNoteRight
     , kAutoPathDoNothing
     // Keep the emun in sync with the LUT
   };
   std::vector<std::string> m_pathPlannerLUT
   { 
-      "Four Note Auto" 
-    , "Three Note Auto"
-    , "Two Note Auto" 
-    , "One Note Auto"
-    , "Exit Zone Auto" 
-    , "Do Nothing Auto"       // These strings are the names of the PathPlanner .path files
+      "4NoteAuto" 
+    , "3NoteAuto"
+    , "2NoteAuto" 
+    , "1NoteLeftBlueAuto"
+    , "1NoteRightBlueAuto"
+    , "DoNothingAuto"       // These strings are the names of the PathPlanner .path files
   };
   frc::SendableChooser<EAutoPath> m_chooser;
   void SetIsAutoRunning(bool isAutoRunning) { m_isAutoRunning = isAutoRunning; }

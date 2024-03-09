@@ -123,7 +123,15 @@ CommandPtr RobotContainer::GetAutonomousCommand()
                                 , maxModuleSpeed
                                 , driveBaseRadius
                                 , replanningConfig ),
-      [this]() { return false; }, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+      [this]() 
+      {
+        auto alliance = DriverStation::GetAlliance();
+        if (alliance)
+        {
+          return alliance.value() == DriverStation::Alliance::kRed;
+        }
+        return false; 
+      }, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
       &m_drive // Drive requirements, usually just a single drive subsystem
   );
 
