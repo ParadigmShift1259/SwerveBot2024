@@ -58,7 +58,7 @@ RobotContainer::RobotContainer()
   NamedCommands::registerCommand("ShootClose", std::move(
     frc2::SequentialCommandGroup{
         PreShootCommand(*this, 1_m)
-      , frc2::WaitCommand(0.25_s)
+      , frc2::WaitCommand(0.5_s)
       , ShootCommand(*this, true)
     }.ToPtr()));
 
@@ -67,7 +67,7 @@ RobotContainer::RobotContainer()
   NamedCommands::registerCommand("ShootFar", std::move(
     frc2::SequentialCommandGroup{
         PreShootCommand(*this, 5_m)
-      , frc2::WaitCommand(0.25_s)
+      , frc2::WaitCommand(0.7_s)  // Wait for elev angle to sync to gyro
       , ShootCommand(*this, true)
     }.ToPtr()));
 

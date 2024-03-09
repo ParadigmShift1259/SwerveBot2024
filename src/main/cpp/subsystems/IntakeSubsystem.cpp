@@ -14,7 +14,7 @@ constexpr double c_defaultIntakeD = 0.0;
 constexpr double c_defaultIntakeMin = -0.5;
 constexpr double c_defaultIntakeMax = 0.5;
 
-constexpr double c_defaultRetractTurns = -1.0;
+constexpr double c_defaultRetractTurns = -0.5;
 constexpr double c_defaultExtendTurns = 45.0;
 
 using namespace frc;
@@ -177,7 +177,7 @@ void IntakeSubsystem::Set(double speed)
 void IntakeSubsystem::ExtendIntake()
 {
     double turns = frc::SmartDashboard::GetNumber("DepExtTurns", c_defaultExtendTurns);
-    printf("dep extend turns %.3f\n", turns);
+    //printf("dep extend turns %.3f\n", turns);
 #ifdef USE_SMART_MOTION_DEPLOY
     m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
 #else
