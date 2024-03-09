@@ -10,7 +10,7 @@
 #include "subsystems/ShooterSubsystem.h"
 #include "subsystems/ClimberSubsystem.h"
 #include "subsystems/AmpSubsystem.h"
-
+#include "subsystems/LEDSubsystem.h"
 
 #include <frc/DataLogManager.h>
 
@@ -24,6 +24,7 @@ public:
     virtual ShooterSubsystem&        GetShooter() = 0;
     virtual ClimberSubsystem&        GetClimber() = 0; 
     virtual AmpSubsystem&        GetAmp() = 0;
+    virtual LEDSubsystem&         GetLED() = 0;
 
 
     virtual wpi::log::DataLog&      GetLogger() = 0;
