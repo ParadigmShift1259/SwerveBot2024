@@ -2,9 +2,10 @@
 
 #include <frc/Timer.h>
 
-ShootCommand::ShootCommand(ISubsystemAccess& subsystemAccess)
+ShootCommand::ShootCommand(ISubsystemAccess& subsystemAccess, bool bIsAuto)
     : m_shooterSubsystem(subsystemAccess.GetShooter())
     , m_intakeSubsystem(subsystemAccess.GetIntake())
+    , m_bIsAuto(bIsAuto)
 {
     AddRequirements(frc2::Requirements{&subsystemAccess.GetShooter(), &subsystemAccess.GetIntake()});
 	  wpi::log::DataLog& log = subsystemAccess.GetLogger();
@@ -34,8 +35,11 @@ bool ShootCommand::IsFinished()
 void ShootCommand::End(bool interrupted)
 {
   m_intakeSubsystem.SetTransferFinished(false);
-  m_shooterSubsystem.Stop();
+  if (m_bIsAuto == false)
+  {
+    m_shooterSubsystem.Stop();
+    m_shooterSubsystem.GoToElevation(33.0_deg);
+  }
   m_intakeSubsystem.Stop();
-  m_shooterSubsystem.GoToElevation(33.0_deg);
   m_logStartShootCommand.Append(false);
 }

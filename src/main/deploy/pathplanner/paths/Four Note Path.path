@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.4,
-        "y": 5.56
+        "x": 2.52,
+        "y": 6.81
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.80825808932417,
-        "y": 6.050590924711262
+        "x": 1.6613944881607856,
+        "y": 6.206633500947357
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.4,
-        "y": 7.0602781827095304
+        "x": 2.340638643541438,
+        "y": 3.9486056330603234
       },
       "prevControl": {
-        "x": 1.8908688649785739,
-        "y": 6.619687379219376
+        "x": 1.7623632139606122,
+        "y": 4.35248053625963
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,8 +30,13 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.2,
-      "rotationDegrees": -155.7507944685352,
+      "waypointRelativePos": 0,
+      "rotationDegrees": -151.73,
+      "rotateFast": true
+    },
+    {
+      "waypointRelativePos": 0.3,
+      "rotationDegrees": 153.30101292816332,
       "rotateFast": true
     }
   ],
@@ -39,7 +44,7 @@
   "eventMarkers": [
     {
       "name": "Intake Note Marker",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.2,
       "command": {
         "type": "sequential",
         "data": {
@@ -62,14 +67,14 @@
     "maxAngularAcceleration": 1800.0
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -151.73,
-    "rotateFast": true
+    "velocity": 0,
+    "rotation": 155.13630342824808,
+    "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 180.0,
+    "rotation": -179.43179134648705,
     "velocity": 0
   },
   "useDefaultConstraints": true

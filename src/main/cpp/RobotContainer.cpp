@@ -59,17 +59,16 @@ RobotContainer::RobotContainer()
     frc2::SequentialCommandGroup{
         PreShootCommand(*this, 1_m)
       , frc2::WaitCommand(0.25_s)
-      , ShootCommand(*this)
+      , ShootCommand(*this, true)
     }.ToPtr()));
 
   NamedCommands::registerCommand("ShootStop", std::move(StopAllCommand(*this).ToPtr()));
 
   NamedCommands::registerCommand("ShootFar", std::move(
     frc2::SequentialCommandGroup{
-        frc2::WaitCommand(0.25_s)
-      ,  PreShootCommand(*this, 5_m)
-      , frc2::WaitCommand(1.0_s)
-      , ShootCommand(*this)
+        PreShootCommand(*this, 5_m)
+      , frc2::WaitCommand(0.25_s)
+      , ShootCommand(*this, true)
     }.ToPtr()));
 
   NamedCommands::registerCommand("Intake Note", std::move(
@@ -100,18 +99,6 @@ RobotContainer::RobotContainer()
   // }
 }
 
-//#define USE_PATH_PLANNER_SWERVE_CMD
-#ifdef USE_PATH_PLANNER_SWERVE_CMD
-Command* RobotContainer::GetAutonomousCommand()
-{
-  auto pptraj = PathPlanner::loadPath("TestPath1", units::meters_per_second_t{1.0}, units::meters_per_second_squared_t{1.0});
-  // Trajectory trajectory = convertPathToTrajectory(pptraj);
-  PrintTrajectory(trajectory);
-  
-  return GetSwerveCommandPath(trajectory);
-  //return GetPathPlannerSwervePath(trajectory);
-}
-#else
 CommandPtr RobotContainer::GetAutonomousCommand()
 {
   auto autoPath = m_chooser.GetSelected();
@@ -124,7 +111,7 @@ CommandPtr RobotContainer::GetAutonomousCommand()
   PIDConstants rotationConstants = PIDConstants(1, 0, 0.025);// 0.5, 0.0, 0.0);
   units::meters_per_second_t maxModuleSpeed = 1_mps; //	Max speed of an individual drive module in meters/sec
   const units::meter_t driveBaseRadius = 17.25_in; // Distance from the center of the robot to the farthest swerve module 
-  ReplanningConfig replanningConfig;//(false, false);
+  ReplanningConfig replanningConfig(false, false);
 
   AutoBuilder::configureHolonomic(
       [this]() { return GetDrive().GetPose(); }, // Function to supply current robot pose
@@ -142,7 +129,6 @@ CommandPtr RobotContainer::GetAutonomousCommand()
 
   return AutoBuilder::buildAuto(autoFile);
 }
-#endif
 
 void RobotContainer::Periodic()
 {

@@ -18,12 +18,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "ShootStop"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Two Note Path"
@@ -42,15 +36,27 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "Three Note Path"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "ShootStop"
+            "name": "ShootFar"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Three Note Path"
+            "pathName": "Four Note Path"
           }
         },
         {
