@@ -70,6 +70,7 @@ public:
   ShooterSubsystem&        GetShooter() override { return m_shooter; }
   ClimberSubsystem&        GetClimber() override { return m_climber; }
   AmpSubsystem&        GetAmp() override { return m_amp; }
+  LEDSubsystem&        GetLED() override { return m_led; }
 
   wpi::log::DataLog&         GetLogger() override { return DataLogManager::GetLog(); }
 
@@ -91,6 +92,7 @@ private:
   ShooterSubsystem m_shooter;
   ClimberSubsystem m_climber;
   AmpSubsystem m_amp;
+  LEDSubsystem m_led;
   
   double m_shootDelayMs = 1.0;
 
@@ -118,6 +120,10 @@ private:
     units::degree_t angle{frc::SmartDashboard::GetNumber("ElevationAngle", 44.0)};
     m_shooter.GoToElevation(angle);
   }, {} };
+
+  InstantCommand m_moveClimbUp{[this] { m_climber.Set(0.9); }, {}};
+  InstantCommand m_moveClimbDown{[this] { m_climber.Set(-0.9); }, {}};
+  InstantCommand m_stopClimb{[this] { m_climber.Stop(); }, {}};
 
   InstantCommand m_ampPositionIntake{[this]
   { 
@@ -156,4 +162,9 @@ private:
 
   bool m_isAutoRunning = false;
   bool m_DriveStraightHook = false;
+
+  LEDSubsystem::Color m_pink = LEDSubsystem::CreateColor(80, 10, 15 , 0);//(255, 141, 187, 0);
+  LEDSubsystem::Color m_green = LEDSubsystem::CreateColor(13, 80, 0, 0);//(133, 240, 45, 0);
+  LEDSubsystem::Color m_black = LEDSubsystem::CreateColor(0, 0, 0, 0);
+
 };
