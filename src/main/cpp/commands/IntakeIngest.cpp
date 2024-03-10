@@ -9,8 +9,9 @@ constexpr double c_defaultIntakeSpeed = 0.75;
 IntakeIngest::IntakeIngest(ISubsystemAccess& subsystemAccess) 
   : m_shooter(subsystemAccess.GetShooter())
   , m_intake(subsystemAccess.GetIntake())
+  , m_led(subsystemAccess.GetLED())
 {
-  AddRequirements({&subsystemAccess.GetShooter(), &subsystemAccess.GetIntake()});
+  AddRequirements({&subsystemAccess.GetShooter(), &subsystemAccess.GetIntake(), &subsystemAccess.GetLED()});
 
   frc::SmartDashboard::PutNumber("IntakeSpeed", c_defaultIntakeSpeed);
   frc::SmartDashboard::PutNumber("IntakeAngle", 42.0);
@@ -22,6 +23,7 @@ IntakeIngest::IntakeIngest(ISubsystemAccess& subsystemAccess)
 void IntakeIngest::Initialize()
 {
   m_logStartCommand.Append(true);
+  m_led.SetAnimation(c_colorGreen, LEDSubsystem::kFlow);
 }
 
 void IntakeIngest::Execute()
@@ -43,7 +45,11 @@ bool IntakeIngest::IsFinished()
 void IntakeIngest::End(bool interrupted) 
 {
 // #ifndef THING1
-  m_intake.SetTransferFinished(true);
+  // m_intake.SetTransferFinished(true);
+  if (!interrupted) {
+    m_led.SetDefaultColor(c_colorPink);
+    m_led.SetAnimation(c_colorPink, LEDSubsystem::kSolid);
+  }
 // #endif
   m_intake.RetractIntake();
   m_intake.Set(0.0);

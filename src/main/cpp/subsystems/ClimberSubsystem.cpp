@@ -26,11 +26,15 @@ ClimberSubsystem::ClimberSubsystem() //
 
     m_leadMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
     m_leadMotor.SetInverted(false);
+    m_leadMotor.SetClosedLoopRampRate(0.0);
+    m_leadRelativeEnc.SetPosition(0.0);
 
     // m_followMotor.RestoreFactoryDefaults();
 
     m_followMotor.SetIdleMode(rev::CANSparkBase::IdleMode::kBrake);
-    m_followMotor.SetInverted(false);
+    m_followMotor.SetInverted(true);
+    m_followMotor.SetClosedLoopRampRate(0.0);
+    m_followRelativeEnc.SetPosition(0.0);
 
     c_defaultHighTurns = m_HighTurns;
     c_defaultParkTurns = m_ParkTurns;
@@ -56,6 +60,12 @@ ClimberSubsystem::ClimberSubsystem() //
     frc::Preferences::InitDouble("kClimbPosI", c_defaultClimbI);
     frc::Preferences::InitDouble("kClimbPosD", c_defaultClimbD);
 
+    frc::SmartDashboard::PutNumber("ClimbLeadMotorPos", 1.0);
+    frc::SmartDashboard::PutNumber("ClimbFollowMotorPos", 1.0);
+
+    m_leadPIDController.SetOutputRange(kMinOut, kMaxOut);
+    m_followPIDController.SetOutputRange(kMinOut, kMaxOut);
+
 }
 
 void ClimberSubsystem::Periodic()
@@ -77,11 +87,12 @@ void ClimberSubsystem::Periodic()
     m_HighTurns = frc::SmartDashboard::GetNumber("ClimbHiTurns", c_defaultHighTurns);
     m_ParkTurns     = frc::SmartDashboard::GetNumber("ClimbParkTurns", c_defaultParkTurns);
 
-    frc::SmartDashboard::PutNumber("ClimbLeadMotorPos", m_leadRelativeEnc.GetPosition());
-    frc::SmartDashboard::PutNumber("ClimbFollowMotorPos", m_followRelativeEnc.GetPosition());
+    frc::SmartDashboard::PutNumber("ClimbLeadMotorPos Echo", m_leadRelativeEnc.GetPosition());
+    frc::SmartDashboard::PutNumber("ClimbFollowMotorPos Echo", m_followRelativeEnc.GetPosition());
 
     m_climbLeadPosition = frc::SmartDashboard::GetNumber("ClimbLeadMotorPos", 1.0);
-    m_climbFollowPosition = frc::SmartDashboard::PutNumber("ClimbFollowMotorPos", 1.0);
+    //m_climbFollowPosition = frc::SmartDashboard::GetNumber("ClimbFollowMotorPos", 1.0);
+    m_climbFollowPosition = frc::SmartDashboard::GetNumber("ClimbLeadMotorPos", 1.0);
   }
 }
 

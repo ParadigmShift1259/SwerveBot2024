@@ -16,6 +16,10 @@ class StopAllCommand: public frc2::CommandHelper<frc2::Command, StopAllCommand>
     private:
         ShooterSubsystem& m_shooterSubsystem;
         IntakeSubsystem& m_intakeSubsystem;
+        LEDSubsystem& m_led;
+
+        LEDSubsystem::Color c_colorPink = LEDSubsystem::CreateColor(80, 10, 15 , 0);
+        LEDSubsystem::Color c_colorGreen = LEDSubsystem::CreateColor(13, 80, 0, 0);
 
 		wpi::log::BooleanLogEntry m_logStartCommand;
 };

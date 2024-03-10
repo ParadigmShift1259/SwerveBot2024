@@ -4,8 +4,9 @@
 
 PreShootCommand::PreShootCommand(ISubsystemAccess& subsystemAccess, units::meter_t distance)
     : m_shooterSubsystem(subsystemAccess.GetShooter())
+    , m_led(subsystemAccess.GetLED())
 {
-    AddRequirements(frc2::Requirements{&subsystemAccess.GetShooter()});
+    AddRequirements(frc2::Requirements{&subsystemAccess.GetShooter(), &subsystemAccess.GetLED()});
 
 	
     m_distance = distance;
@@ -17,7 +18,9 @@ PreShootCommand::PreShootCommand(ISubsystemAccess& subsystemAccess, units::meter
 
 void PreShootCommand::Initialize()
 {
+  m_led.SetRobotBusy(true);
   int shootIndex = m_distance < 2.0_m ? 0 : 1;
+  m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
   m_logStartPreShootCommand.Append(true);
   m_shooterSubsystem.GoToElevation(shootIndex);
   //double elevationAngle = frc::SmartDashboard::GetNumber("ShotAngle", 39.0);

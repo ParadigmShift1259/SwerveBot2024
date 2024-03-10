@@ -32,12 +32,18 @@ public:
     /// \param speed         Desired motor speed to run, ranging from [-1, 1]
     void Set(double speed);
 
-    void Stop() { Set(0.0); }
+    void Stop() { m_followMotor.StopMotor(); m_leadMotor.StopMotor(); }
 
     void GoToPosition(double position);
 
     void HighPosition() { GoToPosition(m_HighTurns); }
     void ParkPosition() { GoToPosition(m_ParkTurns); }
+
+    enum Position {
+        kDefaultPosition,
+        kParkPosition = kDefaultPosition,
+        kHighPosition
+    };
 
 private:
     // 775 that pulls/releases rope for hooks

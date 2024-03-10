@@ -74,6 +74,10 @@ public:
 
   wpi::log::DataLog&         GetLogger() override { return DataLogManager::GetLog(); }
 
+  LEDSubsystem::Color c_colorPink = LEDSubsystem::CreateColor(80, 10, 15 , 0);//(255, 141, 187, 0);
+  LEDSubsystem::Color c_colorGreen = LEDSubsystem::CreateColor(13, 80, 0, 0);//(133, 240, 45, 0);
+  LEDSubsystem::Color c_colorBlack = LEDSubsystem::CreateColor(0, 0, 0, 0);
+
 private:
   void SetDefaultCommands();
   void ConfigureBindings();
@@ -162,9 +166,5 @@ private:
 
   bool m_isAutoRunning = false;
   bool m_DriveStraightHook = false;
-
-  LEDSubsystem::Color m_pink = LEDSubsystem::CreateColor(80, 10, 15 , 0);//(255, 141, 187, 0);
-  LEDSubsystem::Color m_green = LEDSubsystem::CreateColor(13, 80, 0, 0);//(133, 240, 45, 0);
-  LEDSubsystem::Color m_black = LEDSubsystem::CreateColor(0, 0, 0, 0);
 
 };

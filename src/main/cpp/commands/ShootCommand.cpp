@@ -6,8 +6,9 @@ ShootCommand::ShootCommand(ISubsystemAccess& subsystemAccess, bool bIsAuto)
     : m_shooterSubsystem(subsystemAccess.GetShooter())
     , m_intakeSubsystem(subsystemAccess.GetIntake())
     , m_bIsAuto(bIsAuto)
+    , m_led(subsystemAccess.GetLED())
 {
-    AddRequirements(frc2::Requirements{&subsystemAccess.GetShooter(), &subsystemAccess.GetIntake()});
+    AddRequirements(frc2::Requirements{&subsystemAccess.GetShooter(), &subsystemAccess.GetIntake(), &subsystemAccess.GetLED()});
 	  wpi::log::DataLog& log = subsystemAccess.GetLogger();
     m_logStartShootCommand = wpi::log::BooleanLogEntry(log, "/ShootCommand/startCommand");
 }
@@ -23,7 +24,9 @@ void ShootCommand::Initialize()
 
 void ShootCommand::Execute()
 {
-
+  if (!m_intakeSubsystem.IsNotePresent()) {
+    m_led.SetAnimation(c_colorPink, LEDSubsystem::kStrobe);
+  }
 }
 
 bool ShootCommand::IsFinished()
@@ -34,6 +37,8 @@ bool ShootCommand::IsFinished()
 
 void ShootCommand::End(bool interrupted)
 {
+  m_led.SetAnimation(m_led.GetDefaultColor(), LEDSubsystem::kSolid);
+  m_led.SetRobotBusy(false);
   m_intakeSubsystem.SetTransferFinished(false);
   if (m_bIsAuto == false)
   {

@@ -3,8 +3,9 @@
 
 IntakeRelease::IntakeRelease(ISubsystemAccess& subsystemAccess)
  : m_intake(subsystemAccess.GetIntake())
+ , m_led(subsystemAccess.GetLED())
 {
-  AddRequirements({&subsystemAccess.GetIntake()});
+  AddRequirements({&subsystemAccess.GetIntake(), &subsystemAccess.GetLED()});
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeRelease/startCommand");

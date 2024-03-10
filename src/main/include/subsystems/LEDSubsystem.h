@@ -23,25 +23,30 @@ class LEDSubsystem : public frc2::SubsystemBase
     void Periodic();
     struct Color
     {
-      int red;
-      int green;
-      int blue;
-      int white;
+      int red = 0;
+      int green = 0;
+      int blue = 0;
+      int white = 0;
     };
 
-    enum class Animation
+    enum Animation
     {
-      kSolid,
+      kDefault,
+      kSolid = kDefault,
       kFade,
       kFlow,
       kStrobe,
       kBlank
     };
+
     void SetAnimation(Color rgbw, Animation animate);
     static Color CreateColor(int r, int g, int b, int w);
 
-    bool IsRobotBusy() { return m_busy; };
-    void SetRobotBusy(bool value) { m_busy = value; };
+    bool IsRobotBusy() { return m_busy; }
+    void SetRobotBusy(bool value) { m_busy = value; }
+
+    void SetDefaultColor(Color color) { m_defaultColor = color; }
+    Color GetDefaultColor() { return m_defaultColor; }
     
   private:
 
@@ -51,8 +56,10 @@ class LEDSubsystem : public frc2::SubsystemBase
 
     static constexpr double c_defaultSpeed = 0.5;
 
-    static constexpr int c_ledNum = 68;
-    static constexpr int c_ledOffset = 0;
+    static constexpr int c_ledNum = 16;
+    static constexpr int c_ledOffset = 8;
+
+    Color m_defaultColor;
 
     double m_speed;
     bool m_busy;
