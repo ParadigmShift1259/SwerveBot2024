@@ -14,9 +14,6 @@ constexpr double c_defaultIntakeD = 0.0;
 constexpr double c_defaultIntakeMin = -0.5;
 constexpr double c_defaultIntakeMax = 0.5;
 
-constexpr double c_defaultRetractTurns = -0.5;
-constexpr double c_defaultExtendTurns = 45.0;
-
 using namespace frc;
 using namespace ctre::phoenix::motorcontrol;
 

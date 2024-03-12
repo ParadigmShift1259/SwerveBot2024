@@ -169,27 +169,20 @@ void ShooterSubsystem::Periodic()
   static int count = 0;
   if (count++ % 20 == 0)
   {
-    auto pitch = m_gyro.GetPitch();
-    auto ticks = m_ElevationRelativeEnc.GetPosition();
-    double angle = (ticks - c_elevOffset) / c_elevSlope;
-    frc::SmartDashboard::PutNumber("ElevationAngleEcho", angle);
-    frc::SmartDashboard::PutNumber("ShooterAngle", pitch);
-    double turns = (c_elevSlope * pitch + c_elevOffset);
-    if (fabs(turns - ticks) > c_elevTurnTolerance)
+    if (m_bSyncToGyro)
     {
-      printf("gyro angle pitch %.3f gyro turns %.3f emcoder ticks %.3f\n", pitch, turns, ticks);
-      m_ElevationRelativeEnc.SetPosition(turns);
+      auto pitch = m_gyro.GetPitch();
+      auto ticks = m_ElevationRelativeEnc.GetPosition();
+      double angle = (ticks - c_elevOffset) / c_elevSlope;
+      frc::SmartDashboard::PutNumber("ElevationAngleEcho", angle);
+      frc::SmartDashboard::PutNumber("ShooterAngle", pitch);
+      double turns = (c_elevSlope * pitch + c_elevOffset);
+      if (fabs(turns - ticks) > c_elevTurnTolerance)
+      {
+        printf("gyro angle pitch %.3f gyro turns %.3f emcoder ticks %.3f\n", pitch, turns, ticks);
+        m_ElevationRelativeEnc.SetPosition(turns);
+      }
     }
-    // double turns = (c_elevSlope * pitch + c_elevOffset);
-    // double adj = m_elevationTurns - turns;
-    // printf("elev from gyro angle pitch %.3f elev angle %.3f adj %.3f goto angle %.3f gyro turns %.3f elev turns %.3f\n", pitch, angle, adj, angle + adj, turns, m_elevationTurns);
-    // if (m_elevationTurns != 0.0 && fabs(adj) < 0.5)
-    // {
-    //   printf("Setting elev from gyro angle pitch %.3f elev angle %.3f adj %.3f goto angle %.3f gyro turns %.3f elev turns %.3f\n", pitch, angle, adj, angle + adj, turns, m_elevationTurns);
-    //   angle = ((m_elevationTurns - adj) - c_elevOffset) / c_elevSlope;
-    //   GoToElevation(units::degree_t(angle));
-    //   m_elevationTurns = 0.0;
-    // }
 
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("OverRPM",  -c_defaultRPM);
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("UnderRPM", c_defaultRPM);
@@ -229,31 +222,6 @@ void ShooterSubsystem::Periodic()
     lastI = i;
     lastD = d;
     lastFF = ff;
-
-    // static double lastMaxVel = 0.0;
-    // static double lastMaxAcc = 0.0;
-    // static double lastAllowedErr = 0.0;
-    // //double minVel = frc::Preferences::GetDouble("kElevMinVel", 0.0);     // rpm
-    // //m_ElevationPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
-    // double maxVel = frc::Preferences::GetDouble("kElevMaxVel", 2000.0);  // rpm
-    // double maxAcc = frc::Preferences::GetDouble("kElevMaxAcc", 1500.0);
-    // double allowedErr = frc::Preferences::GetDouble("kElevAllowedErr", 0.0);
-    // int smartMotionSlot = 0;
-    // if (maxVel != lastMaxVel)
-    // {
-    //   m_ElevationPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
-    // }
-    // if (maxAcc != lastMaxAcc)
-    // {
-    //   m_ElevationPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
-    // }
-    // if (allowedErr != lastAllowedErr)
-    // {
-    //   m_ElevationPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
-    // }
-    // lastMaxVel = maxVel;
-    // lastMaxAcc = maxAcc;
-    // lastAllowedErr = allowedErr;
 
     frc::SmartDashboard::PutNumber("OverRPM echo", m_OverRelativeEnc.GetVelocity());
     frc::SmartDashboard::PutNumber("UnderRPM echo", m_UnderRelativeEnc.GetVelocity());

@@ -46,9 +46,13 @@
 
 using namespace pathplanner;
 
-
-constexpr double c_deployTurnsAmpClearance = 32.0;
+#ifndef THING1
+constexpr double c_deployTurnsAmpClearance = 24.5;//20.0;
+constexpr double c_deployTurnsAmpShoot = 18.5;//14.0;
+#else
+constexpr double c_deployTurnsAmpClearance = 30.0;
 constexpr double c_deployTurnsAmpShoot = 16.0;
+#endif
 constexpr units::degree_t c_elevAngleAmpShoot = -60.0_deg;
 
 RobotContainer::RobotContainer() 
@@ -255,12 +259,13 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   }.ToPtr());
   //primary.A().WhileTrue(ShootCommand(*this).ToPtr());
   // primary.A().WhileTrue(GoToPositionCommand(*this, true).ToPtr());
+
   // primary.B().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
   // primary.B().OnTrue(PreShootCommand(*this, 129_in, 32_deg).ToPtr());
   primary.X().OnTrue(IntakeIngest(*this).ToPtr());
   primary.Y().WhileTrue(IntakeStop(*this).ToPtr());
-  primary.Back().WhileTrue(ClimbCommand(*this, ClimberSubsystem::kParkPosition).ToPtr());
-  primary.Start().WhileTrue(ClimbCommand(*this, ClimberSubsystem::kHighPosition).ToPtr());
+  primary.Back().OnTrue(ClimbCommand(*this, ClimberSubsystem::kParkPosition).ToPtr());
+  primary.Start().OnTrue(ClimbCommand(*this, ClimberSubsystem::kHighPosition).ToPtr());
   // primary.Back().WhileTrue(&m_moveClimbDown);
   // primary.Start().WhileTrue(&m_moveClimbUp);
   primary.LeftBumper().WhileTrue(&m_stopClimb);
@@ -299,14 +304,20 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   secondary.A().OnTrue(frc2::SequentialCommandGroup{
       IntakeIngest(*this)
-    , frc2::WaitCommand(0.25_s)
-    // , IntakeTransfer(*this)
   }.ToPtr());                          
   secondary.B().WhileTrue(frc2::SequentialCommandGroup{
-      IntakeDeploy(*this)
-    , IntakeRelease(*this) 
+      IntakeRelease(*this) 
+  ,   IntakeStop(*this)
   }.ToPtr());     
   secondary.X().OnTrue(frc2::SequentialCommandGroup{
+#ifndef THING1
+      IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
+    , StartLEDCommand(*this)
+    , frc2::WaitCommand(0.15_s)
+    , GoToElevationCommand(*this, c_elevAngleAmpShoot)
+    , frc2::WaitCommand(0.65_s)
+    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpShoot)
+#else
       GoToElevationCommand(*this, 0.0_deg)
     , StartLEDCommand(*this)
     , frc2::WaitCommand(0.2_s)
@@ -315,26 +326,26 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , GoToElevationCommand(*this, c_elevAngleAmpShoot)
     , frc2::WaitCommand(0.25_s)
     , IntakeGoToPositionCommand(*this, c_deployTurnsAmpShoot)
+#endif
   }.ToPtr());
   secondary.Y().OnTrue(frc2::SequentialCommandGroup{
       AmpShootCommand(*this)
     , frc2::WaitCommand(0.7_s)
-    /*, IntakeGoToPositionCommand(*this, 24.0)
-    , frc2::WaitCommand(1.0_s)
-    , GoToElevationCommand(*this, 40.0_deg)
-    , frc2::WaitCommand(1.0_s)
-    , IntakeGoToPositionCommand(*this, 9.0)
-    , frc2::WaitCommand(1.0_s)
-    , GoToElevationCommand(*this, 66.0_deg)
-    , frc2::WaitCommand(1.0_s)
-    , IntakeGoToPositionCommand(*this, 0.0)*/
+#ifndef THING1
+    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
+    , frc2::WaitCommand(0.15_s)
+    , GoToElevationCommand(*this, 33.0_deg)
+    , frc2::WaitCommand(0.35_s)
+    , IntakeGoToPositionCommand(*this, c_defaultRetractTurns)
+#else
     , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
     , frc2::WaitCommand(0.35_s)
     , GoToElevationCommand(*this, 0.0_deg)
     , frc2::WaitCommand(0.3_s)
-    , IntakeGoToPositionCommand(*this, 0.0)
+    , IntakeGoToPositionCommand(*this, c_defaultRetractTurns)
     , frc2::WaitCommand(0.2_s)
     , GoToElevationCommand(*this, 33.0_deg)
+#endif
   }.ToPtr());
 
   secondary.RightBumper().OnTrue(PreShootCommand(*this, 129_in).ToPtr());
@@ -382,20 +393,6 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.Y().WhileTrue(IntakeStop(*this).ToPtr());
   secondary.LeftBumper().WhileTrue(IntakeRelease(*this).ToPtr());
   secondary.RightBumper().OnTrue(&m_resetShooterToStart);
-#else
-  // secondary.B().OnTrue(frc2::SequentialCommandGroup
-  //   {
-  //     AmpShootCommand(*this)
-  //   , frc2::WaitCommand(0.5_s)
-  //   , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
-  //   , frc2::WaitCommand(0.5_s)
-  //   , GoToElevationCommand(*this, 0.0_deg)
-  //   , frc2::WaitCommand(0.4_s)
-  //   , IntakeGoToPositionCommand(*this, 0.0)
-  //   , frc2::WaitCommand(0.4_s)
-  //   , GoToElevationCommand(*this, 65.9_deg)
-  //   }.ToPtr());
-  // secondary.RightBumper().OnTrue(AmpIntakeCommand(*this).ToPtr());
 #endif
 }
 

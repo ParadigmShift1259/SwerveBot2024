@@ -49,11 +49,11 @@ class LEDSubsystem : public frc2::SubsystemBase
     Color GetDefaultColor() { return m_defaultColor; }
     
   private:
-
+#ifndef THING1
     CANdleConfiguration m_candleConfig;
     wpi::log::DoubleLogEntry m_log;
     CANdle m_candle{kLEDCANID};
-
+#endif
     static constexpr double c_defaultSpeed = 0.5;
 
     static constexpr int c_ledNum = 16;

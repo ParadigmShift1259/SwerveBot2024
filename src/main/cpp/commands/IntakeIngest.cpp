@@ -53,5 +53,7 @@ void IntakeIngest::End(bool interrupted)
 // #endif
   m_intake.RetractIntake();
   m_intake.Set(0.0);
+  auto angle = frc::SmartDashboard::GetNumber("Travel Angle", 33.0);
+  m_shooter.GoToElevation(units::degree_t(angle));
   m_logStartCommand.Append(false);
 }

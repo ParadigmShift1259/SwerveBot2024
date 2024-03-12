@@ -7,7 +7,7 @@ static constexpr int c_defaultLEDOffset = 0;
 LEDSubsystem::LEDSubsystem()
 {
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
-
+#ifndef THING1
   m_candleConfig.stripType = LEDStripType::RGB; // set the strip type to RGB
   m_candleConfig.brightnessScalar = 1.0; // dim the LEDs to half brightness
   m_candle.ConfigAllSettings(m_candleConfig);
@@ -28,9 +28,9 @@ LEDSubsystem::LEDSubsystem()
   CANdleFaults faults;
 
   ctre::phoenix::ErrorCode faultsError = m_candle.GetFaults(faults); // fills faults with the current CANdle faults; returns the last error generated
-
-  printf("candle error: %d", error);
-  printf("candle fault: %d", faultsError);
+#endif
+  // printf("candle error: %d", error);
+  // printf("candle fault: %d", faultsError);
 }
 
 void LEDSubsystem::Periodic()
@@ -50,6 +50,7 @@ LEDSubsystem::Color LEDSubsystem::CreateColor(int r, int g, int b, int w)
 
 void LEDSubsystem::SetAnimation(Color rgbw, Animation animate)
 {
+#ifndef THING1
   int red = rgbw.red;
   int green = rgbw.green;
   int blue = rgbw.blue;
@@ -108,4 +109,5 @@ void LEDSubsystem::SetAnimation(Color rgbw, Animation animate)
       m_candle.SetLEDs(red, green, blue, white, c_ledOffset, c_ledNum);
       break;
   }
+#endif
 }

@@ -129,6 +129,8 @@ private:
   InstantCommand m_moveClimbDown{[this] { m_climber.Set(-0.9); }, {}};
   InstantCommand m_stopClimb{[this] { m_climber.Stop(); }, {}};
 
+  InstantCommand m_enableGyroSync{[this] { m_shooter.EnableSyncToGyro(); }, {}};
+
   InstantCommand m_ampPositionIntake{[this]
   { 
     double turns = frc::SmartDashboard::GetNumber("AmpShotTurns", 21);

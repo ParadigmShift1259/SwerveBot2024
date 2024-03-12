@@ -30,6 +30,8 @@ class ShooterSubsystem : public frc2::SubsystemBase
     void StartOverAndUnder(units::meter_t distance);
     void Shoot(units::meter_t distance);
     void Stop();
+    void EnableSyncToGyro() { m_bSyncToGyro = true; }
+    void DisableSyncToGyro() { m_bSyncToGyro = false; }
     units::degree_t GetCloseAngle() const { return m_closeAngle; }
     const std::vector<std::vector<double>> GetReferenceTable() const { return m_shootReference; }
     
@@ -38,7 +40,7 @@ class ShooterSubsystem : public frc2::SubsystemBase
     double m_elevationAngle = 55.0;
     double m_elevationTurns = 0.0;  // For calibration
     double m_lastElevationTurns = 0.0;  // For calibration
-    bool m_poppedPin = false;
+    bool m_bSyncToGyro = true;
     frc::Timer m_timer;
 
     PigeonGyro m_gyro;
