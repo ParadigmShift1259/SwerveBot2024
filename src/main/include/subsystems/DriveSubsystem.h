@@ -81,8 +81,6 @@ public:
 
   units::meters_per_second_t m_currentMaxSpeed = kMaxSpeed;
 
-
-
 // Safer sppeds for lab testing
   // static constexpr units::meters_per_second_t kMaxSpeed = 1.0_mps;
   // static constexpr units::radians_per_second_t kMaxAngularSpeed{0.25 * std::numbers::pi};
@@ -152,14 +150,14 @@ private:
   // Logging Member Variables
   frc::Timer m_timer;
   //std::vector<frc::Trajectory::State> m_StateHist;
-  double m_velocity;
-  double m_acceleration;
+  // double m_velocity;
+  // double m_acceleration;
 
   wpi::log::DoubleLogEntry m_logRobotPoseX;
   wpi::log::DoubleLogEntry m_logRobotPoseY;
   wpi::log::DoubleLogEntry m_logRobotPoseTheta;
-  wpi::log::DoubleLogEntry m_logRobotSpeed;
-  wpi::log::DoubleLogEntry m_logRobotAccel;
+  // wpi::log::DoubleLogEntry m_logRobotSpeed;
+  // wpi::log::DoubleLogEntry m_logRobotAccel;
   wpi::log::DoubleLogEntry m_logGyroPitch;
 
   wpi::log::DoubleLogEntry m_logDriveInputX;

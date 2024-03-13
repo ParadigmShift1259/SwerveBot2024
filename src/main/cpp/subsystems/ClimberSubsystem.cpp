@@ -94,7 +94,7 @@ void ClimberSubsystem::Periodic()
     static double lastP = 0.0;
     static double lastI = 0.0;
     static double lastD = 0.0;
-    static double lastFF = 0.0;
+    //static double lastFF = 0.0;
 
     auto p = frc::Preferences::GetDouble("kClimbPosP", c_defaultClimbP);
     auto i = frc::Preferences::GetDouble("kClimbPosI", c_defaultClimbI);
@@ -144,8 +144,8 @@ void ClimberSubsystem::GoToPosition(double position)
 {
     // double leadTurns = m_climbLeadPosition;
     // double followTurns = m_climbFollowPosition;
-    // printf("plopper lead turns %.3f\n", leadTurns);
-    // printf("plopper follow turns %.3f\n", followTurns);
+    // printf("climb lead turns %.3f\n", leadTurns);
+    // printf("climb follow turns %.3f\n", followTurns);
     m_leadPIDController.SetReference(position, rev::CANSparkBase::ControlType::kPosition);
     m_followPIDController.SetReference(position, rev::CANSparkBase::ControlType::kPosition);
 

@@ -15,8 +15,8 @@ DriveSubsystem::DriveSubsystem()
   m_logRobotPoseX = wpi::log::DoubleLogEntry(log, "/odometry/robotPoseX");
   m_logRobotPoseY = wpi::log::DoubleLogEntry(log, "/odometry/robotPoseY");
   m_logRobotPoseTheta = wpi::log::DoubleLogEntry(log, "/odometry/robotPoseTheta");   
-  m_logRobotSpeed = wpi::log::DoubleLogEntry(log, "/odometry/robotSpeed");
-  m_logRobotAccel = wpi::log::DoubleLogEntry(log, "/odometry/robotAccel");
+  //m_logRobotSpeed = wpi::log::DoubleLogEntry(log, "/odometry/robotSpeed");
+  //m_logRobotAccel = wpi::log::DoubleLogEntry(log, "/odometry/robotAccel");
   m_logGyroPitch = wpi::log::DoubleLogEntry(log, "/gyro/pitch");
 
   m_logDriveInputX = wpi::log::DoubleLogEntry(log, "/input/X");
@@ -140,29 +140,28 @@ void DriveSubsystem::Periodic()
   m_rearLeft.Periodic();
   m_rearRight.Periodic();
 
-  //Log Odometry Values
-  //frc::Pose2d pose = m_odometry.GetPose();
-  //frc::Trajectory::State state;
-  //state.t = m_timer.GetFPGATimestamp();
-  //state.pose = pose;
-	//auto& prevState = m_StateHist.back();
-  //state.velocity = (pose - prevState.pose).Translation().Norm() / (state.t - prevState.t);
-  //state.acceleration = (state.velocity - prevState.velocity) / (state.t - prevState.t);
+  // Log Odometry Values
+  frc::Pose2d pose = m_odometry.GetPose();
+  // frc::Trajectory::State state;
+  // state.t = m_timer.GetFPGATimestamp();
+  // state.pose = pose;
+	// auto& prevState = m_StateHist.back();
+  // state.velocity = (pose - prevState.pose).Translation().Norm() / (state.t - prevState.t);
+  // state.acceleration = (state.velocity - prevState.velocity) / (state.t - prevState.t);
   //m_StateHist.push_back(state);
 
-  //m_velocity = (double)state.velocity;
-  //m_acceleration = (double)state.acceleration;
+  // m_velocity = (double)state.velocity;
+  // m_acceleration = (double)state.acceleration;
 
-  //m_logRobotPoseX.Append(pose.X().to<double>());
-  //m_logRobotPoseY.Append(pose.Y().to<double>());
-  //m_logRobotPoseTheta.Append(pose.Rotation().Degrees().to<double>());
-  //m_logRobotSpeed.Append(m_velocity);
-  //m_logRobotAccel.Append(m_acceleration);
-  //frc::SmartDashboard::PutNumber("GyroPitch", m_gyro.GetPitch());
+  m_logRobotPoseX.Append(pose.X().to<double>());
+  m_logRobotPoseY.Append(pose.Y().to<double>());
+  m_logRobotPoseTheta.Append(pose.Rotation().Degrees().to<double>());
+  // m_logRobotSpeed.Append(m_velocity);
+  // m_logRobotAccel.Append(m_acceleration);
   m_logGyroPitch.Append(m_gyro.GetPitch()); 
 
   static int count = 0;
-  if (count++ % 100 == 0)
+  if (count++ % 25 == 0)
   {
     frc::SmartDashboard::PutBoolean("SlowSpeed", m_currentMaxSpeed == kLowSpeed);
   }

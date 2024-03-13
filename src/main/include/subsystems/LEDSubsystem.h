@@ -59,6 +59,10 @@ class LEDSubsystem : public frc2::SubsystemBase
     static constexpr int c_ledNum = 16;
     static constexpr int c_ledOffset = 8;
 
+    ColorFlowAnimation m_colorFlowAnimation{0, 0, 0, 0, c_defaultSpeed, c_ledNum, ColorFlowAnimation::Forward, c_ledOffset};
+    SingleFadeAnimation m_singleFadeAnimation{0, 0, 0, 0, c_defaultSpeed, c_ledNum, c_ledOffset};
+    StrobeAnimation m_strobeAnimation{0, 0, 0, 0, c_defaultSpeed, c_ledNum, c_ledOffset};
+
     Color m_defaultColor;
 
     double m_speed;

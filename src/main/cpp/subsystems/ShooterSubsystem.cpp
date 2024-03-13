@@ -124,7 +124,7 @@ ShooterSubsystem::ShooterSubsystem()
   frc::SmartDashboard::PutNumber("ShotAngleClose", c_defaultShootCloseAngle);
   frc::SmartDashboard::PutNumber("OverRPM",  m_shootReference[0][1]);
   frc::SmartDashboard::PutNumber("UnderRPM", m_shootReference[0][1]);
-  frc::SmartDashboard::PutNumber("ElevationAngle", 33.0);
+  frc::SmartDashboard::PutNumber("ElevationAngle", c_defaultTravelPosition.value());
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
   frc::SmartDashboard::PutBoolean("SetElevRef", false);
 
@@ -136,31 +136,6 @@ ShooterSubsystem::ShooterSubsystem()
 
 void ShooterSubsystem::Periodic()
 {
-  // if (m_poppedPin == false)
-  // {
-  //   HAL_ControlWord cw;
-  //   if (HAL_GetControlWord(&cw) == 0)
-  //   {
-  //     if (cw.enabled)
-  //     {
-  //       printf("Popping the pin\n");
-  //       GoToElevation(c_pinPopAngle);
-  //       m_poppedPin = true;
-  //     }
-  //   }
-  // }
-
-  // if (m_lastElevationTurns != m_elevationTurns && fabs(m_ElevationRelativeEnc.GetPosition() - frc::SmartDashboard::GetNumber("ElevationTurns", 0.0)) < 1.0)
-  // {
-  //   m_lastElevationTurns = m_elevationTurns;
-  //   // //double adj = pitch - c_elevStartAngle;
-  //   // double turns = (1.13 * pitch - 69.5) / 1.75;
-  //   auto pitch = m_gyro.GetPitch();
-  //   printf("elev gyro angle %.3f rel enc %.3f turns %.3f\n", pitch, m_ElevationRelativeEnc.GetPosition(), m_elevationTurns);
-  // }
-
-  //m_closeAngle = units::degree_t(frc::SmartDashboard::GetNumber("CloseAngle", 49.0));
-
   m_logOverRPM.Append(m_OverRelativeEnc.GetVelocity()); 
   m_logUnderRPM.Append(m_UnderRelativeEnc.GetVelocity());
   m_logCurrentAngle.Append(m_ElevationRelativeEnc.GetPosition());
@@ -179,7 +154,7 @@ void ShooterSubsystem::Periodic()
       double turns = (c_elevSlope * pitch + c_elevOffset);
       if (fabs(turns - ticks) > c_elevTurnTolerance)
       {
-        printf("gyro angle pitch %.3f gyro turns %.3f emcoder ticks %.3f\n", pitch, turns, ticks);
+        //printf("gyro angle pitch %.3f gyro turns %.3f emcoder ticks %.3f\n", pitch, turns, ticks);
         m_ElevationRelativeEnc.SetPosition(turns);
       }
     }
