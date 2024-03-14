@@ -20,7 +20,7 @@ class LEDSubsystem : public frc2::SubsystemBase
 {
   public:
     LEDSubsystem();
-    void Periodic();
+    void Periodic() override;
     struct Color
     {
       int red = 0;

@@ -24,7 +24,7 @@ class ShooterSubsystem : public frc2::SubsystemBase
 {
   public:
     ShooterSubsystem();
-    void Periodic();
+    void Periodic() override;
     void GoToElevation(units::degree_t angle);
     void GoToElevation(int shootIndex);
     void StartOverAndUnder(units::meter_t distance);

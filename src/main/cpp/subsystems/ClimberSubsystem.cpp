@@ -16,6 +16,7 @@ double c_defaultFollowDirection;
 constexpr double c_defaultClimbP = 0.07;
 constexpr double c_defaultClimbI = 0.0;
 constexpr double c_defaultClimbD = 0.0;
+constexpr double c_defaultClimbFF = 0.00000;
 
 using namespace ctre::phoenix::motorcontrol::can;
 using namespace ctre::phoenix::motorcontrol;
@@ -78,6 +79,7 @@ ClimberSubsystem::ClimberSubsystem()
     frc::Preferences::InitDouble("kClimbPosP", c_defaultClimbP);
     frc::Preferences::InitDouble("kClimbPosI", c_defaultClimbI);
     frc::Preferences::InitDouble("kClimbPosD", c_defaultClimbD);
+    frc::Preferences::InitDouble("kClimbPosFF", c_defaultClimbFF);
 
     frc::SmartDashboard::PutNumber("ClimbLeadMotorPos", 1.0);
     frc::SmartDashboard::PutNumber("ClimbFollowMotorPos", 1.0);
@@ -94,12 +96,12 @@ void ClimberSubsystem::Periodic()
     static double lastP = 0.0;
     static double lastI = 0.0;
     static double lastD = 0.0;
-    //static double lastFF = 0.0;
+    static double lastFF = 0.0;
 
-    auto p = frc::Preferences::GetDouble("kClimbPosP", c_defaultClimbP);
+    auto p = frc::Preferences::GetDouble("kClimbPosP", c_defaultClimbP); //originally .07
     auto i = frc::Preferences::GetDouble("kClimbPosI", c_defaultClimbI);
     auto d = frc::Preferences::GetDouble("kClimbPosD", c_defaultClimbD);
-    //auto ff = frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF);
+    auto ff = frc::Preferences::GetDouble("kClimbPosFF", c_defaultClimbFF);
     if (p != lastP)
     {
         m_leadPIDController.SetP(p);
@@ -115,15 +117,15 @@ void ClimberSubsystem::Periodic()
         m_leadPIDController.SetD(d);
         m_followPIDController.SetD(d);
     }
-    // if (ff != lastFF)
-    // {
-    //     m_leadPIDController.SetFF(ff);
-    //    m_followPIDController..SetFF(ff);
-    // }
+    if (ff != lastFF)
+    {
+        m_leadPIDController.SetFF(ff);
+       m_followPIDController.SetFF(ff);
+    }
     lastP = p;
     lastI = i;
     lastD = d;
-    //lastFF = ff;
+    lastFF = ff;
 
     //m_leadDirection = frc::SmartDashboard::GetNumber("ClimbLeadMotorDirection", m_leadDirection);
     //m_followDirection = frc::SmartDashboard::GetNumber("ClimbFollowMotorDirection", m_followDirection);

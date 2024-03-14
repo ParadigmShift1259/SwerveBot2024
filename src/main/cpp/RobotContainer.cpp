@@ -382,7 +382,11 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
 
-  secondary.Back().OnTrue(ClimbCommand(*this, ClimberSubsystem::kParkPosition).ToPtr());
+  secondary.Back().OnTrue(frc2::SequentialCommandGroup{
+      ClimbCommand(*this, ClimberSubsystem::kParkPosition)
+    , frc2::WaitCommand(0.5_s)
+    , GoToElevationCommand(*this, 74.0_deg)
+  }.ToPtr());
   secondary.Start().OnTrue(ClimbCommand(*this, ClimberSubsystem::kHighPosition).ToPtr());
 //#define DASHBOARD_OVERRIDE
 #ifdef DASHBOARD_OVERRIDE
