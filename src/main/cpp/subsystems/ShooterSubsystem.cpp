@@ -56,6 +56,10 @@ ShooterSubsystem::ShooterSubsystem()
   m_logCommandedAngle = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/CommandedAngle");
   m_logAbsoluteAngle = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/AbsoluteAngle");
   m_logElevTurns = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/ElevTurns");
+  m_logElevApplOut = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/ElevAppliedOut");
+  m_logElevBusV = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/ElevBusVoltage");
+  m_logElevTemp = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/ElevTemp");
+  m_logElevOutAmps = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/ElevOutAmps");
 
   m_ElevationRelativeEnc.SetPositionConversionFactor(1.0);
 
@@ -124,6 +128,11 @@ void ShooterSubsystem::Periodic()
   m_logUnderRPM.Append(m_UnderRelativeEnc.GetVelocity());
   m_logCurrentAngle.Append(m_ElevationRelativeEnc.GetPosition());
   m_logCommandedAngle.Append(m_elevationAngle);
+
+  m_logElevApplOut.Append(m_ElevationController.GetAppliedOutput());
+  m_logElevBusV.Append(m_ElevationController.GetBusVoltage());
+  m_logElevTemp.Append(m_ElevationController.GetMotorTemperature());
+  m_logElevOutAmps.Append(m_ElevationController.GetOutputCurrent());
 
   static int count = 0;
   if (count++ % 20 == 0)
@@ -225,11 +234,6 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   m_logElevTurns.Append(turns);
 
   m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
-
-  // frc::SmartDashboard::PutNumber("ElevApplOut", m_ElevationController.GetAppliedOutput());
-  // frc::SmartDashboard::PutNumber("ElevBusV", m_ElevationController.GetBusVoltage());
-  // frc::SmartDashboard::PutNumber("ElevTemp", m_ElevationController.GetMotorTemperature());
-  // frc::SmartDashboard::PutNumber("ElevOutAmps", m_ElevationController.GetOutputCurrent());
 }
 
 void ShooterSubsystem::GoToElevation(int shootIndex)
