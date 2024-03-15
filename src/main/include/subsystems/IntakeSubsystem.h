@@ -35,8 +35,6 @@ public:
     /// Extends the intake out of the robot
     void ExtendIntake();
     void ExtendIntake(double turns);
-    /// Adjusts the intake to allow for higher shooting angles
-    void AdjustIntake();
     // Retracts the intake into the robot
     void RetractIntake();
     void GoToPosition(double turns);
@@ -48,7 +46,6 @@ public:
 
 private:
     void LoadDeployPid();
-    void LoadDeploySmartmotion();
 
     /// 775 that runs intake
     TalonSRX m_motor;

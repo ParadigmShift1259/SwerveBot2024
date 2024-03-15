@@ -9,7 +9,6 @@
 #include "subsystems/IntakeSubsystem.h"
 #include "subsystems/ShooterSubsystem.h"
 #include "subsystems/ClimberSubsystem.h"
-#include "subsystems/AmpSubsystem.h"
 #include "subsystems/LEDSubsystem.h"
 
 #include <frc/DataLogManager.h>
@@ -18,16 +17,13 @@ class ISubsystemAccess
 {
 public:
     virtual DriveSubsystem&        GetDrive() = 0;
-    virtual VisionSubsystem&        GetVision() = 0;
+    virtual VisionSubsystem&       GetVision() = 0;
+    virtual IntakeSubsystem&       GetIntake() = 0;
+    virtual ShooterSubsystem&      GetShooter() = 0;
+    virtual ClimberSubsystem&      GetClimber() = 0; 
+    virtual LEDSubsystem&          GetLED() = 0;
 
-    virtual IntakeSubsystem&        GetIntake() = 0;
-    virtual ShooterSubsystem&        GetShooter() = 0;
-    virtual ClimberSubsystem&        GetClimber() = 0; 
-    virtual AmpSubsystem&        GetAmp() = 0;
-    virtual LEDSubsystem&         GetLED() = 0;
-
-
-    virtual wpi::log::DataLog&      GetLogger() = 0;
+    virtual wpi::log::DataLog&     GetLogger() = 0;
 };
 
 #endif  //ndef __SUBSYSTEMACCESS_H__

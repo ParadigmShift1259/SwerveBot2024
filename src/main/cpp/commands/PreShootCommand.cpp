@@ -23,9 +23,6 @@ void PreShootCommand::Initialize()
   m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
   m_logStartPreShootCommand.Append(true);
   m_shooterSubsystem.GoToElevation(shootIndex);
-  //double elevationAngle = frc::SmartDashboard::GetNumber("ShotAngle", 39.0);
-  //m_shooterSubsystem.GoToElevation(units::degree_t{elevationAngle});
-  //m_shooterSubsystem.GoToElevation(39.0_deg);
   m_shooterSubsystem.StartOverAndUnder(m_distance);
 }
 

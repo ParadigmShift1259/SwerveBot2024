@@ -21,11 +21,9 @@
 #include <ctre/phoenix6/Orchestra.hpp>
 
 #include <pathplanner/lib/auto/AutoBuilder.h>
-// #include <pathplanner/lib/commands/PPSwerveControllerCommand.h>
 #include <unordered_map>
 
 #include "ISubsystemAccess.h"
-// #include "subsystems/DriveSubsystem.h"
 
 using namespace frc;
 using namespace frc2;
@@ -61,6 +59,7 @@ public:
   void SetIsAutoRunning(bool isAutoRunning) { m_isAutoRunning = isAutoRunning; }
 
   void Periodic();
+  void ConfigureRobotLEDs();
 
   // ISubsystemAcces Implementation
   DriveSubsystem&        GetDrive() override { return m_drive; }
@@ -69,7 +68,6 @@ public:
   IntakeSubsystem&        GetIntake() override { return m_intake; }
   ShooterSubsystem&        GetShooter() override { return m_shooter; }
   ClimberSubsystem&        GetClimber() override { return m_climber; }
-  AmpSubsystem&        GetAmp() override { return m_amp; }
   LEDSubsystem&        GetLED() override { return m_led; }
 
   wpi::log::DataLog&         GetLogger() override { return DataLogManager::GetLog(); }
@@ -77,6 +75,7 @@ public:
   LEDSubsystem::Color c_colorPink = LEDSubsystem::CreateColor(80, 10, 15 , 0);//(255, 141, 187, 0);
   LEDSubsystem::Color c_colorGreen = LEDSubsystem::CreateColor(13, 80, 0, 0);//(133, 240, 45, 0);
   LEDSubsystem::Color c_colorBlack = LEDSubsystem::CreateColor(0, 0, 0, 0);
+  LEDSubsystem::Color c_colorOrange = LEDSubsystem::CreateColor(43, 6, 0, 255);
 
 private:
   void SetDefaultCommands();
@@ -95,7 +94,6 @@ private:
   IntakeSubsystem m_intake;
   ShooterSubsystem m_shooter;
   ClimberSubsystem m_climber;
-  AmpSubsystem m_amp;
   LEDSubsystem m_led;
   
   double m_shootDelayMs = 1.0;
@@ -118,16 +116,19 @@ private:
   InstantCommand m_toggleFieldRelative{[this] { m_fieldRelative = !m_fieldRelative; }, {}};
   InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
   // frc2::InstantCommand m_runCompressor{[this] { m_compressor.EnableDigital(); m_bRunningCompressor = true;}, {} };
-  InstantCommand m_resetShooterToStart{[this] { m_shooter.GoToElevation(66_deg); }, {}};
+  InstantCommand m_resetShooterToStart{[this] { m_shooter.GoToElevation(c_defaultStartPosition); }, {}};
   InstantCommand m_goToElev{[this]
   { 
     units::degree_t angle{frc::SmartDashboard::GetNumber("ElevationAngle", 44.0)};
+    //units::degree_t angle = m_vision.GetShotAngle();
     m_shooter.GoToElevation(angle);
   }, {} };
 
   InstantCommand m_moveClimbUp{[this] { m_climber.Set(0.9); }, {}};
   InstantCommand m_moveClimbDown{[this] { m_climber.Set(-0.9); }, {}};
   InstantCommand m_stopClimb{[this] { m_climber.Stop(); }, {}};
+
+  InstantCommand m_enableGyroSync{[this] { m_shooter.EnableSyncToGyro(); }, {}};
 
   InstantCommand m_ampPositionIntake{[this]
   { 
@@ -137,7 +138,6 @@ private:
 
   InstantCommand m_ampShootIntake{[this]
   { 
-    // m_intake.ExtendIntake();
     m_intake.Set(frc::SmartDashboard::GetNumber("AmpShotPercent", -0.6));
   }, {} };
 

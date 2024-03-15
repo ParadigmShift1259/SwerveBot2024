@@ -37,4 +37,5 @@ private:
   
   RobotContainer m_container;
   bool m_hasAutoRun = false;
+  bool m_enabled = false;
 };

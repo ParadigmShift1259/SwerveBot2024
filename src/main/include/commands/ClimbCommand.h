@@ -15,10 +15,14 @@ class ClimbCommand: public frc2::CommandHelper<frc2::Command, ClimbCommand>
     private:
         ClimberSubsystem&        m_climber;
         LEDSubsystem& m_led;
+        ShooterSubsystem& m_shooter;
+        IntakeSubsystem& m_intake;
 
         LEDSubsystem::Color c_colorPink = LEDSubsystem::CreateColor(80, 10, 15 , 0);
         LEDSubsystem::Color c_colorGreen = LEDSubsystem::CreateColor(13, 80, 0, 0);
         frc::Timer m_timer;
+
+        double m_positionTurns = 0;
 
         ClimberSubsystem::Position m_position;
 };

@@ -5,8 +5,8 @@
 ShootCommand::ShootCommand(ISubsystemAccess& subsystemAccess, bool bIsAuto)
     : m_shooterSubsystem(subsystemAccess.GetShooter())
     , m_intakeSubsystem(subsystemAccess.GetIntake())
-    , m_bIsAuto(bIsAuto)
     , m_led(subsystemAccess.GetLED())
+    , m_bIsAuto(bIsAuto)
 {
     AddRequirements(frc2::Requirements{&subsystemAccess.GetShooter(), &subsystemAccess.GetIntake(), &subsystemAccess.GetLED()});
 	  wpi::log::DataLog& log = subsystemAccess.GetLogger();
@@ -18,7 +18,6 @@ void ShootCommand::Initialize()
   m_timer.Reset();
   m_timer.Start();
   m_logStartShootCommand.Append(true);
-  // m_shooterSubsystem.Shoot(m_distance);
   m_intakeSubsystem.EjectNote();
 }
 
@@ -32,7 +31,6 @@ void ShootCommand::Execute()
 bool ShootCommand::IsFinished()
 {
     return m_timer.HasElapsed(1.0_s);
-//    return false;
 }
 
 void ShootCommand::End(bool interrupted)
@@ -43,7 +41,7 @@ void ShootCommand::End(bool interrupted)
   if (m_bIsAuto == false)
   {
     m_shooterSubsystem.Stop();
-    m_shooterSubsystem.GoToElevation(33.0_deg);
+    m_shooterSubsystem.GoToElevation(c_defaultTravelPosition);
   }
   m_intakeSubsystem.Stop();
   m_logStartShootCommand.Append(false);

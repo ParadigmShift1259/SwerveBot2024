@@ -6,6 +6,8 @@
 
 #include <frc2/command/CommandScheduler.h>
 #include <cameraserver/CameraServer.h>
+#include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/shuffleboard/Shuffleboard.h>
 
 wpi::log::DoubleLogEntry logMatchTime;
 
@@ -24,6 +26,9 @@ void Robot::RobotPeriodic()
 
 void Robot::DisabledInit()
 {
+  m_enabled = false;
+  frc::SmartDashboard::PutBoolean("Robot Enabled", m_enabled);
+  m_container.ConfigureRobotLEDs();
 }
 
 void Robot::DisabledPeriodic()
@@ -32,6 +37,9 @@ void Robot::DisabledPeriodic()
 
 void Robot::DisabledExit()
 {
+  m_enabled = true;
+  frc::SmartDashboard::PutBoolean("Robot Enabled", m_enabled);
+  m_container.ConfigureRobotLEDs();
 }
 
 void Robot::AutonomousInit()

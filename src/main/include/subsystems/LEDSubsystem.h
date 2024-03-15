@@ -20,7 +20,7 @@ class LEDSubsystem : public frc2::SubsystemBase
 {
   public:
     LEDSubsystem();
-    void Periodic();
+    void Periodic() override;
     struct Color
     {
       int red = 0;
@@ -49,15 +49,19 @@ class LEDSubsystem : public frc2::SubsystemBase
     Color GetDefaultColor() { return m_defaultColor; }
     
   private:
-
+#ifndef THING1
     CANdleConfiguration m_candleConfig;
     wpi::log::DoubleLogEntry m_log;
     CANdle m_candle{kLEDCANID};
-
+#endif
     static constexpr double c_defaultSpeed = 0.5;
 
     static constexpr int c_ledNum = 16;
     static constexpr int c_ledOffset = 8;
+
+    ColorFlowAnimation m_colorFlowAnimation{0, 0, 0, 0, c_defaultSpeed, c_ledNum, ColorFlowAnimation::Forward, c_ledOffset};
+    SingleFadeAnimation m_singleFadeAnimation{0, 0, 0, 0, c_defaultSpeed, c_ledNum, c_ledOffset};
+    StrobeAnimation m_strobeAnimation{0, 0, 0, 0, c_defaultSpeed, c_ledNum, c_ledOffset};
 
     Color m_defaultColor;
 
