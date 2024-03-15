@@ -14,7 +14,9 @@ AmpIntakeCommand::AmpIntakeCommand(ISubsystemAccess& subsystemAccess)
 void AmpIntakeCommand::Initialize()
 {
   m_logStartCommand.Append(true);
-  m_intake.Set(frc::SmartDashboard::GetNumber("AmpIntakePercent", 0.5));
+  double speed = frc::SmartDashboard::GetNumber("AmpIntakePercent", 0.5);
+  printf("amp intake speed: %.3f\n", speed);
+  m_intake.Set(speed);
 }
 
 void AmpIntakeCommand::Execute()

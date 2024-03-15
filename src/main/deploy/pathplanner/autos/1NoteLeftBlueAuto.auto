@@ -14,12 +14,6 @@
         {
           "type": "named",
           "data": {
-            "name": "PreShootClose"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "ShootClose"
           }
         },

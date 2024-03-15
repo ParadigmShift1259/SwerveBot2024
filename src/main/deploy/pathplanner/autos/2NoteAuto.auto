@@ -18,12 +18,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "ShootStop"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "2NotePath"
@@ -39,6 +33,12 @@
           "type": "named",
           "data": {
             "name": "ShootFar"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootStop"
           }
         }
       ]

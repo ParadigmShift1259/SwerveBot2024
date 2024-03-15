@@ -1,5 +1,7 @@
 #include "commands/AmpShootCommand.h"
 
+#include <frc/SmartDashBoard/SmartDashboard.h>
+
 AmpShootCommand::AmpShootCommand(ISubsystemAccess& subsystemAccess)
     : m_shooterSubsystem(subsystemAccess.GetShooter())
     , m_intakeSubsystem(subsystemAccess.GetIntake())
@@ -14,7 +16,9 @@ AmpShootCommand::AmpShootCommand(ISubsystemAccess& subsystemAccess)
 void AmpShootCommand::Initialize()
 {
   m_logStartAmpShootCommand.Append(true);
-  m_intakeSubsystem.Set(-0.6);
+  double speed = 0.6;//frc::SmartDashboard::GetNumber("AmpIntakePercent", 0.6);
+  // printf("amp intake speed: %.3f\n", speed);
+  m_intakeSubsystem.Set(-1.0 * speed);
   m_timer.Reset();
   m_timer.Start();
 }
