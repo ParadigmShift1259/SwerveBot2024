@@ -56,6 +56,11 @@ RobotContainer::RobotContainer()
   : m_drive()
   , m_orchestra("output.chrp")
 {
+  //---------------------------------------------------------
+  printf("************************Calling SilenceJoystickConnectionWarning - Wisco2024 Day 1 only REMOVE!!!!!\n");
+  DriverStation::SilenceJoystickConnectionWarning(true);
+  //---------------------------------------------------------
+
   // NamedCommands::registerCommand("PreShootClose", std::move(PreShootCommand(*this, 1_m).ToPtr()));
   // NamedCommands::registerCommand("ShootClose", std::move(ShootCommand(*this).ToPtr()));
 
