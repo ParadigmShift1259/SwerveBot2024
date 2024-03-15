@@ -105,28 +105,12 @@ ShooterSubsystem::ShooterSubsystem()
   m_ElevationPIDController.SetFF(frc::Preferences::GetDouble("kElevationFF", c_defaultElevFF));
   m_ElevationPIDController.SetOutputRange(-1.0, 1.0);
 
-  // Smart Motion Coefficients
-  // double minVel = frc::Preferences::GetDouble("kElevMinVel", 0.0);     // rpm
-  // double maxVel = frc::Preferences::GetDouble("kElevMaxVel", 2000.0);  // rpm
-  // double maxAcc = frc::Preferences::GetDouble("kElevMaxAcc", 1500.0);
-  // double allowedErr = frc::Preferences::GetDouble("kElevAllowedErr", 0.0);
-
-  // int smartMotionSlot = 0;
-  // m_ElevationPIDController.SetSmartMotionMaxVelocity(maxVel, smartMotionSlot);
-  // m_ElevationPIDController.SetSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
-  // m_ElevationPIDController.SetSmartMotionMaxAccel(maxAcc, smartMotionSlot);
-//   // m_ElevationPIDController.SetSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);  
-// WPI_IGNORE_DEPRECATED
-//   m_ElevationPIDController.SetSmartMotionAccelStrategy(rev::SparkMaxPIDController::AccelStrategy::kSCurve, smartMotionSlot); // Other accel strategy kTrapezoidal
-// WPI_UNIGNORE_DEPRECATED
-
-  frc::SmartDashboard::PutNumber("ShotAngle", c_defaultShootFarAngle);
-  frc::SmartDashboard::PutNumber("ShotAngleClose", c_defaultShootCloseAngle);
+  frc::SmartDashboard::PutNumber("ShotAngle", c_defaultShootFarAngle.value());
+  frc::SmartDashboard::PutNumber("ShotAngleClose", c_defaultShootCloseAngle.value());
   frc::SmartDashboard::PutNumber("OverRPM",  m_shootReference[0][1]);
   frc::SmartDashboard::PutNumber("UnderRPM", m_shootReference[0][1]);
   frc::SmartDashboard::PutNumber("ElevationAngle", c_defaultTravelPosition.value());
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
-  frc::SmartDashboard::PutBoolean("SetElevRef", false);
 
   auto pitch = m_gyro.GetPitch();
   double turns = (c_elevSlope * pitch + c_elevOffset);
@@ -165,8 +149,8 @@ void ShooterSubsystem::Periodic()
     m_shootReference[0][0] = frc::SmartDashboard::GetNumber("OverRPMClose",  -c_defaultRPM);
     m_shootReference[0][0] = frc::SmartDashboard::GetNumber("UnderRPMClose", c_defaultRPM);
 
-    m_shootReference[2][1] = frc::SmartDashboard::GetNumber("ShotAngle", c_defaultShootFarAngle);
-    m_shootReference[2][0] = frc::SmartDashboard::GetNumber("ShotAngleClose", c_defaultShootCloseAngle);
+    m_shootReference[2][1] = frc::SmartDashboard::GetNumber("ShotAngle", c_defaultShootFarAngle.value());
+    m_shootReference[2][0] = frc::SmartDashboard::GetNumber("ShotAngleClose", c_defaultShootCloseAngle.value());
 
     static double lastP = 0.0;
     static double lastI = 0.0;
@@ -240,12 +224,7 @@ void ShooterSubsystem::GoToElevation(units::degree_t angle)
   m_elevationTurns = turns;  // For calibration
   m_logElevTurns.Append(turns);
 
-  //bool setRef = frc::SmartDashboard::GetBoolean("SetElevRef", false);
-  // if (setRef)
-  // {
-     m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
-  // }
-  // m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kSmartMotion);
+  m_ElevationPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
 
   // frc::SmartDashboard::PutNumber("ElevApplOut", m_ElevationController.GetAppliedOutput());
   // frc::SmartDashboard::PutNumber("ElevBusV", m_ElevationController.GetBusVoltage());
@@ -276,9 +255,6 @@ void ShooterSubsystem::StartOverAndUnder(units::meter_t distance)
 
 void ShooterSubsystem::Shoot(units::meter_t distance)
 {
-  //m_OverPIDController.SetIAccum(0);
-  //m_UnderPIDController.SetIAccum(0);
-  
   m_shootIndex = distance < 2.0_m ? 0 : 1;
 
   m_overRPM = -m_shootReference[0][m_shootIndex];

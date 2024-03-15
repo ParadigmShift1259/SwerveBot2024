@@ -428,34 +428,41 @@ void RobotContainer::ConfigButtonBoxBindings()
   // 1	  Back			    Start			    Left Stick Button	Right Stick Button	Left Bumper
   // 2	  Right Trigger	Left Trigger	X					        Y					          Right Bumper
   // 3	  B				      A				      POV Left			    POV Right			      POV Up
-  //buttonBox.A().OnTrue(IntakeIngest(*this).ToPtr());                          // Blue   row 3
-  //buttonBox.B().WhileTrue(IntakeRelease(*this).ToPtr());                              // Blue   row 3
-  //buttonBox.Start().OnTrue(PlopperGoToPositionCommand(*this).ToPtr());                                 // Black  row 3
-  //buttonBox.LeftStick().WhileTrue(PlopperShootCommand(*this).ToPtr());    
-  //buttonBox.Back().OnTrue(GoToElevationCommand(*this, 66.0_deg).ToPtr());
+  //-------------------------------------------------------------------------------------
+  // Row 1 L-R
+  buttonBox.Back().OnTrue(GoToElevationCommand(*this, c_defaultStartPosition).ToPtr());      // Black
+  buttonBox.Start().OnTrue(GoToElevationCommand(*this, c_defaultShootCloseAngle).ToPtr());   // Blue
+  buttonBox.LeftStick().OnTrue(GoToElevationCommand(*this, c_defaultShootFarAngle).ToPtr()); // Green
+  buttonBox.RightStick().OnTrue(GoToElevationCommand(*this, 0.0_deg).ToPtr());               // Yellow                     // Yellow row 1
+  buttonBox.LeftBumper().OnTrue(frc2::SequentialCommandGroup{                                // Red
+      GoToElevationCommand(*this, c_defaultTravelPosition)
+    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
+    , StartLEDCommand(*this)
+    , frc2::WaitCommand(0.15_s)
+    , GoToElevationCommand(*this, c_elevAngleAmpShoot)
+    , frc2::WaitCommand(0.65_s)
+    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpShoot)
+  }.ToPtr());  
 
-  buttonBox.X().OnTrue(&m_goToElev);
-  buttonBox.Y().OnTrue(&m_ampPositionIntake);
-  buttonBox.LeftStick().OnTrue(IntakeIngest(*this).ToPtr());
-
-  // Green  row 2
-  // buttonBox.Y().OnTrue(RetrieveGamePiece(*this).ToPtr());                        // Yellow row 2
-
-  // buttonBox.LeftBumper().OnTrue(PlaceOnFloor(*this).ToPtr());                    // Red    row 1
-  // buttonBox.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());               // Red    row 2
-  // buttonBox.Start().WhileTrue(&m_rotateArm);                                     // Blue   row 1
-  // buttonBox.Back().WhileTrue(RotateTurntableCW(*this).ToPtr());                     // Black  row 1
-
-  // buttonBox.LeftStick().OnTrue(&m_extendArm);                            // Green  row 1
-  // buttonBox.RightStick().OnTrue(&m_retractArm);                           // Yellow row 1
-  // buttonBox.LeftTrigger().WhileTrue(TravelPosition(*this).ToPtr());       // Blue   row 2
-  // buttonBox.RightTrigger().WhileTrue(&m_toggleClaw);                      // Black  row 2
-
-  // auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
-  // buttonBox.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });  // Green  row 3
-  // buttonBox.POVRight(loop).Rising().IfHigh([this] { m_deployment.RetractBackPlate(); });// Yellow row 3
-  // buttonBox.POVUp(loop).Rising().IfHigh([this] { PlaceHighCube(*this).Schedule(); });      // Red    row 3
-  // buttonBox.POVUp(loop).Rising().IfHigh(RotateTurntableCW(*this).ToPtr()});      // Red    row 3
+  // Row 2 L-R
+  buttonBox.RightTrigger().OnTrue(GoToElevationCommand(*this, c_defaultTravelPosition).ToPtr());  // Black
+  buttonBox.LeftTrigger().OnTrue(frc2::SequentialCommandGroup{                                    // Blue
+      GoToElevationCommand(*this, c_defaultTravelPosition)
+    , ClimbCommand(*this, ClimberSubsystem::kParkPosition)
+    , frc2::WaitCommand(0.5_s)
+    , GoToElevationCommand(*this, 74.0_deg)
+  }.ToPtr());
+  buttonBox.X().OnTrue(&m_goToElev);                                                              // Green
+  buttonBox.Y().OnTrue(&m_ampPositionIntake);                                                     // Yellow
+  //buttonBox.RightBumper().WhileTrue(IntakeRelease(*this).ToPtr());                              // Red
+  
+  // Row 3 L-R
+  auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
+  buttonBox.B().WhileTrue(StopAllCommand(*this).ToPtr());                                         // Black
+  //buttonBox.A().OnTrue(IntakeIngest(*this).ToPtr());                                            // Blue
+  //buttonBox.POVLeft(loop).Rising().IfHigh([this] { m_deployment.ExtendBackPlate(); });          // Green
+  buttonBox.POVRight(loop).Rising().IfHigh([this] { m_wheelsLeft.Schedule(); });                  // Yellow
+  buttonBox.POVUp(loop).Rising().IfHigh([this] { m_wheelsForward.Schedule(); });                  // Red
 }
 #endif
 
