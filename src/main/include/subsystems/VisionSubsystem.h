@@ -49,6 +49,9 @@ class VisionSubsystem : public frc2::SubsystemBase
   double m_ty = 0.0;
   double m_shotAngle = 0.0;
 
+  wpi::log::DoubleLogEntry m_logRobotAlliPoseX;
+  wpi::log::DoubleLogEntry m_logRobotAlliPoseY;
+  wpi::log::DoubleLogEntry m_logRobotAlliPoseTheta;
   wpi::log::DoubleLogEntry m_logRobotPoseX;
   wpi::log::DoubleLogEntry m_logRobotPoseY;
   wpi::log::DoubleLogEntry m_logRobotPoseTheta;

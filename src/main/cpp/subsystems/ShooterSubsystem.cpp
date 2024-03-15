@@ -54,7 +54,6 @@ ShooterSubsystem::ShooterSubsystem()
   m_logUnderRPM = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/UnderRPM");
   m_logCurrentAngle = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/CurrentAngle");
   m_logCommandedAngle = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/CommandedAngle");
-  m_logAbsoluteAngle = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/AbsoluteAngle");
   m_logElevTurns = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/ElevTurns");
   m_logElevApplOut = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/ElevAppliedOut");
   m_logElevBusV = wpi::log::DoubleLogEntry(log, "/subsystem/shooter/ElevBusVoltage");
@@ -126,7 +125,6 @@ void ShooterSubsystem::Periodic()
 {
   m_logOverRPM.Append(m_OverRelativeEnc.GetVelocity()); 
   m_logUnderRPM.Append(m_UnderRelativeEnc.GetVelocity());
-  m_logCurrentAngle.Append(m_ElevationRelativeEnc.GetPosition());
   m_logCommandedAngle.Append(m_elevationAngle);
 
   m_logElevApplOut.Append(m_ElevationController.GetAppliedOutput());
@@ -137,9 +135,10 @@ void ShooterSubsystem::Periodic()
   static int count = 0;
   if (count++ % 20 == 0)
   {
+    auto pitch = m_gyro.GetPitch();
+    m_logCurrentAngle.Append(pitch);
     if (m_bSyncToGyro)
     {
-      auto pitch = m_gyro.GetPitch();
       auto ticks = m_ElevationRelativeEnc.GetPosition();
       double angle = (ticks - c_elevOffset) / c_elevSlope;
       frc::SmartDashboard::PutNumber("ElevationAngleEcho", angle);

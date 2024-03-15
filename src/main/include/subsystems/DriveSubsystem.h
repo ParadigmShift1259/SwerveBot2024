@@ -19,6 +19,8 @@
 #include <frc2/command/SubsystemBase.h>
 #include <frc/Preferences.h>
 
+#include <networktables/StructTopic.h>
+
 #include "IDriveSubsystem.h"
 #include "ConstantsCANIDs.h"
 #include "subsystems/SwerveModule.h"
@@ -80,8 +82,6 @@ public:
   }
 
   units::meters_per_second_t m_currentMaxSpeed = kMaxSpeed;
-
-
 
 // Safer sppeds for lab testing
   // static constexpr units::meters_per_second_t kMaxSpeed = 1.0_mps;
@@ -165,6 +165,8 @@ private:
   wpi::log::DoubleLogEntry m_logDriveInputX;
   wpi::log::DoubleLogEntry m_logDriveInputY;
   wpi::log::DoubleLogEntry m_logDriveInputRot;
+
+  nt::StructPublisher<frc::Pose2d> m_publisher = nt::NetworkTableInstance::GetDefault().GetStructTopic<frc::Pose2d>("OdoPose").Publish();
 };
 
 #endif  //ndef __DRIVESUBSYSTEM_H__

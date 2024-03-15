@@ -6,10 +6,13 @@ VisionSubsystem::VisionSubsystem()
 {
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
+  m_logRobotAlliPoseX = wpi::log::DoubleLogEntry(log, "/vision/robotAlliPoseX");
+  m_logRobotAlliPoseY = wpi::log::DoubleLogEntry(log, "/vision/robotAlliPoseY");
+  m_logRobotAlliPoseTheta = wpi::log::DoubleLogEntry(log, "/vision/robotAlliPoseTheta");
+  m_logLL_Latency = wpi::log::DoubleLogEntry(log, "/vision/LL_Latency");
   m_logRobotPoseX = wpi::log::DoubleLogEntry(log, "/vision/robotPoseX");
   m_logRobotPoseY = wpi::log::DoubleLogEntry(log, "/vision/robotPoseY");
   m_logRobotPoseTheta = wpi::log::DoubleLogEntry(log, "/vision/robotPoseTheta");
-  m_logLL_Latency = wpi::log::DoubleLogEntry(log, "/vision/LL_Latency");
   m_logtx = wpi::log::DoubleLogEntry(log, "/vision/tx");
   m_logty = wpi::log::DoubleLogEntry(log, "/vision/ty");
   m_logta = wpi::log::DoubleLogEntry(log, "/vision/ta");
@@ -25,10 +28,15 @@ void VisionSubsystem::Periodic()
   if (m_isValid)
   {
       m_net_buffer = m_net_table->GetNumberArray(m_bIsBlue ? "botpose_wpiblue" : "botpose_wpired", m_zero_vector);
+      m_logRobotAlliPoseX.Append(m_net_buffer[eX]);
+      m_logRobotAlliPoseY.Append(m_net_buffer[eY]);
+      m_logRobotAlliPoseTheta.Append(m_net_buffer[eYaw]);
+      m_logLL_Latency.Append(m_net_buffer[eLatency]);
+
+      m_net_buffer = m_net_table->GetNumberArray("botpose", m_zero_vector);
       m_logRobotPoseX.Append(m_net_buffer[eX]);
       m_logRobotPoseY.Append(m_net_buffer[eY]);
       m_logRobotPoseTheta.Append(m_net_buffer[eYaw]);
-      m_logLL_Latency.Append(m_net_buffer[eLatency]);
 
       m_ty = m_net_table->GetNumber("ty", 0.0);
       m_logtx.Append(m_net_table->GetNumber("tx", 0.0));

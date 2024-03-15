@@ -62,7 +62,6 @@ RobotContainer::RobotContainer()
   //---------------------------------------------------------
 
   // NamedCommands::registerCommand("PreShootClose", std::move(PreShootCommand(*this, 1_m).ToPtr()));
-  // NamedCommands::registerCommand("ShootClose", std::move(ShootCommand(*this).ToPtr()));
 
   NamedCommands::registerCommand("ShootClose", std::move(
     frc2::SequentialCommandGroup{
@@ -97,7 +96,6 @@ RobotContainer::RobotContainer()
   }
   frc::SmartDashboard::PutData("Auto Path", &m_chooser);
 
-  frc::SmartDashboard::PutNumber("ShootDelay", m_shootDelayMs);
   frc::SmartDashboard::PutNumber("AmpShotTurns", 21);
   frc::SmartDashboard::PutNumber("AmpIntakePercent", 0.0);
 

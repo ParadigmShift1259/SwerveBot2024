@@ -17,7 +17,7 @@ DriveSubsystem::DriveSubsystem()
   m_logRobotPoseTheta = wpi::log::DoubleLogEntry(log, "/odometry/robotPoseTheta");   
   //m_logRobotSpeed = wpi::log::DoubleLogEntry(log, "/odometry/robotSpeed");
   //m_logRobotAccel = wpi::log::DoubleLogEntry(log, "/odometry/robotAccel");
-  m_logGyroPitch = wpi::log::DoubleLogEntry(log, "/gyro/pitch");
+  m_logGyroPitch = wpi::log::DoubleLogEntry(log, "/drivegyro/pitch");
 
   m_logDriveInputX = wpi::log::DoubleLogEntry(log, "/input/X");
   m_logDriveInputY = wpi::log::DoubleLogEntry(log, "/input/Y");
@@ -202,6 +202,7 @@ void DriveSubsystem::UpdateOdometry()
   m_odometry.Update(m_gyro.GetRotation2d(),
                    {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
                     m_rearLeft.GetPosition(),  m_rearRight.GetPosition()});
+  m_publisher.Set(m_odometry.GetPose());
 }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose)
@@ -226,7 +227,7 @@ void DriveSubsystem::WheelsForward()
 {
   frc::SwerveModuleState sms;
   sms.angle = frc::Rotation2d{0.0_deg};
-  sms.speed = -1.0_mps;
+  sms.speed = 0.0_mps;
   SetAllDesiredState(sms);
 }
 
@@ -241,7 +242,7 @@ void DriveSubsystem::WheelsLeft()
 void DriveSubsystem::WheelsBackward()
 {
   frc::SwerveModuleState sms;
-  sms.angle = frc::Rotation2d{150.0_deg};
+  sms.angle = frc::Rotation2d{180.0_deg};
   sms.speed = 0.0_mps;
   SetAllDesiredState(sms);
 }
@@ -249,7 +250,7 @@ void DriveSubsystem::WheelsBackward()
 void DriveSubsystem::WheelsRight()
 {
   frc::SwerveModuleState sms;
-  sms.angle = frc::Rotation2d{-45.0_deg};
+  sms.angle = frc::Rotation2d{-90.0_deg};
   sms.speed = 0.0_mps;
   SetAllDesiredState(sms);
 }
