@@ -40,6 +40,7 @@ IntakeSubsystem::IntakeSubsystem()
 
     frc::SmartDashboard::PutNumber("DepRtctTurns", c_defaultRetractTurns);
     frc::SmartDashboard::PutNumber("DepExtTurns", c_defaultExtendTurns);
+    frc::SmartDashboard::PutNumber("DepOffsetTurns", c_defaultOffsetTurns);
 
     m_deployFollowMotor.SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
     m_deployFollowMotor.SetClosedLoopRampRate(0.0);
@@ -107,8 +108,9 @@ void IntakeSubsystem::Set(double speed)
 void IntakeSubsystem::ExtendIntake()
 {
     double turns = frc::SmartDashboard::GetNumber("DepExtTurns", c_defaultExtendTurns);
+    double offsetTurns = frc::SmartDashboard::GetNumber("DepOffsetTurns", c_defaultOffsetTurns);
     //printf("dep extend turns %.3f\n", turns);
-    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition);
 
     m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
     // frc::SmartDashboard::PutNumber("DepApplOut", m_deployMotor.GetAppliedOutput()); 
@@ -119,7 +121,8 @@ void IntakeSubsystem::ExtendIntake()
 
 void IntakeSubsystem::ExtendIntake(double turns)
 {
-    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    double offsetTurns = frc::SmartDashboard::GetNumber("DepOffsetTurns", c_defaultOffsetTurns);
+    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition);
     m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
 }
 
@@ -128,13 +131,14 @@ void IntakeSubsystem::RetractIntake()
 {
     double turns = frc::SmartDashboard::GetNumber("DepRtctTurns", c_defaultRetractTurns);
     //printf("dep retract turns %.3f\n", turns);
-
-    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    double offsetTurns = frc::SmartDashboard::GetNumber("DepOffsetTurns", c_defaultOffsetTurns);
+    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition);
     m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
 }
 
 void IntakeSubsystem::GoToPosition(double turns)
 {
-    m_deployPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    double offsetTurns = frc::SmartDashboard::GetNumber("DepOffsetTurns", c_defaultOffsetTurns);
+    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition);
     m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
 }

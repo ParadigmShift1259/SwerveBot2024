@@ -20,7 +20,7 @@ void IntakeDeploy::Initialize()
 void IntakeDeploy::Execute() 
 {
   m_intake.ExtendIntake();
-  auto angle = frc::SmartDashboard::GetNumber("IntakeAngle", 42.0);
+  auto angle = frc::SmartDashboard::GetNumber("IntakeAngle", 44.0);
   m_shooter.GoToElevation(units::degree_t(angle));
 }
 

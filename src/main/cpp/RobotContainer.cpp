@@ -44,8 +44,8 @@
 using namespace pathplanner;
 
 #ifndef THING1
-constexpr double c_deployTurnsAmpClearance = 24.5;//20.0;
-constexpr double c_deployTurnsAmpShoot = 18.5;//14.0;
+constexpr double c_deployTurnsAmpClearance = 32.5;//20.0;
+constexpr double c_deployTurnsAmpShoot = 28.5;//14.0;
 #else
 constexpr double c_deployTurnsAmpClearance = 30.0;
 constexpr double c_deployTurnsAmpShoot = 16.0;
@@ -57,8 +57,8 @@ RobotContainer::RobotContainer()
   , m_orchestra("output.chrp")
 {
   //---------------------------------------------------------
-  printf("************************Calling SilenceJoystickConnectionWarning - Wisco2024 Day 1 only REMOVE!!!!!\n");
-  DriverStation::SilenceJoystickConnectionWarning(true);
+  //printf("************************Calling SilenceJoystickConnectionWarning - Wisco2024 Day 1 only REMOVE!!!!!\n");
+  //DriverStation::SilenceJoystickConnectionWarning(true);
   //---------------------------------------------------------
 
   // NamedCommands::registerCommand("PreShootClose", std::move(PreShootCommand(*this, 1_m).ToPtr()));
@@ -79,12 +79,7 @@ RobotContainer::RobotContainer()
       , ShootCommand(*this, true)
     }.ToPtr()));
 
-  NamedCommands::registerCommand("Intake Note", std::move(
-    frc2::SequentialCommandGroup{
-        IntakeIngest(*this)
-      , frc2::WaitCommand(0.25_s)
-      , IntakeTransfer(*this)
-    }.ToPtr()));
+  NamedCommands::registerCommand("Intake Note", std::move(IntakeIngest(*this).ToPtr()));
 
   SetDefaultCommands();
   ConfigureBindings();
