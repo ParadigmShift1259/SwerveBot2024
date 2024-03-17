@@ -17,7 +17,7 @@
 #include <units/angle.h>
 #include <units/length.h>
 
-constexpr units::angle::degree_t c_defaultShootFarAngle = 38.0_deg;
+constexpr units::angle::degree_t c_defaultShootFarAngle = 39.0_deg;
 constexpr units::angle::degree_t c_defaultShootCloseAngle = 55.0_deg;
 
 class ShooterSubsystem : public frc2::SubsystemBase

@@ -7,6 +7,7 @@
 #include "commands/IntakeStop.h"
 #include "commands/IntakeRelease.h"
 #include "commands/IntakeIngest.h"
+#include "commands/IntakePreIngest.h"
 #include "commands/IntakeDeploy.h"
 #include "commands/StopAllCommand.h"
 #include "commands/PreShootCommand.h"
@@ -78,6 +79,8 @@ RobotContainer::RobotContainer()
       , frc2::WaitCommand(0.7_s)  // Wait for elev angle to sync to gyro
       , ShootCommand(*this, true)
     }.ToPtr()));
+
+  NamedCommands::registerCommand("Pre Ingest", std::move(IntakePreIngest(*this).ToPtr()));
 
   NamedCommands::registerCommand("Intake Note", std::move(IntakeIngest(*this).ToPtr()));
 

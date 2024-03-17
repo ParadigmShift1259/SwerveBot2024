@@ -17,7 +17,7 @@ constexpr double c_elevStartAngle = 55.0;
 
 constexpr double c_elevSlope = 1.09;
 constexpr double c_elevOffset = -69.7;
-constexpr double c_elevTurnTolerance = 2.0;  // In Periodic, if the encoder position is off by this much re-sync to gyro
+constexpr double c_elevTurnTolerance = 1.5;  // In Periodic, if the encoder position is off by this much re-sync to gyro
 
 constexpr double c_defaultShootNeoP = 0.0005;
 constexpr double c_defaultShootNeoI = 0.0;
@@ -133,7 +133,7 @@ void ShooterSubsystem::Periodic()
   m_logElevOutAmps.Append(m_ElevationController.GetOutputCurrent());
 
   static int count = 0;
-  if (count++ % 20 == 0)
+  if (count++ % 50 == 0)
   {
     auto pitch = m_gyro.GetPitch();
     m_logCurrentAngle.Append(pitch);
