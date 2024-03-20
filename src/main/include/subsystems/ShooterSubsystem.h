@@ -40,7 +40,7 @@ class ShooterSubsystem : public frc2::SubsystemBase
     double m_elevationAngle = 55.0;
     double m_elevationTurns = 0.0;  // For calibration
     double m_lastElevationTurns = 0.0;  // For calibration
-    bool m_bSyncToGyro = true;
+    bool m_bSyncToGyro = false;//true;
     frc::Timer m_timer;
 
     PigeonGyro m_gyro;

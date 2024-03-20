@@ -5,8 +5,13 @@
 PreShootCommand::PreShootCommand(ISubsystemAccess& subsystemAccess, units::meter_t distance)
     : m_shooterSubsystem(subsystemAccess.GetShooter())
     , m_led(subsystemAccess.GetLED())
+    , m_vision(subsystemAccess.GetVision())
 {
-    AddRequirements(frc2::Requirements{&subsystemAccess.GetShooter(), &subsystemAccess.GetLED()});
+    AddRequirements(frc2::Requirements{
+        &subsystemAccess.GetShooter()
+      , &subsystemAccess.GetLED()
+      , &subsystemAccess.GetVision()  
+    });
 
 	
     m_distance = distance;
@@ -22,7 +27,22 @@ void PreShootCommand::Initialize()
   int shootIndex = m_distance < 2.0_m ? 0 : 1;
   m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
   m_logStartPreShootCommand.Append(true);
-  m_shooterSubsystem.GoToElevation(shootIndex);
+  if (shootIndex == 0)
+  {
+    m_shooterSubsystem.GoToElevation(shootIndex);
+  }
+  else
+  {
+    units::degree_t angle = m_vision.GetShotAngle();
+    if (angle.value() == 0.0)
+    {
+      m_shooterSubsystem.GoToElevation(shootIndex);
+    }
+    else
+    {
+      m_shooterSubsystem.GoToElevation(angle);
+    }
+  }
   m_shooterSubsystem.StartOverAndUnder(m_distance);
 }
 

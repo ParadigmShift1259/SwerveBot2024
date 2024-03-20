@@ -17,6 +17,8 @@ VisionSubsystem::VisionSubsystem()
   m_logty = wpi::log::DoubleLogEntry(log, "/vision/ty");
   m_logta = wpi::log::DoubleLogEntry(log, "/vision/ta");
   m_logts = wpi::log::DoubleLogEntry(log, "/vision/ts");
+  
+  frc::SmartDashboard::PutNumber("ATTSAngle", 6.53);
 
   frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
 }
@@ -44,8 +46,12 @@ void VisionSubsystem::Periodic()
       m_logta.Append(m_net_table->GetNumber("ta", 0.0));
       m_logts.Append(m_net_table->GetNumber("ts", 0.0));
 
-      //m_shotAngle = (45.0 - m_ty) + 13.47;
-      m_shotAngle = (45.0 + m_ty) + 6.53;
+      constexpr double c_limelightMountAngle = 42.0;
+      //double aprilTagToSpeakerAngle = frc::SmartDashboard::GetNumber("ATTSAngle", 6.53);
+      double yOffset = frc::SmartDashboard::GetNumber("ATTSAngle", 10.2);
+
+      double aprilTagToSpeakerAngle = -0.291 * m_ty + yOffset;//10.2;
+      m_shotAngle = (c_limelightMountAngle + m_ty) + aprilTagToSpeakerAngle;
       frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
   }
   else

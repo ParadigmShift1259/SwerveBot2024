@@ -126,6 +126,7 @@ void ShooterSubsystem::Periodic()
   m_logOverRPM.Append(m_OverRelativeEnc.GetVelocity()); 
   m_logUnderRPM.Append(m_UnderRelativeEnc.GetVelocity());
   m_logCommandedAngle.Append(m_elevationAngle);
+  frc::SmartDashboard::PutNumber("CmdAngle", m_elevationAngle);
 
   m_logElevApplOut.Append(m_ElevationController.GetAppliedOutput());
   m_logElevBusV.Append(m_ElevationController.GetBusVoltage());

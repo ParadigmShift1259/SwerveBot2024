@@ -119,8 +119,8 @@ private:
   InstantCommand m_resetShooterToStart{[this] { m_shooter.GoToElevation(c_defaultStartPosition); }, {}};
   InstantCommand m_goToElev{[this]
   { 
-    units::degree_t angle{frc::SmartDashboard::GetNumber("ElevationAngle", 44.0)};
-    //units::degree_t angle = m_vision.GetShotAngle();
+    //units::degree_t angle{frc::SmartDashboard::GetNumber("ElevationAngle", 44.0)};
+    units::degree_t angle = m_vision.GetShotAngle();
     m_shooter.GoToElevation(angle);
   }, {} };
 
