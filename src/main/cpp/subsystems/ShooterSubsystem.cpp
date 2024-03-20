@@ -138,7 +138,7 @@ void ShooterSubsystem::Periodic()
   {
     auto pitch = m_gyro.GetPitch();
     m_logCurrentAngle.Append(pitch);
-    if (m_bSyncToGyro)
+    if (m_bSyncToGyro) 
     {
       auto ticks = m_ElevationRelativeEnc.GetPosition();
       double angle = (ticks - c_elevOffset) / c_elevSlope;
