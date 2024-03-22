@@ -32,6 +32,8 @@ static constexpr units::radians_per_second_t kMaxAngularSpeed{2.5 * std::numbers
 static constexpr units::radians_per_second_squared_t kMaxAngularAcceleration{10.0 * std::numbers::pi};  // 4 rotations per second squared
 static constexpr units::radians_per_second_t kRotationDriveMaxSpeed = 7.5_rad_per_s;
 static constexpr units::radians_per_second_t kRotationDriveDirectionLimit = 7.0_rad_per_s;
+static constexpr units::radians_per_second_t kAimingRotationDriveMaxSpeed = 7.5_rad_per_s;
+static constexpr units::radians_per_second_t kAimingRotationDriveDirectionLimit = 7.0_rad_per_s;
 
 /**
  * Represents a swerve drive style DriveSubsystem.
@@ -52,6 +54,10 @@ public:
                    , double yRot
                    , bool fieldRelative) override; 
 
+  void RotationDrive(units::meters_per_second_t xSpeed
+                   , units::meters_per_second_t ySpeed
+                   , units::radian_t rot
+                   , bool fieldRelative);
   
   void UpdateOdometry() override;
   void ResetOdometry(frc::Pose2d pose) override;
@@ -71,6 +77,8 @@ public:
 
   TalonFX& GetTalon(int module);
 
+  units::angle::radian_t GetGyroAzimuth() { return m_gyro.GetRotation2d().Radians(); }
+
   void ToggleSlowSpeed() override
   { 
     m_currentMaxSpeed = (m_currentMaxSpeed == kMaxSpeed ? kLowSpeed : kMaxSpeed);
@@ -88,10 +96,6 @@ public:
   // static constexpr units::radians_per_second_t kMaxAngularSpeed{0.25 * std::numbers::pi};
 
 private:
-  void RotationDrive(units::meters_per_second_t xSpeed
-                   , units::meters_per_second_t ySpeed
-                   , units::radian_t rot
-                   , bool fieldRelative);
 
   void SetAllDesiredState(const frc::SwerveModuleState& sms);
 

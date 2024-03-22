@@ -14,7 +14,7 @@ IntakePreIngest::IntakePreIngest(ISubsystemAccess& subsystemAccess)
   AddRequirements({&subsystemAccess.GetShooter(), &subsystemAccess.GetIntake(), &subsystemAccess.GetLED()});
 
   frc::SmartDashboard::PutNumber("IntakeSpeed", c_defaultIntakeSpeed);
-  frc::SmartDashboard::PutNumber("IntakeAngle", 44.0);
+  frc::SmartDashboard::PutNumber("IntakeAngle", 48.0);
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/IntakePreIngest/startCommand");
@@ -30,7 +30,7 @@ void IntakePreIngest::Initialize()
 void IntakePreIngest::Execute()
 {
   m_intake.ExtendIntake();
-  auto angle = frc::SmartDashboard::GetNumber("IntakeAngle", 44.0);
+  auto angle = frc::SmartDashboard::GetNumber("IntakeAngle", 48.0);
   m_shooter.GoToElevation(units::degree_t(angle));
 }
 

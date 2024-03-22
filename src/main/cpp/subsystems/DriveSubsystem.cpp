@@ -31,6 +31,8 @@ DriveSubsystem::DriveSubsystem()
   frc::Preferences::InitDouble("Offset2", 0.0);
   frc::Preferences::InitDouble("Offset3", 0.0);
   frc::Preferences::InitDouble("Offset4", 0.0);
+  
+  frc::SmartDashboard::PutNumber("yawsign", 1.0);
 }
 
 void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
@@ -75,6 +77,7 @@ void DriveSubsystem::RotationDrive(units::meters_per_second_t xSpeed
                                  , bool fieldRelative) 
 {  
   auto error = rot - m_gyro.GetRotation2d().Radians();//m_gyro->GetHeadingAsRot2d().Radians().to<double>();
+  frc::SmartDashboard::PutNumber("turnError", error.value());
   if (error.to<double>() > std::numbers::pi)
   {
     error -= units::radian_t(2 * std::numbers::pi);
@@ -83,8 +86,17 @@ void DriveSubsystem::RotationDrive(units::meters_per_second_t xSpeed
   {
     error += units::radian_t(2 * std::numbers::pi);
   }
+
   auto max = kRotationDriveMaxSpeed;
   auto maxTurn = kRotationDriveDirectionLimit;
+  
+  bool isAiming = frc::SmartDashboard::GetBoolean("IsAiming", false);
+  
+  if (isAiming)
+  {
+    max = kAimingRotationDriveMaxSpeed;
+    // maxTurn = kAimingRotationDriveDirectionLimit;
+  }
 
   #ifdef TUNE_ROTATION_DRIVE
   double P = SmartDashboard::GetNumber("T_D_RP", 0);
@@ -159,10 +171,12 @@ void DriveSubsystem::Periodic()
   // m_logRobotSpeed.Append(m_velocity);
   // m_logRobotAccel.Append(m_acceleration);
   m_logGyroPitch.Append(m_gyro.GetPitch()); 
+  frc::SmartDashboard::PutNumber("currPoseRadians", GetGyroAzimuth().value());
 
   static int count = 0;
   if (count++ % 25 == 0)
   {
+    
     frc::SmartDashboard::PutBoolean("SlowSpeed", m_currentMaxSpeed == kLowSpeed);
   }
 }

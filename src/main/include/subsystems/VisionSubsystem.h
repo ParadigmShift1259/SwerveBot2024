@@ -47,7 +47,11 @@ class VisionSubsystem : public frc2::SubsystemBase
   
   bool m_bIsBlue = false;
   double m_ty = 0.0;
+  double m_tx = 0.0;
   double m_shotAngle = 0.0;
+
+  double c_defaultAimP = -0.1;
+  double c_minAimCommanded = 0.05;
 
   wpi::log::DoubleLogEntry m_logRobotAlliPoseX;
   wpi::log::DoubleLogEntry m_logRobotAlliPoseY;

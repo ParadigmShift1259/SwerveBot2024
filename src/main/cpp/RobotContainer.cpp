@@ -4,6 +4,7 @@
 
 #include "RobotContainer.h"
 #include "commands/GoToPositionCommand.h"
+#include "commands/GoToAzimuthCommand.h"
 #include "commands/IntakeStop.h"
 #include "commands/IntakeRelease.h"
 #include "commands/IntakeIngest.h"
@@ -143,6 +144,10 @@ CommandPtr RobotContainer::GetAutonomousCommand()
 void RobotContainer::Periodic()
 {
   m_drive.Periodic();
+  double adjustment = frc::SmartDashboard::GetNumber("SteerAdjustment", 0.0);
+  double rotationInput = -1.0 * sin(adjustment);
+  auto adjRot = m_yawRotationLimiter.Calculate(rotationInput) * units::radians_per_second_t{2.0};
+  frc::SmartDashboard::PutNumber("AdjustRotation", adjRot.value());
   // m_vision.Periodic();
   static int count = 0;
   if (count++ % 25 == 0)
@@ -216,17 +221,17 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // Keep the bindings in this order
   // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
 
-  primary.A().WhileTrue(frc2::SequentialCommandGroup{
-      PreShootCommand(*this, 129_in)
-    , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
-    , ShootCommand(*this)
-  }.ToPtr());
+  // primary.A().WhileTrue(frc2::SequentialCommandGroup{
+  //     PreShootCommand(*this, 129_in)
+  //   , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
+  //   , ShootCommand(*this)
+  // }.ToPtr());
 
-  primary.B().WhileTrue(frc2::SequentialCommandGroup{
-      PreShootCommand(*this, 30_in)
-    , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
-    , ShootCommand(*this)
-  }.ToPtr());
+  // primary.B().WhileTrue(frc2::SequentialCommandGroup{
+  //     PreShootCommand(*this, 30_in)
+  //   , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
+  //   , ShootCommand(*this)
+  // }.ToPtr());
 
   primary.X().OnTrue(IntakeIngest(*this).ToPtr());
   primary.Y().WhileTrue(IntakeStop(*this).ToPtr());
@@ -336,7 +341,8 @@ void RobotContainer::ConfigButtonBoxBindings()
   // Row 1 L-R
   buttonBox.Back().OnTrue(GoToElevationCommand(*this, c_defaultStartPosition).ToPtr());      // Black
   buttonBox.Start().OnTrue(GoToElevationCommand(*this, c_defaultShootCloseAngle).ToPtr());   // Blue
-  buttonBox.LeftStick().OnTrue(GoToElevationCommand(*this, c_defaultShootFarAngle).ToPtr()); // Green
+  // buttonBox.LeftStick().OnTrue(GoToElevationCommand(*this, c_defaultShootFarAngle).ToPtr()); // Green
+  buttonBox.LeftStick().WhileTrue(GoToAzimuthCommand(*this).ToPtr()); // Green
   buttonBox.RightStick().OnTrue(GoToElevationCommand(*this, 0.0_deg).ToPtr());               // Yellow
   buttonBox.LeftBumper().OnTrue(frc2::SequentialCommandGroup{                                // Red
       GoToElevationCommand(*this, c_defaultTravelPosition)
