@@ -15,6 +15,7 @@ IntakeIngest::IntakeIngest(ISubsystemAccess& subsystemAccess)
 
   frc::SmartDashboard::PutNumber("IntakeSpeed", c_defaultIntakeSpeed);
   frc::SmartDashboard::PutNumber("IntakeAngle", 48.0);
+  frc::SmartDashboard::PutNumber("IntakeFinalAngle", 58.0);
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeIngest/startCommand");
@@ -29,13 +30,21 @@ void IntakeIngest::Initialize()
 
 void IntakeIngest::Execute()
 {
-  m_intake.ExtendIntake();
-  auto angle = frc::SmartDashboard::GetNumber("IntakeAngle", 48.0);
-  m_shooter.GoToElevation(units::degree_t(angle));
-  frc2::WaitCommand(0.25_s); // Wait for backplate to extend and turntable motor to engage
-  auto speed = frc::SmartDashboard::GetNumber("IntakeSpeed", c_defaultIntakeSpeed);
-  m_intake.Set(speed);
-  //m_intake.Set(kIngestSpeed);
+  if (m_intake.GetPosition() < 10.0)
+  {
+    m_intake.ExtendIntake();
+    auto angle = frc::SmartDashboard::GetNumber("IntakeAngle", 48.0);
+    m_shooter.GoToElevation(units::degree_t(angle));
+    auto speed = frc::SmartDashboard::GetNumber("IntakeSpeed", c_defaultIntakeSpeed);
+    m_intake.Set(speed);
+  }
+  else if (m_intake.GetPosition() > 35.0)
+  {
+    auto angle = frc::SmartDashboard::GetNumber("IntakeFinalAngle", 58.0);
+    m_shooter.GoToElevation(units::degree_t(angle));
+  }
+
+  //frc2::WaitCommand(0.25_s); // Wait for backplate to extend and turntable motor to engage
 }
 
 bool IntakeIngest::IsFinished()

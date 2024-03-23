@@ -38,6 +38,7 @@ public:
     // Retracts the intake into the robot
     void RetractIntake();
     void GoToPosition(double turns);
+    double GetPosition() { return m_deployRelativeEnc.GetPosition(); }
     bool IsNotePresent() { return m_photoEye.Get(); }
     void EjectNote() { Set(kIngestSpeed); }
     void Stop() { Set(0.0); }
