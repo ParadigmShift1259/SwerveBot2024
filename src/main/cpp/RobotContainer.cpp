@@ -235,11 +235,12 @@ void RobotContainer::ConfigPrimaryButtonBindings()
 
   primary.X().OnTrue(IntakeIngest(*this).ToPtr());
   primary.Y().WhileTrue(IntakeStop(*this).ToPtr());
-  primary.Back().OnTrue(frc2::SequentialCommandGroup{
-      ClimbCommand(*this, ClimberSubsystem::kParkPosition)
-    , frc2::WaitCommand(0.5_s)
-    , GoToElevationCommand(*this, 74.0_deg)
-  }.ToPtr());
+  primary.Back().OnTrue(ClimbCommand(*this, ClimberSubsystem::kParkPosition).ToPtr());
+  // primary.Back().OnTrue(frc2::SequentialCommandGroup{
+  //     ClimbCommand(*this, ClimberSubsystem::kParkPosition)
+  //   , frc2::WaitCommand(0.5_s)
+  //   , GoToElevationCommand(*this, 74.0_deg)
+  // }.ToPtr());
   
   primary.Start().OnTrue(ClimbCommand(*this, ClimberSubsystem::kHighPosition).ToPtr());
   // primary.Back().WhileTrue(&m_moveClimbDown);
@@ -313,11 +314,12 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , GoToElevationCommand(*this, c_defaultStartPosition)
   }.ToPtr());
 
-  secondary.Back().OnTrue(frc2::SequentialCommandGroup{
-      ClimbCommand(*this, ClimberSubsystem::kParkPosition)
-    , frc2::WaitCommand(0.5_s)
-    , GoToElevationCommand(*this, 74.0_deg)
-  }.ToPtr());
+  secondary.Back().OnTrue(ClimbCommand(*this, ClimberSubsystem::kParkPosition).ToPtr());
+  // secondary.Back().OnTrue(frc2::SequentialCommandGroup{
+  //     ClimbCommand(*this, ClimberSubsystem::kParkPosition)
+  //   , frc2::WaitCommand(0.5_s)
+  //   , GoToElevationCommand(*this, 74.0_deg)
+  // }.ToPtr());
   secondary.Start().OnTrue(ClimbCommand(*this, ClimberSubsystem::kHighPosition).ToPtr());
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();

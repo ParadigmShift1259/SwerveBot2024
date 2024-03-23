@@ -7,13 +7,13 @@
 
 #include <frc/Preferences.h>
 
-constexpr double c_defaultParkTurns = 0.0;
-constexpr double c_defaultHighTurns = 170.0;
+constexpr double c_defaultParkTurns = -30.0;
+constexpr double c_defaultHighTurns = -147.0;
 
 double c_defaultLeadDirection;
 double c_defaultFollowDirection;
 
-constexpr double c_defaultClimbP = 0.07;
+constexpr double c_defaultClimbP = 0.006;
 constexpr double c_defaultClimbI = 0.0;
 constexpr double c_defaultClimbD = 0.0;
 constexpr double c_defaultClimbFF = 0.00000;
@@ -21,23 +21,6 @@ constexpr double c_defaultClimbFF = 0.00000;
 using namespace ctre::phoenix::motorcontrol::can;
 using namespace ctre::phoenix::motorcontrol;
 
-#ifdef THING1
-ClimberSubsystem::ClimberSubsystem()
-{
-}
-
-void ClimberSubsystem::Periodic()
-{
-}
-
-void ClimberSubsystem::GoToPosition(double position)
-{
-}
-
-void ClimberSubsystem::Set(double speed) 
-{
-}
-#else
 ClimberSubsystem::ClimberSubsystem()
     : m_leadMotor(kClimbLeadMotorCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
     , m_followMotor(kClimbFollowMotorCANID, rev::CANSparkLowLevel::MotorType::kBrushless)
@@ -146,4 +129,3 @@ void ClimberSubsystem::Set(double speed)
     m_leadMotor.Set(speed);
     m_followMotor.Set(speed);
 }
-#endif

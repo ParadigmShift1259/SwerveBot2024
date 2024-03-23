@@ -36,16 +36,16 @@ void ClimbCommand::Initialize()
     if (m_position == ClimberSubsystem::kHighPosition)
     {
         // Go down
-        m_shooter.GoToElevation(c_defaultTravelPosition);
-        m_intake.GoToPosition(25.5);
-        m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
+        // m_shooter.GoToElevation(c_defaultTravelPosition);
+        // m_intake.GoToPosition(25.5);
+        // m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
         m_positionTurns = frc::SmartDashboard::GetNumber("ClimbHiTurns", 170.0);
     } 
     else 
     {
         // Go up
-        m_intake.GoToPosition(14.0);
-        m_led.SetAnimation(c_colorPink, LEDSubsystem::kStrobe);
+        // m_intake.GoToPosition(14.0);
+        // m_led.SetAnimation(c_colorPink, LEDSubsystem::kStrobe);
         m_positionTurns = frc::SmartDashboard::GetNumber("ClimbParkTurns", 0.0);
         // Now done in sequence with delay in RobotContainer m_shooter.GoToElevation(45.0_deg);
     }
@@ -63,7 +63,7 @@ bool ClimbCommand::IsFinished()
 
 void ClimbCommand::End(bool interrupted)
 {
-    m_led.SetAnimation(m_led.GetDefaultColor(), LEDSubsystem::kSolid);
-    m_led.SetRobotBusy(false);
+    // m_led.SetAnimation(m_led.GetDefaultColor(), LEDSubsystem::kSolid);
+    // m_led.SetRobotBusy(false);
     // m_climber.Stop();
 }

@@ -32,11 +32,7 @@ public:
     /// \param speed         Desired motor speed to run, ranging from [-1, 1]
     void Set(double speed);
 
-#ifndef THING1
     void Stop() { m_followMotor.StopMotor(); m_leadMotor.StopMotor(); }
-#else
-    void Stop() { }
-#endif
 
     void GoToPosition(double position);
 
@@ -51,15 +47,13 @@ public:
 
 private:
     // 775 that pulls/releases rope for hooks
-#ifndef THING1
     rev::CANSparkMax m_leadMotor;
     rev::SparkRelativeEncoder m_leadRelativeEnc = m_leadMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);    
     rev::SparkPIDController m_leadPIDController = m_leadMotor.GetPIDController();
     rev::CANSparkMax m_followMotor;
     rev::SparkRelativeEncoder m_followRelativeEnc = m_followMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);    
     rev::SparkPIDController m_followPIDController = m_followMotor.GetPIDController();
-#endif
-
+    
     double m_HighTurns;    
     double m_ParkTurns;   
 

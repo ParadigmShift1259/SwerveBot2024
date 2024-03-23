@@ -49,14 +49,14 @@ bool GoToAzimuthCommand::IsFinished()
     // printf("rotation %.3f commandedpose %.3f\n", rot.value(), m_commandedAzimuth.value());
     bool finished = fabs(rot.value() - m_commandedAzimuth.value()) < c_tolerance;
 
-    if (finished) 
-    {
-        printf("tv %s commanded %.3f rot %.3f \n"
-        , m_visionSubsystem.IsValid() ? "true" : "false"
-        , m_commandedAzimuth
-        , rot
-        );
-    }
+    // if (finished) 
+    // {
+    //     printf("tv %s commanded %.3f rot %.3f \n"
+    //     , m_visionSubsystem.IsValid() ? "true" : "false"
+    //     , m_commandedAzimuth
+    //     , rot
+    //     );
+    // }
 
     // return abs(c_targetY - y) < c_tolerance && abs(c_targetX - x) < c_tolerance;
     return finished;
