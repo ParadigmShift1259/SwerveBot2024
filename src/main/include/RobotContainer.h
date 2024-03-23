@@ -125,8 +125,9 @@ private:
     m_shooter.GoToElevation(angle);
   }, {} };
 
-  InstantCommand m_moveClimbUp{[this] { m_climber.Set(0.9); }, {}};
-  InstantCommand m_moveClimbDown{[this] { m_climber.Set(-0.9); }, {}};
+  // InstantCommand m_moveClimbUp{[this] { m_climber.Set(0.9); }, {}};
+  // InstantCommand m_moveClimbDown{[this] { m_climber.Set(-0.9); }, {}};
+  InstantCommand m_parkClimb{[this] { m_climber.Park(); }, {}};
   InstantCommand m_stopClimb{[this] { m_climber.Stop(); }, {}};
 
   InstantCommand m_enableGyroSync{[this] { m_shooter.EnableSyncToGyro(); }, {}};

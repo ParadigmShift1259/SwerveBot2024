@@ -78,6 +78,7 @@ public:
   TalonFX& GetTalon(int module);
 
   units::angle::radian_t GetGyroAzimuth() { return m_gyro.GetRotation2d().Radians(); }
+  units::angle::degree_t GetGyroAzimuthDeg() { return m_gyro.GetRotation2d().Degrees(); }
 
   void ToggleSlowSpeed() override
   { 

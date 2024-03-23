@@ -173,6 +173,8 @@ void DriveSubsystem::Periodic()
   m_logGyroPitch.Append(m_gyro.GetPitch()); 
   frc::SmartDashboard::PutNumber("currPoseRadians", GetGyroAzimuth().value());
 
+  frc::SmartDashboard::PutNumber("azimuthDeg", m_gyro.GetRotation2d().Degrees().value());
+
   static int count = 0;
   if (count++ % 25 == 0)
   {

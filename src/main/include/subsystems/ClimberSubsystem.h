@@ -19,6 +19,10 @@ WPI_UNIGNORE_DEPRECATED
 
 #include <rev/CANSparkMax.h>
 
+constexpr double c_defaultClimbHiTurns = -147;
+constexpr double c_defaultClimbTurns = -50;
+constexpr double c_defaultClimbParkTurns = -3;
+
 class ClimberSubsystem : public frc2::SubsystemBase
 {
 public:
@@ -32,6 +36,7 @@ public:
     /// \param speed         Desired motor speed to run, ranging from [-1, 1]
     void Set(double speed);
 
+    void Park() { GoToPosition(c_defaultClimbParkTurns); }
     void Stop() { m_followMotor.StopMotor(); m_leadMotor.StopMotor(); }
 
     void GoToPosition(double position);

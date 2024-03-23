@@ -3,8 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
-#include "commands/GoToPositionCommand.h"
-#include "commands/GoToAzimuthCommand.h"
+#include "commands/GoToPositionCommand.h" // Innovation center test
+#include "commands/GoToAzimuthCommand.h"  // Bad limelguht example with radians? 
 #include "commands/IntakeStop.h"
 #include "commands/IntakeRelease.h"
 #include "commands/IntakeIngest.h"
@@ -45,13 +45,8 @@
 
 using namespace pathplanner;
 
-#ifndef THING1
-constexpr double c_deployTurnsAmpClearance = 32.5;//20.0;
-constexpr double c_deployTurnsAmpShoot = 28.5;//14.0;
-#else
-constexpr double c_deployTurnsAmpClearance = 30.0;
-constexpr double c_deployTurnsAmpShoot = 16.0;
-#endif
+constexpr double c_deployTurnsAmpClearance = 32.5;
+constexpr double c_deployTurnsAmpShoot = 20;
 constexpr units::degree_t c_elevAngleAmpShoot = -60.0_deg;
 
 RobotContainer::RobotContainer() 
@@ -263,6 +258,7 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   }.ToPtr());
 
   // primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
+  primary.LeftBumper().WhileTrue(GoToAzimuthCommand(*this).ToPtr());
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
 }
 
@@ -311,6 +307,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.LeftTrigger(0.9).OnTrue(frc2::SequentialCommandGroup{
       IntakeGoToPositionCommand(*this, 0.0)
     , frc2::WaitCommand(0.35_s)
+    
     , GoToElevationCommand(*this, c_defaultStartPosition)
   }.ToPtr());
 
@@ -341,45 +338,47 @@ void RobotContainer::ConfigButtonBoxBindings()
   // 3	  B				      A				      POV Left			    POV Right			      POV Up
   //-------------------------------------------------------------------------------------
   // Row 1 L-R
-  buttonBox.Back().OnTrue(GoToElevationCommand(*this, c_defaultStartPosition).ToPtr());      // Black
-  buttonBox.Start().OnTrue(GoToElevationCommand(*this, c_defaultShootCloseAngle).ToPtr());   // Blue
+  // buttonBox.Back().OnTrue(GoToElevationCommand(*this, c_defaultStartPosition).ToPtr());      // Black
+  // buttonBox.Start().OnTrue(GoToElevationCommand(*this, c_defaultShootCloseAngle).ToPtr());   // Blue
   // buttonBox.LeftStick().OnTrue(GoToElevationCommand(*this, c_defaultShootFarAngle).ToPtr()); // Green
-  buttonBox.LeftStick().WhileTrue(GoToAzimuthCommand(*this).ToPtr()); // Green
-  buttonBox.RightStick().OnTrue(GoToElevationCommand(*this, 0.0_deg).ToPtr());               // Yellow
-  buttonBox.LeftBumper().OnTrue(frc2::SequentialCommandGroup{                                // Red
-      GoToElevationCommand(*this, c_defaultTravelPosition)
-    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
-    , StartLEDCommand(*this)
-    , frc2::WaitCommand(0.15_s)
-    , GoToElevationCommand(*this, c_elevAngleAmpShoot)
-    , frc2::WaitCommand(0.65_s)
-    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpShoot)
-  }.ToPtr());  
+  //buttonBox.LeftStick().WhileTrue(GoToAzimuthCommand(*this).ToPtr()); // Green
+  // buttonBox.RightStick().OnTrue(GoToElevationCommand(*this, 0.0_deg).ToPtr());               // Yellow
+  // buttonBox.LeftBumper().OnTrue(frc2::SequentialCommandGroup{                                // Red
+  //     GoToElevationCommand(*this, c_defaultTravelPosition)
+  //   , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
+  //   , StartLEDCommand(*this)
+  //   , frc2::WaitCommand(0.15_s)
+  //   , GoToElevationCommand(*this, c_elevAngleAmpShoot)
+  //   , frc2::WaitCommand(0.65_s)
+  //   , IntakeGoToPositionCommand(*this, c_deployTurnsAmpShoot)
+  // }.ToPtr());  
 
   // Row 2 L-R
-  buttonBox.RightTrigger().OnTrue(GoToElevationCommand(*this, c_defaultTravelPosition).ToPtr());  // Black
-  buttonBox.LeftTrigger().OnTrue(frc2::SequentialCommandGroup{                                    // Blue
-      GoToElevationCommand(*this, c_defaultTravelPosition)
-    , ClimbCommand(*this, ClimberSubsystem::kParkPosition)
-    , frc2::WaitCommand(0.5_s)
-    , GoToElevationCommand(*this, 74.0_deg)
-  }.ToPtr());
-  buttonBox.X().OnTrue(&m_goToElev);                                                              // Green
-  buttonBox.Y().OnTrue(&m_ampPositionIntake);                                                     // Yellow
-  buttonBox.RightBumper().OnTrue(frc2::SequentialCommandGroup{                                    // Red
-      AmpShootCommand(*this)
-    , frc2::WaitCommand(0.7_s)
-    , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
-    , frc2::WaitCommand(0.15_s)
-    , GoToElevationCommand(*this, c_defaultTravelPosition)
-    , frc2::WaitCommand(0.35_s)
-    , IntakeGoToPositionCommand(*this, c_defaultRetractTurns)
-  }.ToPtr());
+  buttonBox.RightTrigger().OnTrue(&m_goToElev);                                            // Green
+  buttonBox.LeftTrigger().OnTrue(&m_ampPositionIntake);                                    // Yellow
+  buttonBox.X().OnTrue(GoToPositionCommand(*this, true).ToPtr());
+  buttonBox.Y().OnTrue(GoToPositionCommand(*this, false).ToPtr());
+  // buttonBox.X().OnTrue(GoToElevationCommand(*this, c_defaultTravelPosition).ToPtr());   // Black
+  // buttonBox.Y().OnTrue(frc2::SequentialCommandGroup{                                    // Blue
+  //     GoToElevationCommand(*this, c_defaultTravelPosition)
+  //   , ClimbCommand(*this, ClimberSubsystem::kParkPosition)
+  //   , frc2::WaitCommand(0.5_s)
+  //   , GoToElevationCommand(*this, 74.0_deg)
+  // }.ToPtr());
+  // buttonBox.RightBumper().OnTrue(frc2::SequentialCommandGroup{                                    // Red
+  //     AmpShootCommand(*this)
+  //   , frc2::WaitCommand(0.7_s)
+  //   , IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
+  //   , frc2::WaitCommand(0.15_s)
+  //   , GoToElevationCommand(*this, c_defaultTravelPosition)
+  //   , frc2::WaitCommand(0.35_s)
+  //   , IntakeGoToPositionCommand(*this, c_defaultRetractTurns)
+  // }.ToPtr());
   
   // Row 3 L-R
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   //buttonBox.B().OnTrue(StopAllCommand(*this).ToPtr());                                            // Black
-  buttonBox.A().OnTrue(ClimbCommand(*this, ClimberSubsystem::kHighPosition).ToPtr());             // Blue
+  //buttonBox.A().OnTrue(ClimbCommand(*this, ClimberSubsystem::kHighPosition).ToPtr());             // Blue
   buttonBox.POVLeft(loop).Rising().IfHigh([this] { m_wheelsLeft.Schedule(); });                   // Green
   buttonBox.POVRight(loop).Rising().IfHigh([this] { m_wheelsForward.Schedule(); });               // Yellow
   buttonBox.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });            // Red

@@ -39,14 +39,14 @@ void ClimbCommand::Initialize()
         // m_shooter.GoToElevation(c_defaultTravelPosition);
         // m_intake.GoToPosition(25.5);
         // m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
-        m_positionTurns = frc::SmartDashboard::GetNumber("ClimbHiTurns", 170.0);
+        m_positionTurns = frc::SmartDashboard::GetNumber("ClimbHiTurns", c_defaultClimbHiTurns);
     } 
     else 
     {
         // Go up
         // m_intake.GoToPosition(14.0);
         // m_led.SetAnimation(c_colorPink, LEDSubsystem::kStrobe);
-        m_positionTurns = frc::SmartDashboard::GetNumber("ClimbParkTurns", 0.0);
+        m_positionTurns = frc::SmartDashboard::GetNumber("ClimbParkTurns", c_defaultClimbTurns);
         // Now done in sequence with delay in RobotContainer m_shooter.GoToElevation(45.0_deg);
     }
 }

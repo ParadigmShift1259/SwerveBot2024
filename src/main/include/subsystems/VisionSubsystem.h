@@ -27,27 +27,40 @@ enum BotPoseIndices
 class VisionSubsystem : public frc2::SubsystemBase
 {
   public:
-    VisionSubsystem(/* args */);
+    VisionSubsystem();
+    
     void Periodic() override;
-    bool IsValid() { return m_isValid; }
-    double GetX() { return m_net_buffer[eX]; }
-    double GetY() { return m_net_buffer[eY]; }
-    double GetYaw() { return m_net_buffer[eYaw]; }
-    double GetLatency() { return m_net_buffer[eLatency]; }
-    void SetBlueAlliance(bool bIsBlue) { m_bIsBlue = bIsBlue; } 
+    bool IsValidShooter() { return m_isValidShooter; }
+    bool IsValidAmp() { return m_isValidAmp; }
+    double GetX() { return m_netBufferAlli[eX]; }
+    double GetY() { return m_netBufferAlli[eY]; }
+    double GetYaw() { return m_netBufferAlli[eYaw]; }
+    double GetLatency() { return m_netBufferAlli[eLatency]; }
+    int GetTagId() { return m_tidAmp; }
     units::degree_t GetShotAngle();
 
   private:
-    bool m_isValid = false;
-    std::vector<double> m_net_buffer{2};
+    void PeriodicShooter();
+    void PeriodicAmp();
+
+    bool m_isValidShooter = false;
+    bool m_isValidAmp = false;
+    std::vector<double> m_netBufferField{2};
+    std::vector<double> m_netBufferAlli{2};
     std::vector<double> m_zero_vector = {42.0, 42.0, 42.0, 92, 10, 22};
 
-    std::shared_ptr<nt::NetworkTable> m_net_table = 
-        nt::NetworkTableInstance::GetDefault().GetTable("limelight-treone");
+    std::shared_ptr<nt::NetworkTable> m_netTableShooter = 
+        nt::NetworkTableInstance::GetDefault().GetTable("limelight-shooter");
+
+    std::shared_ptr<nt::NetworkTable> m_netTableAmp = 
+        nt::NetworkTableInstance::GetDefault().GetTable("limelight-amp");
   
   bool m_bIsBlue = false;
-  double m_ty = 0.0;
-  double m_tx = 0.0;
+  double m_tyShooter = 0.0;
+  double m_txShooter = 0.0;
+  double m_tyAmp = 0.0;
+  double m_txAmp = 0.0;
+  int m_tidAmp = 0;
   double m_shotAngle = 0.0;
 
   double c_defaultAimP = -0.1;
@@ -60,8 +73,9 @@ class VisionSubsystem : public frc2::SubsystemBase
   wpi::log::DoubleLogEntry m_logRobotPoseY;
   wpi::log::DoubleLogEntry m_logRobotPoseTheta;
   wpi::log::DoubleLogEntry m_logLL_Latency;
-  wpi::log::DoubleLogEntry m_logtx;
-  wpi::log::DoubleLogEntry m_logty;
-  wpi::log::DoubleLogEntry m_logta;
-  wpi::log::DoubleLogEntry m_logts;
+  wpi::log::DoubleLogEntry m_logtxShooter;
+  wpi::log::DoubleLogEntry m_logtyShooter;
+  wpi::log::DoubleLogEntry m_logtxAmp;
+  wpi::log::DoubleLogEntry m_logtyAmp;
+  wpi::log::IntegerLogEntry m_logtidAmp;
 };

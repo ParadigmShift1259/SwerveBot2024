@@ -6,7 +6,7 @@
 class GoToPositionCommand: public frc2::CommandHelper<frc2::Command, GoToPositionCommand>
 {
     public:
-        explicit GoToPositionCommand(ISubsystemAccess& subsystemAccess, bool bGoToPodium);
+        explicit GoToPositionCommand(ISubsystemAccess& subsystemAccess, bool bIsBlue);
         void Initialize() override;
         void Execute() override;
         bool IsFinished() override;

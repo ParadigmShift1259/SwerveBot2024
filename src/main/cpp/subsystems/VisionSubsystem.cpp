@@ -1,9 +1,19 @@
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/DriverStation.h>
 
 #include "subsystems/VisionSubsystem.h"
 
+constexpr double c_limelightShooterMountAngle = 60.0;
+constexpr double c_limelightAmpMountAngle = 39.0;
+
 VisionSubsystem::VisionSubsystem()
 {
+  auto alliance = frc::DriverStation::GetAlliance();
+  if (alliance)
+  {
+    m_bIsBlue = (alliance.value() == frc::DriverStation::Alliance::kBlue);
+  }
+
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
   m_logRobotAlliPoseX = wpi::log::DoubleLogEntry(log, "/vision/robotAlliPoseX");
@@ -13,10 +23,11 @@ VisionSubsystem::VisionSubsystem()
   m_logRobotPoseX = wpi::log::DoubleLogEntry(log, "/vision/robotPoseX");
   m_logRobotPoseY = wpi::log::DoubleLogEntry(log, "/vision/robotPoseY");
   m_logRobotPoseTheta = wpi::log::DoubleLogEntry(log, "/vision/robotPoseTheta");
-  m_logtx = wpi::log::DoubleLogEntry(log, "/vision/tx");
-  m_logty = wpi::log::DoubleLogEntry(log, "/vision/ty");
-  m_logta = wpi::log::DoubleLogEntry(log, "/vision/ta");
-  m_logts = wpi::log::DoubleLogEntry(log, "/vision/ts");
+  m_logtxShooter = wpi::log::DoubleLogEntry(log, "/vision/txShooter");
+  m_logtyShooter = wpi::log::DoubleLogEntry(log, "/vision/tyShotter");
+  m_logtxAmp = wpi::log::DoubleLogEntry(log, "/vision/txAmp");
+  m_logtyAmp = wpi::log::DoubleLogEntry(log, "/vision/tyAmp");
+  m_logtidAmp = wpi::log::IntegerLogEntry(log, "/vision/tidAmp");
   
   frc::SmartDashboard::PutNumber("ATTSAngle", 6.53);
 
@@ -25,37 +36,39 @@ VisionSubsystem::VisionSubsystem()
 
 void VisionSubsystem::Periodic()
 {
-  m_isValid = m_net_table->GetNumber("tv", 0) == 1.0;
-  //printf(" VisionSubsystem::Periodic() valid %d tv %.3f\n", m_isValid, m_net_table->GetNumber("tv", 0));
-  if (m_isValid)
+  PeriodicShooter();
+  PeriodicAmp();
+}
+
+void VisionSubsystem::PeriodicShooter()
+{
+  m_isValidShooter = m_netTableShooter->GetNumber("tv", 0) == 1.0;
+  if (m_isValidShooter)
   {
-      m_net_buffer = m_net_table->GetNumberArray(m_bIsBlue ? "botpose_wpiblue" : "botpose_wpired", m_zero_vector);
-      m_logRobotAlliPoseX.Append(m_net_buffer[eX]);
-      m_logRobotAlliPoseY.Append(m_net_buffer[eY]);
-      m_logRobotAlliPoseTheta.Append(m_net_buffer[eYaw]);
-      m_logLL_Latency.Append(m_net_buffer[eLatency]);
+      m_netBufferField = m_netTableShooter->GetNumberArray("botpose", m_zero_vector);
+      m_logRobotPoseX.Append(m_netBufferField[eX]);
+      m_logRobotPoseY.Append(m_netBufferField[eY]);
+      m_logRobotPoseTheta.Append(m_netBufferField[eYaw]);
 
-      m_net_buffer = m_net_table->GetNumberArray("botpose", m_zero_vector);
-      m_logRobotPoseX.Append(m_net_buffer[eX]);
-      m_logRobotPoseY.Append(m_net_buffer[eY]);
-      m_logRobotPoseTheta.Append(m_net_buffer[eYaw]);
+      m_netBufferAlli = m_netTableShooter->GetNumberArray(m_bIsBlue ? "botpose_wpiblue" : "botpose_wpired", m_zero_vector);
+      m_logRobotAlliPoseX.Append(m_netBufferAlli[eX]);
+      m_logRobotAlliPoseY.Append(m_netBufferAlli[eY]);
+      m_logRobotAlliPoseTheta.Append(m_netBufferAlli[eYaw]);
+      m_logLL_Latency.Append(m_netBufferAlli[eLatency]);
 
-      m_ty = m_net_table->GetNumber("ty", 0.0);
-      m_tx = m_net_table->GetNumber("tx", 0.0);
-      m_logtx.Append(m_tx);
-      m_logty.Append(m_ty);
-      m_logta.Append(m_net_table->GetNumber("ta", 0.0));
-      m_logts.Append(m_net_table->GetNumber("ts", 0.0));
+      m_tyShooter = m_netTableShooter->GetNumber("ty", 0.0);
+      m_txShooter = m_netTableShooter->GetNumber("tx", 0.0);
+      m_logtxShooter.Append(m_txShooter);
+      m_logtyShooter.Append(m_tyShooter);
 
-      constexpr double c_limelightMountAngle = 42.0;
       //double aprilTagToSpeakerAngle = frc::SmartDashboard::GetNumber("ATTSAngle", 6.53);
       double yOffset = frc::SmartDashboard::GetNumber("ATTSAngle", 10.2);
 
-      double aprilTagToSpeakerAngle = -0.291 * m_ty + yOffset;//10.2;
-      m_shotAngle = (c_limelightMountAngle + m_ty) + aprilTagToSpeakerAngle;
+      double aprilTagToSpeakerAngle = -0.291 * m_tyShooter + yOffset;//10.2;
+      m_shotAngle = (c_limelightShooterMountAngle + m_tyShooter) + aprilTagToSpeakerAngle;
       frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
       // printf("m_tx %.3f\n", m_tx);
-      double yawError = -1.0 * (m_tx / 180.0) * std::numbers::pi;
+      double yawError = -1.0 * (m_txShooter / 180.0) * std::numbers::pi;
       // double steeringAdjust = 0.0f;
 
       // if (m_tx > 1.0)
@@ -75,6 +88,34 @@ void VisionSubsystem::Periodic()
     double yawError = 0.0;
     frc::SmartDashboard::PutNumber("SteerAdjustment", yawError);
   }
+}
+
+void VisionSubsystem::PeriodicAmp()
+{
+  m_isValidAmp = m_netTableAmp->GetNumber("tv", 0) == 1.0;
+  if (m_isValidAmp)
+  {
+      m_netBufferField = m_netTableAmp->GetNumberArray("botpose", m_zero_vector);
+      m_logRobotPoseX.Append(m_netBufferField[eX]);
+      m_logRobotPoseY.Append(m_netBufferField[eY]);
+      m_logRobotPoseTheta.Append(m_netBufferField[eYaw]);
+
+      m_netBufferAlli = m_netTableAmp->GetNumberArray(m_bIsBlue ? "botpose_wpiblue" : "botpose_wpired", m_zero_vector);
+      m_logRobotAlliPoseX.Append(m_netBufferAlli[eX]);
+      m_logRobotAlliPoseY.Append(m_netBufferAlli[eY]);
+      m_logRobotAlliPoseTheta.Append(m_netBufferAlli[eYaw]);
+      m_logLL_Latency.Append(m_netBufferAlli[eLatency]);
+
+      m_tyAmp = m_netTableAmp->GetNumber("ty", 0.0);
+      m_txAmp = m_netTableAmp->GetNumber("tx", 0.0);
+      m_tidAmp = m_netTableAmp->GetNumber("tid", 0);
+      m_logtxAmp.Append(m_txAmp);
+      m_logtyAmp.Append(m_tyAmp);
+      m_logtidAmp.Append(m_tidAmp);
+  }
+  // else
+  // {
+  // }
 }
 
 units::degree_t VisionSubsystem::GetShotAngle()

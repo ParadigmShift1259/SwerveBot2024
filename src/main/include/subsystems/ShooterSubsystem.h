@@ -45,13 +45,8 @@ class ShooterSubsystem : public frc2::SubsystemBase
 
     PigeonGyro m_gyro;
 
-#ifdef THING1
-    rev::CANSparkMax m_OverWheels;
-    rev::CANSparkMax m_UnderWheels;
-#else
     rev::CANSparkFlex m_OverWheels;
     rev::CANSparkFlex m_UnderWheels; 
-#endif
 
     rev::CANSparkMax m_ElevationController;
 

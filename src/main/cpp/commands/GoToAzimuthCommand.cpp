@@ -52,7 +52,7 @@ bool GoToAzimuthCommand::IsFinished()
     // if (finished) 
     // {
     //     printf("tv %s commanded %.3f rot %.3f \n"
-    //     , m_visionSubsystem.IsValid() ? "true" : "false"
+    //     , m_visionSubsystem.IsValidShooter() ? "true" : "false"
     //     , m_commandedAzimuth
     //     , rot
     //     );
