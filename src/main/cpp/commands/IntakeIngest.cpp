@@ -15,7 +15,7 @@ IntakeIngest::IntakeIngest(ISubsystemAccess& subsystemAccess)
 
   frc::SmartDashboard::PutNumber("IntakeSpeed", c_defaultIntakeSpeed);
   frc::SmartDashboard::PutNumber("IntakeAngle", 48.0);
-  frc::SmartDashboard::PutNumber("IntakeFinalAngle", 58.0);
+  frc::SmartDashboard::PutNumber("IntakeFinalAngle", 55.0);
 
   wpi::log::DataLog& log = subsystemAccess.GetLogger();
   m_logStartCommand = wpi::log::BooleanLogEntry(log, "/intakeIngest/startCommand");
@@ -40,7 +40,7 @@ void IntakeIngest::Execute()
   }
   else if (m_intake.GetPosition() > 35.0)
   {
-    auto angle = frc::SmartDashboard::GetNumber("IntakeFinalAngle", 58.0);
+    auto angle = frc::SmartDashboard::GetNumber("IntakeFinalAngle", 55.0);
     m_shooter.GoToElevation(units::degree_t(angle));
   }
 

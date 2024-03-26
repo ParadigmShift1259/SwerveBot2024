@@ -15,6 +15,7 @@ AmpShootCommand::AmpShootCommand(ISubsystemAccess& subsystemAccess)
 
 void AmpShootCommand::Initialize()
 {
+  m_led.SetRobotBusy(true);
   m_logStartAmpShootCommand.Append(true);
   double speed = 0.6;//frc::SmartDashboard::GetNumber("AmpIntakePercent", 0.6);
   // printf("amp intake speed: %.3f\n", speed);

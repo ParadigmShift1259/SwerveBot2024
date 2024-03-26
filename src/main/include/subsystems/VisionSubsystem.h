@@ -7,6 +7,7 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <frc/smartdashboard/Field2d.h>
+#include <frc/filter/LinearFilter.h>
 #include <frc/DataLogManager.h>
 
 #include <units/angle.h>
@@ -65,6 +66,8 @@ class VisionSubsystem : public frc2::SubsystemBase
 
   double c_defaultAimP = -0.1;
   double c_minAimCommanded = 0.05;
+
+  frc::LinearFilter<double> m_elevationAngleFilter = frc::LinearFilter<double>::MovingAverage(25);
 
   wpi::log::DoubleLogEntry m_logRobotAlliPoseX;
   wpi::log::DoubleLogEntry m_logRobotAlliPoseY;

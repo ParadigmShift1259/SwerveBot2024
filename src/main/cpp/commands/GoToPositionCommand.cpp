@@ -17,40 +17,52 @@ const double c_targetSpeakerRedY = 4.106 - 1.448;
 
 const double c_targetAmpBlueX = (1.933_m - 0.050_m).value();  // 5cm bias on shooter/intake
 const double c_targetAmpBlueY = (8.111_m - c_halfRobotSize).value();
+const double c_targetAmpBlueRot = 90.0;
 
 const double c_targetAmpRedX = c_targetAmpBlueX;
 const double c_targetAmpRedY = c_halfRobotSize.value();
+const double c_targetAmpRedRot = -1.0 * c_targetAmpBlueRot;
 
 const units::velocity::meters_per_second_t c_defaultGoToAmpMaxSpeed = 4.5_mps;
 
 GoToPositionCommand::GoToPositionCommand(ISubsystemAccess& subsystemAccess, bool bIsBlue)
     : m_driveSubsystem(subsystemAccess.GetDrive())
     , m_visionSubsystem(subsystemAccess.GetVision())
+    , m_led(subsystemAccess.GetLED())
     , m_targetX(bIsBlue ? c_targetAmpBlueX : c_targetAmpRedX)
     , m_targetY(bIsBlue ? c_targetAmpBlueY : c_targetAmpRedY)
+    , m_targetRot(bIsBlue ? c_targetAmpBlueRot : c_targetAmpRedRot)
 {
-    AddRequirements(frc2::Requirements{&subsystemAccess.GetDrive(), &subsystemAccess.GetVision()});
+    AddRequirements(frc2::Requirements{&subsystemAccess.GetDrive(), &subsystemAccess.GetVision(), &subsystemAccess.GetLED()});
 
     frc::SmartDashboard::PutNumber("GoAmpMaxSpd", c_defaultGoToAmpMaxSpeed.value());
+    frc::SmartDashboard::PutNumber("GoAmpMaxAnglSpd", 120.0);
 }
 
 void GoToPositionCommand::Initialize()
 {
-
+    m_led.SetRobotBusy(true);
+    m_timer.Reset();
+    m_timer.Start();
 }
 
 void GoToPositionCommand::Execute()
 {
     const double c_maxX = 3.0;
     const double c_maxY = 3.0;
+    const double c_maxRot = 45.0;
     auto x = m_visionSubsystem.GetX();
     auto y = m_visionSubsystem.GetY();
+    auto rotation = m_driveSubsystem.GetGyroAzimuthDeg().value();
     auto xInput = 0.0;
     auto yInput = 0.0;
+    auto rotInput = 0.0;
     auto xDiff = fabs(m_targetX - x);
     auto yDiff = fabs(m_targetY - y);
+    auto rotDiff = fabs(m_targetY - y);
     auto xSpeed = 0.0_mps;
-    auto ySpeed =0.0_mps;
+    auto ySpeed = 0.0_mps;
+    auto rotSpeed = 0.0_deg_per_s;
     
     if (m_visionSubsystem.IsValidAmp())
     {
@@ -96,23 +108,43 @@ void GoToPositionCommand::Execute()
             }
         }
 
+        if (rotDiff >= c_tolerance && rotDiff < c_maxRot)
+        {
+            rotInput = (rotation - m_targetRot) / c_maxRot;
+
+            // if (yInput < 0.0)
+            // {
+            //     yInput = std::min(-c_minInput, yInput);
+            // }
+            // else
+            // {
+            //     yInput = std::max(c_minInput, yInput);
+            // }
+        }
+
         units::velocity::meters_per_second_t maxSpeed = units::velocity::meters_per_second_t{frc::SmartDashboard::GetNumber("GoAmpMaxSpd", c_defaultGoToAmpMaxSpeed.value())};
         xSpeed = xInput * maxSpeed; 
-        ySpeed = yInput * maxSpeed;         
+        ySpeed = yInput * maxSpeed; 
+        units::angular_velocity::degrees_per_second_t maxAngularSpeed = units::angular_velocity::degrees_per_second_t{frc::SmartDashboard::GetNumber("GoAmpMaxAnglSpd", 120.0)};
+        rotSpeed = rotInput * maxAngularSpeed;         
         
-        m_driveSubsystem.Drive(xSpeed, ySpeed, 0.0_rad_per_s, false);
+        m_driveSubsystem.Drive(xSpeed, ySpeed, rotSpeed, false);
     }
 
-    printf("tv %s x %.3f y %.3f xDiff %.3f yDiff %.3f xInput %.3f yInput %.3f xSpeed %.3f yspeed %.3f \n"
+    printf("tv %s x %.3f y %.3f rot %.3f xDiff %.3f yDiff %.3f rotDiff %.3f xInput %.3f yInput %.3f rotInput %.3f xSpeed %.3f yspeed %.3f rotSpeed %.3f\n"
         , m_visionSubsystem.IsValidAmp() ? "true" : "false"
         , x
         , y
+        , rotation
         , xDiff
         , yDiff
+        , rotDiff
         , xInput
         , yInput
+        , rotInput
         , xSpeed.value()
-        , ySpeed.value());
+        , ySpeed.value()
+        , rotSpeed.value());
 }
 
 bool GoToPositionCommand::IsFinished()
@@ -141,5 +173,10 @@ bool GoToPositionCommand::IsFinished()
 
 void GoToPositionCommand::End(bool interrupted)
 {
+    if (m_timer.HasElapsed(0.4_s))
+    {
+        m_led.SetAnimation(c_colorWhite, LEDSubsystem::kStrobe);
+    }
+    // m_led.SetRobotBusy(false);
     m_driveSubsystem.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false);
 }

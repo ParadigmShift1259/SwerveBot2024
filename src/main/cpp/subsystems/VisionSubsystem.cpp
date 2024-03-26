@@ -3,7 +3,7 @@
 
 #include "subsystems/VisionSubsystem.h"
 
-constexpr double c_limelightShooterMountAngle = 60.0;
+constexpr double c_limelightShooterMountAngle = 38.0;
 constexpr double c_limelightAmpMountAngle = 39.0;
 
 VisionSubsystem::VisionSubsystem()
@@ -29,7 +29,8 @@ VisionSubsystem::VisionSubsystem()
   m_logtyAmp = wpi::log::DoubleLogEntry(log, "/vision/tyAmp");
   m_logtidAmp = wpi::log::IntegerLogEntry(log, "/vision/tidAmp");
   
-  frc::SmartDashboard::PutNumber("ATTSAngle", 6.53);
+  // frc::SmartDashboard::PutNumber("ATTSAngle", 6.53);
+  frc::SmartDashboard::PutNumber("ATTSAngle", 8.2);
 
   frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
 }
@@ -61,11 +62,13 @@ void VisionSubsystem::PeriodicShooter()
       m_logtxShooter.Append(m_txShooter);
       m_logtyShooter.Append(m_tyShooter);
 
+      auto tyFilteredShooter = m_elevationAngleFilter.Calculate(m_tyShooter);
+
       //double aprilTagToSpeakerAngle = frc::SmartDashboard::GetNumber("ATTSAngle", 6.53);
       double yOffset = frc::SmartDashboard::GetNumber("ATTSAngle", 10.2);
 
-      double aprilTagToSpeakerAngle = -0.291 * m_tyShooter + yOffset;//10.2;
-      m_shotAngle = (c_limelightShooterMountAngle + m_tyShooter) + aprilTagToSpeakerAngle;
+      double aprilTagToSpeakerAngle = -0.291 * tyFilteredShooter + yOffset;//10.2;
+      m_shotAngle = (c_limelightShooterMountAngle + tyFilteredShooter) + aprilTagToSpeakerAngle;
       frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
       // printf("m_tx %.3f\n", m_tx);
       double yawError = -1.0 * (m_txShooter / 180.0) * std::numbers::pi;

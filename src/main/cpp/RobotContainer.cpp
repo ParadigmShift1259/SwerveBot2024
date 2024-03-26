@@ -228,6 +228,8 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   //   , ShootCommand(*this)
   // }.ToPtr());
 
+  primary.A().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
+
   primary.X().OnTrue(IntakeIngest(*this).ToPtr());
   primary.Y().WhileTrue(IntakeStop(*this).ToPtr());
   primary.Back().OnTrue(ClimbCommand(*this, ClimberSubsystem::kParkPosition).ToPtr());

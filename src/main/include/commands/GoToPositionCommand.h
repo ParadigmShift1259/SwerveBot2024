@@ -1,6 +1,8 @@
 #include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
 
+#include <frc/Timer.h>
+
 #include "ISubsystemAccess.h"
 
 class GoToPositionCommand: public frc2::CommandHelper<frc2::Command, GoToPositionCommand>
@@ -15,6 +17,12 @@ class GoToPositionCommand: public frc2::CommandHelper<frc2::Command, GoToPositio
     private:
         DriveSubsystem&        m_driveSubsystem;
         VisionSubsystem&        m_visionSubsystem;
+        LEDSubsystem&           m_led;
         double m_targetX;
         double m_targetY;
+        double m_targetRot;
+
+        frc::Timer m_timer;
+
+        LEDSubsystem::Color c_colorWhite = LEDSubsystem::CreateColor(255, 255, 255, 255);
 };

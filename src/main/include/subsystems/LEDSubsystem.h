@@ -31,12 +31,25 @@ class LEDSubsystem : public frc2::SubsystemBase
 
     enum Animation
     {
-      kDefault,
-      kSolid = kDefault,
+      kDefaultAnim,
+      kSolid = kDefaultAnim,
       kFade,
       kFlow,
       kStrobe,
       kBlank
+    };
+
+    enum CurrentAction
+    {
+      kDefaultAction,
+      kIdle = kDefaultAction,
+      kIntaking,
+      kPreShoot,
+      kShootMovement,
+      kShoot,
+      kAmpPosition,
+      kAmpMovement,
+      kAmpShoot
     };
 
     void SetAnimation(Color rgbw, Animation animate);
@@ -47,6 +60,9 @@ class LEDSubsystem : public frc2::SubsystemBase
 
     void SetDefaultColor(Color color) { m_defaultColor = color; }
     Color GetDefaultColor() { return m_defaultColor; }
+
+    void SetCurrentAction(CurrentAction action) { m_currentAction = action; }
+    CurrentAction GetCurrentAction() { return m_currentAction; }
     
   private:
 #ifndef THING1
@@ -64,6 +80,7 @@ class LEDSubsystem : public frc2::SubsystemBase
     StrobeAnimation m_strobeAnimation{0, 0, 0, 0, c_defaultSpeed, c_ledNum, c_ledOffset};
 
     Color m_defaultColor;
+    CurrentAction m_currentAction;
 
     double m_speed;
     bool m_busy;
