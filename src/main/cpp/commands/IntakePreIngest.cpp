@@ -32,6 +32,8 @@ void IntakePreIngest::Execute()
   m_intake.ExtendIntake();
   auto angle = frc::SmartDashboard::GetNumber("IntakeAngle", 48.0);
   m_shooter.GoToElevation(units::degree_t(angle));
+  auto speed = frc::SmartDashboard::GetNumber("IntakeSpeed", c_defaultIntakeSpeed);
+  m_intake.Set(speed);
 }
 
 bool IntakePreIngest::IsFinished()

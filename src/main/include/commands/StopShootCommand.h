@@ -3,10 +3,10 @@
 
 #include "ISubsystemAccess.h"
 
-class ShootCommand: public frc2::CommandHelper<frc2::Command, ShootCommand>
+class StopShootCommand: public frc2::CommandHelper<frc2::Command, StopShootCommand>
 {
     public:
-        explicit ShootCommand(ISubsystemAccess& subsystemAccess, bool bIsAuto = false);
+        explicit StopShootCommand(ISubsystemAccess& subsystemAccess);
 		
         void Initialize() override;
         void Execute() override;
@@ -15,15 +15,13 @@ class ShootCommand: public frc2::CommandHelper<frc2::Command, ShootCommand>
 
     private:
         ShooterSubsystem& m_shooterSubsystem;
-        IntakeSubsystem& m_intakeSubsystem;
-        LEDSubsystem& m_led;
-        VisionSubsystem& m_vision;
+        // IntakeSubsystem& m_intakeSubsystem;
+        // LEDSubsystem& m_led;
+        // DriveSubsystem& m_drive;
+        // VisionSubsystem& m_vision;
 
         LEDSubsystem::Color c_colorPink = LEDSubsystem::CreateColor(80, 10, 15 , 0);
         LEDSubsystem::Color c_colorGreen = LEDSubsystem::CreateColor(13, 80, 0, 0);
-        
-        frc::Timer m_timer;
-        bool m_bIsAuto = false;
-        
-		wpi::log::BooleanLogEntry m_logStartShootCommand;
+
+		wpi::log::BooleanLogEntry m_logStartCommand;
 };

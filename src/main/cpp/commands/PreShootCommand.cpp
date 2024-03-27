@@ -2,7 +2,7 @@
 #include <frc2/command/WaitCommand.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
-PreShootCommand::PreShootCommand(ISubsystemAccess& subsystemAccess, units::meter_t distance)
+PreShootCommand::PreShootCommand(ISubsystemAccess& subsystemAccess)
     : m_shooterSubsystem(subsystemAccess.GetShooter())
     , m_led(subsystemAccess.GetLED())
     , m_vision(subsystemAccess.GetVision())
@@ -12,9 +12,6 @@ PreShootCommand::PreShootCommand(ISubsystemAccess& subsystemAccess, units::meter
       , &subsystemAccess.GetLED()
       , &subsystemAccess.GetVision()  
     });
-
-	
-    m_distance = distance;
     m_elevationAngle = m_shooterSubsystem.GetCloseAngle();
     
     wpi::log::DataLog& log = subsystemAccess.GetLogger();
@@ -23,10 +20,14 @@ PreShootCommand::PreShootCommand(ISubsystemAccess& subsystemAccess, units::meter
 
 void PreShootCommand::Initialize()
 {
+  m_distance = units::meter_t{m_vision.GetShotDistance()};
+  frc::SmartDashboard::PutNumber("VisionDistance echo", m_distance.value());
   m_led.SetRobotBusy(true);
   int shootIndex = m_distance < 2.0_m ? 0 : 1;
+  frc::SmartDashboard::PutNumber("ShootIndex", shootIndex);
   m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
   m_logStartPreShootCommand.Append(true);
+  m_vision.EnableShooterLEDs();
   if (shootIndex == 0)
   {
     m_shooterSubsystem.GoToElevation(shootIndex);

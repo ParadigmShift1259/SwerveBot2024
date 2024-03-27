@@ -6,7 +6,7 @@
 class PreShootCommand: public frc2::CommandHelper<frc2::Command, PreShootCommand>
 {
     public:
-        explicit PreShootCommand(ISubsystemAccess& subsystemAccess, units::meter_t distance);
+        explicit PreShootCommand(ISubsystemAccess& subsystemAccess);
 		
         void Initialize() override;
         void Execute() override;

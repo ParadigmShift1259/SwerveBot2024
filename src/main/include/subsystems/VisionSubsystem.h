@@ -39,6 +39,9 @@ class VisionSubsystem : public frc2::SubsystemBase
     double GetLatency() { return m_netBufferAlli[eLatency]; }
     int GetTagId() { return m_tidAmp; }
     units::degree_t GetShotAngle();
+    void EnableShooterLEDs() { m_netTableShooter->PutNumber("ledMode", 3); }
+    void DisableShooterLEDs() { m_netTableShooter->PutNumber("ledMode", 1); }
+    double GetShotDistance() { return m_shotDistance; }
 
   private:
     void PeriodicShooter();
@@ -63,6 +66,7 @@ class VisionSubsystem : public frc2::SubsystemBase
   double m_txAmp = 0.0;
   int m_tidAmp = 0;
   double m_shotAngle = 0.0;
+  double m_shotDistance = 0.0;
 
   double c_defaultAimP = -0.1;
   double c_minAimCommanded = 0.05;

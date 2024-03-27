@@ -11,6 +11,7 @@
 #include "commands/IntakePreIngest.h"
 #include "commands/IntakeDeploy.h"
 #include "commands/StopAllCommand.h"
+#include "commands/StopShootCommand.h"
 #include "commands/PreShootCommand.h"
 #include "commands/ShootCommand.h"
 #include "commands/AmpIntakeCommand.h"
@@ -46,7 +47,7 @@
 using namespace pathplanner;
 
 constexpr double c_deployTurnsAmpClearance = 32.5;
-constexpr double c_deployTurnsAmpShoot = 20;
+constexpr double c_deployTurnsAmpShoot = 21.0;
 constexpr units::degree_t c_elevAngleAmpShoot = -60.0_deg;
 
 RobotContainer::RobotContainer() 
@@ -62,7 +63,7 @@ RobotContainer::RobotContainer()
 
   NamedCommands::registerCommand("ShootClose", std::move(
     frc2::SequentialCommandGroup{
-        PreShootCommand(*this, 1_m)
+        PreShootCommand(*this)
       , frc2::WaitCommand(0.5_s)
       , ShootCommand(*this, true)
     }.ToPtr()));
@@ -71,7 +72,7 @@ RobotContainer::RobotContainer()
 
   NamedCommands::registerCommand("ShootFar", std::move(
     frc2::SequentialCommandGroup{
-        PreShootCommand(*this, 5_m)
+        PreShootCommand(*this)
       , frc2::WaitCommand(0.7_s)  // Wait for elev angle to sync to gyro
       , ShootCommand(*this, true)
     }.ToPtr()));
@@ -280,6 +281,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.X().OnTrue(frc2::SequentialCommandGroup{
       IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
     , StartLEDCommand(*this)
+    , StopShootCommand(*this)
     , frc2::WaitCommand(0.15_s)
     , GoToElevationCommand(*this, c_elevAngleAmpShoot)
     , frc2::WaitCommand(0.65_s)
@@ -295,8 +297,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , IntakeGoToPositionCommand(*this, c_defaultRetractTurns)
   }.ToPtr());
 
-  secondary.RightBumper().OnTrue(PreShootCommand(*this, 129_in).ToPtr());
-  secondary.LeftBumper().OnTrue(PreShootCommand(*this, 30_in).ToPtr());
+  secondary.RightBumper().OnTrue(PreShootCommand(*this).ToPtr());
+  secondary.LeftBumper().OnTrue(PreShootCommand(*this).ToPtr());
 
   secondary.LeftStick().OnTrue(&m_enableGyroSync);
   secondary.RightStick().OnTrue(frc2::SequentialCommandGroup{

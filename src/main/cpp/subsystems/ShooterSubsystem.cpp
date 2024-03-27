@@ -34,6 +34,8 @@ constexpr double c_defaultElevI = 0.0;
 constexpr double c_defaultElevD = 0.0;
 constexpr double c_defaultElevFF = 0.07;
 
+constexpr units::meter_t c_minVisionShotDistance = 2.0_m;
+
 const units::degree_t c_minElevAngle = -180.0_deg;
 const units::degree_t c_maxElevAngle = 100.0_deg;
 
@@ -114,6 +116,7 @@ ShooterSubsystem::ShooterSubsystem()
   frc::SmartDashboard::PutNumber("UnderRPM", m_shootReference[0][1]);
   frc::SmartDashboard::PutNumber("ElevationAngle", c_defaultTravelPosition.value());
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
+  frc::SmartDashboard::PutNumber("PostIntakeRPM", 2000.0);
 
   auto pitch = m_gyro.GetPitch();
   double turns = (c_elevSlope * pitch + c_elevOffset);
@@ -247,6 +250,20 @@ void ShooterSubsystem::StartOverAndUnder(units::meter_t distance)
 
     m_overRPM = -m_shootReference[0][m_shootIndex];
     m_underRPM = m_shootReference[0][m_shootIndex];
+
+    auto distanceAdder = distance - c_minVisionShotDistance;
+
+    if (distance < 0.0_m) 
+    {
+      auto postIntakeRPM = frc::SmartDashboard::GetNumber("PostIntakeRPM", 2000.0);
+      m_overRPM = -postIntakeRPM;
+      m_underRPM = postIntakeRPM;
+    }
+    else if (distanceAdder > 0.0_m)
+    {
+      m_overRPM -= distanceAdder.value() * 200.0;
+      m_underRPM += distanceAdder.value() * 200.0;
+    }
 
     double ffNeo = frc::Preferences::GetDouble("kShooterFF", c_defaultShootNeoFF);
     m_OverPIDController.SetFF(ffNeo);

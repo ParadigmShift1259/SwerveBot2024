@@ -5,8 +5,9 @@ StopAllCommand::StopAllCommand(ISubsystemAccess& subsystemAccess)
     , m_intakeSubsystem(subsystemAccess.GetIntake())
     , m_led(subsystemAccess.GetLED())
     , m_drive(subsystemAccess.GetDrive())
+    , m_vision(subsystemAccess.GetVision())
 {
-    AddRequirements(frc2::Requirements{&subsystemAccess.GetShooter(), &subsystemAccess.GetIntake(), &subsystemAccess.GetLED(), &subsystemAccess.GetLED()});
+    AddRequirements(frc2::Requirements{&subsystemAccess.GetShooter(), &subsystemAccess.GetIntake(), &subsystemAccess.GetLED(), &subsystemAccess.GetLED(), &subsystemAccess.GetVision()});
 
 	  wpi::log::DataLog& log = subsystemAccess.GetLogger();
     m_logStartCommand = wpi::log::BooleanLogEntry(log, "/StopAllCommand/startCommand");
@@ -20,6 +21,7 @@ void StopAllCommand::Initialize()
   m_drive.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false);
   m_led.SetAnimation(m_led.GetDefaultColor(), LEDSubsystem::kSolid);
   m_led.SetRobotBusy(false);
+  m_vision.DisableShooterLEDs();
 }
 
 void StopAllCommand::Execute()

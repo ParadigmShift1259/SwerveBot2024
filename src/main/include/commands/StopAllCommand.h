@@ -18,6 +18,7 @@ class StopAllCommand: public frc2::CommandHelper<frc2::Command, StopAllCommand>
         IntakeSubsystem& m_intakeSubsystem;
         LEDSubsystem& m_led;
         DriveSubsystem& m_drive;
+        VisionSubsystem& m_vision;
 
         LEDSubsystem::Color c_colorPink = LEDSubsystem::CreateColor(80, 10, 15 , 0);
         LEDSubsystem::Color c_colorGreen = LEDSubsystem::CreateColor(13, 80, 0, 0);

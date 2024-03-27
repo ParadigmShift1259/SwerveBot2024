@@ -3,8 +3,9 @@
 
 #include "subsystems/VisionSubsystem.h"
 
-constexpr double c_limelightShooterMountAngle = 38.0;
+constexpr double c_limelightShooterMountAngle = 26.0;
 constexpr double c_limelightAmpMountAngle = 39.0;
+constexpr units::meter_t c_targetHeight = 55.875_in;
 
 VisionSubsystem::VisionSubsystem()
 {
@@ -67,9 +68,13 @@ void VisionSubsystem::PeriodicShooter()
       //double aprilTagToSpeakerAngle = frc::SmartDashboard::GetNumber("ATTSAngle", 6.53);
       double yOffset = frc::SmartDashboard::GetNumber("ATTSAngle", 10.2);
 
+      double targetAngle = c_limelightShooterMountAngle + tyFilteredShooter;
+
       double aprilTagToSpeakerAngle = -0.291 * tyFilteredShooter + yOffset;//10.2;
-      m_shotAngle = (c_limelightShooterMountAngle + tyFilteredShooter) + aprilTagToSpeakerAngle;
+      m_shotAngle = (targetAngle) + aprilTagToSpeakerAngle;
       frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
+      m_shotDistance = c_targetHeight.value() / sin((targetAngle * std::numbers::pi) / 180.0);
+      frc::SmartDashboard::PutNumber("VisionShotDistance", m_shotDistance);
       // printf("m_tx %.3f\n", m_tx);
       double yawError = -1.0 * (m_txShooter / 180.0) * std::numbers::pi;
       // double steeringAdjust = 0.0f;
@@ -88,6 +93,7 @@ void VisionSubsystem::PeriodicShooter()
   else
   {
     m_shotAngle = 0.0;
+    m_shotDistance = 0.0;
     double yawError = 0.0;
     frc::SmartDashboard::PutNumber("SteerAdjustment", yawError);
   }
