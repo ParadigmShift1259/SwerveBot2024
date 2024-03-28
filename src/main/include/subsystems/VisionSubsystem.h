@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <wpi/DataLog.h>
+#include <wpi/interpolating_map.h>
 
 #include <frc2/command/SubsystemBase.h>
 #include <networktables/NetworkTable.h>
@@ -66,12 +67,15 @@ class VisionSubsystem : public frc2::SubsystemBase
   double m_txAmp = 0.0;
   int m_tidAmp = 0;
   double m_shotAngle = 0.0;
+  double m_floorDistance = 0.0;
   double m_shotDistance = 0.0;
 
   double c_defaultAimP = -0.1;
   double c_minAimCommanded = 0.05;
 
   frc::LinearFilter<double> m_elevationAngleFilter = frc::LinearFilter<double>::MovingAverage(25);
+
+  wpi::interpolating_map< units::length::inch_t, units::angle::degree_t > c_distanceToAngleMap;
 
   wpi::log::DoubleLogEntry m_logRobotAlliPoseX;
   wpi::log::DoubleLogEntry m_logRobotAlliPoseY;

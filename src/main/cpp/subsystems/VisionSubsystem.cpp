@@ -3,7 +3,7 @@
 
 #include "subsystems/VisionSubsystem.h"
 
-constexpr double c_limelightShooterMountAngle = 26.0;
+constexpr double c_limelightShooterMountAngle = 27.0;
 constexpr double c_limelightAmpMountAngle = 39.0;
 constexpr units::meter_t c_targetHeight = 55.875_in;
 
@@ -14,6 +14,13 @@ VisionSubsystem::VisionSubsystem()
   {
     m_bIsBlue = (alliance.value() == frc::DriverStation::Alliance::kBlue);
   }
+
+  c_distanceToAngleMap.insert(53.25_in,   55.0_deg);
+  c_distanceToAngleMap.insert(61.24_in,   50.0_deg);
+  c_distanceToAngleMap.insert(76.0_in,    45.0_deg);
+  c_distanceToAngleMap.insert(100.0_in,   41.0_deg);
+  c_distanceToAngleMap.insert(125.0_in,   37.0_deg);
+  c_distanceToAngleMap.insert(150.0_in,   34.0_deg);
 
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
@@ -68,12 +75,15 @@ void VisionSubsystem::PeriodicShooter()
       //double aprilTagToSpeakerAngle = frc::SmartDashboard::GetNumber("ATTSAngle", 6.53);
       double yOffset = frc::SmartDashboard::GetNumber("ATTSAngle", 10.2);
 
-      double targetAngle = c_limelightShooterMountAngle + tyFilteredShooter;
-
-      double aprilTagToSpeakerAngle = -0.291 * tyFilteredShooter + yOffset;//10.2;
-      m_shotAngle = (targetAngle) + aprilTagToSpeakerAngle;
+      double targetAngle = (c_limelightShooterMountAngle + tyFilteredShooter) * std::numbers::pi / 180.0;
+      // Linear Fit
+      // double aprilTagToSpeakerAngle = -0.291 * tyFilteredShooter + yOffset;//10.2;
+      // m_shotAngle = (targetAngle) + aprilTagToSpeakerAngle;
+      //floorDistance = height from camera to apriltag / tangent + limelight offset from robot
+      m_floorDistance = (45.875 / tan(targetAngle)) + 11.0;
+      m_shotAngle = c_distanceToAngleMap[units::inch_t{m_floorDistance}].value();
       frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
-      m_shotDistance = c_targetHeight.value() / sin((targetAngle * std::numbers::pi) / 180.0);
+      m_shotDistance = c_targetHeight.value() / sin(targetAngle);
       frc::SmartDashboard::PutNumber("VisionShotDistance", m_shotDistance);
       // printf("m_tx %.3f\n", m_tx);
       double yawError = -1.0 * (m_txShooter / 180.0) * std::numbers::pi;

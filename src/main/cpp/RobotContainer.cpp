@@ -47,7 +47,7 @@
 using namespace pathplanner;
 
 constexpr double c_deployTurnsAmpClearance = 32.5;
-constexpr double c_deployTurnsAmpShoot = 21.0;
+constexpr double c_deployTurnsAmpShoot = 22.0;
 constexpr units::degree_t c_elevAngleAmpShoot = -60.0_deg;
 
 RobotContainer::RobotContainer() 
