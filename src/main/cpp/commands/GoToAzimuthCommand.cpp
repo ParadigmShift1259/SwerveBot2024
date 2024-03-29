@@ -22,23 +22,19 @@ GoToAzimuthCommand::GoToAzimuthCommand(ISubsystemAccess& subsystemAccess)
 void GoToAzimuthCommand::Initialize()
 {
     double adjustment = frc::SmartDashboard::GetNumber("SteerAdjustment", 0.0);
-    // double rotInput = sin(adjustment);
     m_rot = units::radians_per_second_t{frc::SmartDashboard::GetNumber("AdjustRotation", 0.0)};//m_rotLimiter.Calculate(rotInput) * kMaxAngularSpeed;
     frc::SmartDashboard::PutBoolean("IsAiming", true);
     units::angle::radian_t poseRadians = m_driveSubsystem.GetGyroAzimuth();//GetPose().Rotation().Radians();
-    // double multiplier = frc::SmartDashboard::GetNumber("yawsign", 1.0);
     frc::SmartDashboard::PutNumber("startposeradians", poseRadians.value());
     m_commandedAzimuth = units::angle::radian_t{poseRadians.value() + adjustment};
     frc::SmartDashboard::PutNumber("commandedposition", m_commandedAzimuth.value());
-    // printf("start angle %.3f adjustment %.3f commanded angle %.3f", poseRadians.value(), adjustment, m_commandedAzimuth.value());
+ 
 }
 
 void GoToAzimuthCommand::Execute()
 {
     m_rot = units::radians_per_second_t{frc::SmartDashboard::GetNumber("AdjustRotation", 0.0)};
     m_driveSubsystem.Drive(0.0_mps, 0.0_mps, m_rot, false);
-    // auto rot = m_driveSubsystem.GetPose().Rotation().Radians();
-    // printf("rotation %.3f commandedpose %.3f\n", rot.value(), m_commandedAzimuth.value());
 }
 
 bool GoToAzimuthCommand::IsFinished()

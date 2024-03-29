@@ -300,7 +300,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.RightBumper().OnTrue(PreShootCommand(*this).ToPtr());
   secondary.LeftBumper().OnTrue(PreShootCommand(*this).ToPtr());
 
-  secondary.LeftStick().OnTrue(&m_enableGyroSync);
+  secondary.LeftStick().OnTrue(ClimbCommand(*this, ClimberSubsystem::kResetPosition).ToPtr());
   secondary.RightStick().OnTrue(frc2::SequentialCommandGroup{
       IntakeGoToPositionCommand(*this, c_defaultRetractTurns)
     , frc2::WaitCommand(0.35_s)

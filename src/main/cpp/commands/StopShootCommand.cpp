@@ -15,6 +15,7 @@ StopShootCommand::StopShootCommand(ISubsystemAccess& subsystemAccess)
 
 void StopShootCommand::Initialize()
 {
+  m_shooterSubsystem.DisableSyncToGyro();
   m_logStartCommand.Append(true);
   m_shooterSubsystem.Stop();
 }

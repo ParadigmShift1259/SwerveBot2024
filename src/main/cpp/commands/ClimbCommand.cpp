@@ -39,15 +39,20 @@ void ClimbCommand::Initialize()
         m_shooter.GoToElevation(c_defaultTravelPosition);
         m_intake.GoToPosition(25.5);
         m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
-        m_positionTurns = frc::SmartDashboard::GetNumber("ClimbHiTurns", c_defaultClimbHiTurns);
+        m_positionTurns = frc::SmartDashboard::GetNumber("ClimbHiTurns", c_defaultHighTurns);
     } 
-    else 
+    else if (m_position == ClimberSubsystem::kParkPosition)
     {
         // Go up
         // m_intake.GoToPosition(14.0);
         m_led.SetAnimation(c_colorPink, LEDSubsystem::kStrobe);
-        m_positionTurns = frc::SmartDashboard::GetNumber("ClimbParkTurns", c_defaultClimbTurns);
+        m_positionTurns = frc::SmartDashboard::GetNumber("ClimbParkTurns", c_defaultParkTurns);
         // Now done in sequence with delay in RobotContainer m_shooter.GoToElevation(45.0_deg);
+    }
+    else
+    {
+        m_shooter.EnableSyncToGyro();
+        m_positionTurns = frc::SmartDashboard::GetNumber("ClimbResetTurns", c_defaultResetTurns);
     }
 }
 
@@ -63,7 +68,6 @@ bool ClimbCommand::IsFinished()
 
 void ClimbCommand::End(bool interrupted)
 {
-    // m_led.SetAnimation(m_led.GetDefaultColor(), LEDSubsystem::kSolid);
-    // m_led.SetRobotBusy(false);
-    // m_climber.Stop();
+    m_led.SetAnimation(m_led.GetDefaultColor(), LEDSubsystem::kSolid);
+    m_led.SetRobotBusy(false);
 }

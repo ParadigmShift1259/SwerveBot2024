@@ -4,7 +4,7 @@
 #include "subsystems/VisionSubsystem.h"
 
 constexpr double c_limelightShooterMountAngle = 27.0;
-constexpr double c_limelightAmpMountAngle = 39.0;
+constexpr double c_limelightAmpMountAngle = 30.0;
 constexpr units::meter_t c_targetHeight = 55.875_in;
 
 VisionSubsystem::VisionSubsystem()

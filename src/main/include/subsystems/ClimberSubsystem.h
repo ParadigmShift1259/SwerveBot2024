@@ -19,9 +19,9 @@ WPI_UNIGNORE_DEPRECATED
 
 #include <rev/CANSparkMax.h>
 
-constexpr double c_defaultClimbHiTurns = -147;
-constexpr double c_defaultClimbTurns = -50;
-constexpr double c_defaultClimbParkTurns = -3;
+constexpr double c_defaultResetTurns = 0.0;
+constexpr double c_defaultParkTurns = -30.0;
+constexpr double c_defaultHighTurns = -150.0;
 
 class ClimberSubsystem : public frc2::SubsystemBase
 {
@@ -36,18 +36,15 @@ public:
     /// \param speed         Desired motor speed to run, ranging from [-1, 1]
     void Set(double speed);
 
-    void Park() { GoToPosition(c_defaultClimbParkTurns); }
     void Stop() { m_followMotor.StopMotor(); m_leadMotor.StopMotor(); }
 
     void GoToPosition(double position);
 
-    void HighPosition() { GoToPosition(m_HighTurns); }
-    void ParkPosition() { GoToPosition(m_ParkTurns); }
-
     enum Position {
         kDefaultPosition,
-        kParkPosition = kDefaultPosition,
-        kHighPosition
+        kResetPosition = kDefaultPosition,
+        kHighPosition,
+        kParkPosition
     };
 
 private:
@@ -58,9 +55,6 @@ private:
     rev::CANSparkMax m_followMotor;
     rev::SparkRelativeEncoder m_followRelativeEnc = m_followMotor.GetEncoder(rev::SparkRelativeEncoder::Type::kHallSensor, 42);    
     rev::SparkPIDController m_followPIDController = m_followMotor.GetPIDController();
-    
-    double m_HighTurns;    
-    double m_ParkTurns;   
 
     double m_climbLeadPosition = 1.0;
     double m_climbFollowPosition = 1.0;

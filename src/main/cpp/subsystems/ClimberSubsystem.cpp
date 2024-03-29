@@ -7,13 +7,14 @@
 
 #include <frc/Preferences.h>
 
-constexpr double c_defaultParkTurns = -30.0;
-constexpr double c_defaultHighTurns = -147.0;
-
 double c_defaultLeadDirection;
 double c_defaultFollowDirection;
 
-constexpr double c_defaultClimbP = 0.006;
+constexpr int c_defaultClimbDownPIDSlot = 0;
+constexpr int c_defaultClimbUpPIDSlot = 1;
+
+constexpr double c_defaultClimbDownP = 0.006;
+constexpr double c_defaultClimbUpP = 0.07;
 constexpr double c_defaultClimbI = 0.0;
 constexpr double c_defaultClimbD = 0.0;
 constexpr double c_defaultClimbFF = 0.00000;
@@ -39,9 +40,6 @@ ClimberSubsystem::ClimberSubsystem()
     m_followMotor.SetClosedLoopRampRate(0.0);
     m_followRelativeEnc.SetPosition(0.0);
 
-    m_HighTurns = c_defaultHighTurns;
-    m_ParkTurns = c_defaultParkTurns;
-
     c_defaultLeadDirection = m_leadDirection;
     c_defaultFollowDirection = m_followDirection;
 
@@ -58,8 +56,10 @@ ClimberSubsystem::ClimberSubsystem()
 
     frc::SmartDashboard::PutNumber("ClimbHiTurns", c_defaultHighTurns);
     frc::SmartDashboard::PutNumber("ClimbParkTurns", c_defaultParkTurns);
+    frc::SmartDashboard::PutNumber("ClimbResetTurns", c_defaultResetTurns);
 
-    frc::Preferences::InitDouble("kClimbPosP", c_defaultClimbP);
+    frc::Preferences::InitDouble("kClimbPosDownP", c_defaultClimbDownP);
+    frc::Preferences::InitDouble("kClimbPosUpP", c_defaultClimbUpP);
     frc::Preferences::InitDouble("kClimbPosI", c_defaultClimbI);
     frc::Preferences::InitDouble("kClimbPosD", c_defaultClimbD);
     frc::Preferences::InitDouble("kClimbPosFF", c_defaultClimbFF);
@@ -77,19 +77,26 @@ void ClimberSubsystem::Periodic()
   static int count = 0;
   if (count++ % 20 == 0)
   {
-    static double lastP = 0.0;
+    static double lastDownP = 0.0;
+    static double lastUpP = 0.0;
     static double lastI = 0.0;
     static double lastD = 0.0;
     static double lastFF = 0.0;
 
-    auto p = frc::Preferences::GetDouble("kClimbPosP", c_defaultClimbP); //originally .07
+    auto pDown = frc::Preferences::GetDouble("kClimbPosDownP", c_defaultClimbDownP); //originally .07
+    auto pUp = frc::Preferences::GetDouble("kClimbPosUpP", c_defaultClimbUpP);
     auto i = frc::Preferences::GetDouble("kClimbPosI", c_defaultClimbI);
     auto d = frc::Preferences::GetDouble("kClimbPosD", c_defaultClimbD);
     auto ff = frc::Preferences::GetDouble("kClimbPosFF", c_defaultClimbFF);
-    if (p != lastP)
+    if (pDown != lastDownP)
     {
-        m_leadPIDController.SetP(p);
-        m_followPIDController.SetP(p);
+        m_leadPIDController.SetP(pDown, c_defaultClimbDownPIDSlot);
+        m_followPIDController.SetP(pDown, c_defaultClimbDownPIDSlot);
+    }
+    if (pUp != lastUpP)
+    {
+        m_leadPIDController.SetP(pUp, c_defaultClimbUpPIDSlot);
+        m_followPIDController.SetP(pUp, c_defaultClimbUpPIDSlot);
     }
     if (i != lastI)
     {
@@ -106,7 +113,8 @@ void ClimberSubsystem::Periodic()
         m_leadPIDController.SetFF(ff);
        m_followPIDController.SetFF(ff);
     }
-    lastP = p;
+    lastDownP = pDown;
+    lastUpP = pUp;
     lastI = i;
     lastD = d;
     lastFF = ff;
@@ -118,8 +126,9 @@ void ClimberSubsystem::Periodic()
 
 void ClimberSubsystem::GoToPosition(double position)
 {
-    m_leadPIDController.SetReference(position, rev::CANSparkBase::ControlType::kPosition);
-    m_followPIDController.SetReference(position, rev::CANSparkBase::ControlType::kPosition);
+    int slot = position < -70.0 ? c_defaultClimbUpPIDSlot : c_defaultClimbDownPIDSlot;
+    m_leadPIDController.SetReference(position, rev::CANSparkBase::ControlType::kPosition, slot);
+    m_followPIDController.SetReference(position, rev::CANSparkBase::ControlType::kPosition, slot);
 
 }
 

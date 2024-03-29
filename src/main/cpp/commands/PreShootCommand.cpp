@@ -20,6 +20,7 @@ PreShootCommand::PreShootCommand(ISubsystemAccess& subsystemAccess)
 
 void PreShootCommand::Initialize()
 {
+  m_shooterSubsystem.EnableSyncToGyro();
   m_distance = units::meter_t{m_vision.GetShotDistance()};
   frc::SmartDashboard::PutNumber("VisionDistance echo", m_distance.value());
   m_led.SetRobotBusy(true);
