@@ -20,7 +20,7 @@ void StopAllCommand::Initialize()
   m_intakeSubsystem.Stop();
   m_drive.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false);
   m_led.SetAnimation(m_led.GetDefaultColor(), LEDSubsystem::kSolid);
-  m_led.SetRobotBusy(false);
+  m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kIdle);
   m_vision.DisableShooterLEDs();
 }
 

@@ -20,32 +20,42 @@ PreShootCommand::PreShootCommand(ISubsystemAccess& subsystemAccess)
 
 void PreShootCommand::Initialize()
 {
-  m_shooterSubsystem.EnableSyncToGyro();
-  m_distance = units::meter_t{m_vision.GetShotDistance()};
-  frc::SmartDashboard::PutNumber("VisionDistance echo", m_distance.value());
-  m_led.SetRobotBusy(true);
-  int shootIndex = m_distance < 2.0_m ? 0 : 1;
-  frc::SmartDashboard::PutNumber("ShootIndex", shootIndex);
-  m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
-  m_logStartPreShootCommand.Append(true);
-  m_vision.EnableShooterLEDs();
-  if (shootIndex == 0)
+  auto bSafeToShoot = true;
+  if ((m_led.GetCurrentAction() == LEDSubsystem::CurrentAction::kAmpMovement)
+  || (m_led.GetCurrentAction() == LEDSubsystem::CurrentAction::kAmpPosition)
+  || (m_led.GetCurrentAction() == LEDSubsystem::CurrentAction::kAmpShoot))
   {
-    m_shooterSubsystem.GoToElevation(shootIndex);
+    bSafeToShoot = false;
   }
-  else
+  if (bSafeToShoot)
   {
+    m_shooterSubsystem.EnableSyncToGyro();
+    m_distance = units::meter_t{m_vision.GetShotDistance()};
+    frc::SmartDashboard::PutNumber("VisionDistance echo", m_distance.value());
+    m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kPreShoot);
+    int shootIndex = m_distance < 2.0_m ? 0 : 1;
+    frc::SmartDashboard::PutNumber("ShootIndex", shootIndex);
+    m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
+    m_logStartPreShootCommand.Append(true);
+    m_vision.EnableShooterLEDs();
     units::degree_t angle = m_vision.GetShotAngle();
-    if (angle.value() == 0.0)
+    if (shootIndex == 0)
     {
       m_shooterSubsystem.GoToElevation(shootIndex);
     }
     else
     {
-      m_shooterSubsystem.GoToElevation(angle);
+      if (angle.value() == 0.0)
+      {
+        m_shooterSubsystem.GoToElevation(shootIndex);
+      }
+      else
+      {
+        m_shooterSubsystem.GoToElevation(angle);
+      }
     }
+    m_shooterSubsystem.StartOverAndUnder(m_distance);
   }
-  m_shooterSubsystem.StartOverAndUnder(m_distance);
 }
 
 void PreShootCommand::Execute()

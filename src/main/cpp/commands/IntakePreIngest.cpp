@@ -22,7 +22,7 @@ IntakePreIngest::IntakePreIngest(ISubsystemAccess& subsystemAccess)
 
 void IntakePreIngest::Initialize()
 {
-  m_led.SetRobotBusy(true);
+  m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kIntaking);
   m_logStartCommand.Append(true);
   m_led.SetAnimation(c_colorGreen, LEDSubsystem::kFlow);
 }

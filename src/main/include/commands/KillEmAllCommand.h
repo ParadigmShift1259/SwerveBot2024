@@ -3,10 +3,10 @@
 
 #include "ISubsystemAccess.h"
 
-class EndLEDCommand: public frc2::CommandHelper<frc2::Command, EndLEDCommand>
+class KillEmAllCommand: public frc2::CommandHelper<frc2::Command, KillEmAllCommand>
 {
     public:
-        explicit EndLEDCommand(ISubsystemAccess& subsystemAccess);
+        explicit KillEmAllCommand(ISubsystemAccess& subsystemAccess);
 		
         void Initialize() override;
         void Execute() override;
@@ -14,11 +14,13 @@ class EndLEDCommand: public frc2::CommandHelper<frc2::Command, EndLEDCommand>
         void End(bool interrupted) override;
 
     private:
+        ShooterSubsystem& m_shooterSubsystem;
         LEDSubsystem& m_led;
+        DriveSubsystem& m_drive;
+        VisionSubsystem& m_vision;
 
         LEDSubsystem::Color c_colorPink = LEDSubsystem::CreateColor(80, 10, 15 , 0);
         LEDSubsystem::Color c_colorGreen = LEDSubsystem::CreateColor(13, 80, 0, 0);
-        frc::Timer m_timer;
 
-		wpi::log::BooleanLogEntry m_logStartEndLEDCommand;
+		wpi::log::BooleanLogEntry m_logStartCommand;
 };

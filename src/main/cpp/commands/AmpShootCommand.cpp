@@ -15,7 +15,8 @@ AmpShootCommand::AmpShootCommand(ISubsystemAccess& subsystemAccess)
 
 void AmpShootCommand::Initialize()
 {
-  m_led.SetRobotBusy(true);
+
+  m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kAmpShoot);
   m_logStartAmpShootCommand.Append(true);
   double speed = 0.6;//frc::SmartDashboard::GetNumber("AmpIntakePercent", 0.6);
   // printf("amp intake speed: %.3f\n", speed);
@@ -40,8 +41,6 @@ bool AmpShootCommand::IsFinished()
 void AmpShootCommand::End(bool interrupted)
 {
   m_led.SetAnimation(m_led.GetDefaultColor(), LEDSubsystem::kSolid);
-  m_led.SetRobotBusy(false);
-  m_intakeSubsystem.SetTransferFinished(false);
   m_intakeSubsystem.Stop();
   m_logStartAmpShootCommand.Append(false);
 }

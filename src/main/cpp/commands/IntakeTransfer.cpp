@@ -22,15 +22,15 @@ void IntakeTransfer::Initialize()
 
 void IntakeTransfer::Execute()
 {
-  if (!m_intake.IsTransferFinished()) {
-    auto speed = c_defaultIntakeSpeed;
-    m_intake.Set(-speed);
-  }
+  // if (!m_intake.IsTransferFinished()) {
+  //   auto speed = c_defaultIntakeSpeed;
+  //   m_intake.Set(-speed);
+  // }
 }
 
 bool IntakeTransfer::IsFinished()
 {
-  if (m_intake.IsTransferFinished()) { return true; }
+  // if (m_intake.IsTransferFinished()) { return true; }
   if (!m_frontPassed)
   {
     m_frontPassed = !m_intake.IsNotePresent();
@@ -43,7 +43,7 @@ bool IntakeTransfer::IsFinished()
 
 void IntakeTransfer::End(bool interrupted) 
 {
-  m_intake.SetTransferFinished(true);
+  // m_intake.SetTransferFinished(true);
   m_intake.Set(0.0);
   m_logStartCommand.Append(false);
 }

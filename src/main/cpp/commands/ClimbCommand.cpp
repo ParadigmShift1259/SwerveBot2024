@@ -32,7 +32,7 @@ void ClimbCommand::Initialize()
     m_timer.Reset();
     m_timer.Start();
     m_shooter.DisableSyncToGyro();
-    m_led.SetRobotBusy(true);
+    m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kClimbing);
     if (m_position == ClimberSubsystem::kHighPosition)
     {
         // Go down
@@ -69,5 +69,5 @@ bool ClimbCommand::IsFinished()
 void ClimbCommand::End(bool interrupted)
 {
     m_led.SetAnimation(m_led.GetDefaultColor(), LEDSubsystem::kSolid);
-    m_led.SetRobotBusy(false);
+    m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kClimbFinish);
 }

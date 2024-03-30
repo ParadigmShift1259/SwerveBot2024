@@ -47,6 +47,9 @@ class VisionSubsystem : public frc2::SubsystemBase
     double GetYawError() { return m_yawError; }
     void SetShooterPositionPipeline();
     void SetShooterAnglePipeline();
+    double GetFloorDist() { return m_floorDistance; };
+    void ToggleAllowedAmp() { m_isAllowedAmp = !m_isAllowedAmp; }
+    void ToggleAllowedShooter() { m_isAllowedShooter = !m_isAllowedShooter; }
 
   private:
     void PeriodicShooter();
@@ -54,6 +57,8 @@ class VisionSubsystem : public frc2::SubsystemBase
 
     bool m_isValidShooter = false;
     bool m_isValidAmp = false;
+    bool m_isAllowedShooter = true;
+    bool m_isAllowedAmp = true;
     std::vector<double> m_netBufferField{2};
     std::vector<double> m_netBufferAlli{2};
     std::vector<double> m_zero_vector = {42.0, 42.0, 42.0, 92, 10, 22};

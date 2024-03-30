@@ -1,6 +1,6 @@
 #include "subsystems/LEDSubsystem.h"
 
-static const LEDSubsystem::Color c_defaultColor = LEDSubsystem::CreateColor(255, 255, 255, 255);
+static const LEDSubsystem::Color c_defaultColor = LEDSubsystem::CreateColor(255, 255, 255, 10);
 static constexpr int c_defaultLEDNum = 8;
 static constexpr int c_defaultLEDOffset = 0;
 

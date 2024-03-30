@@ -76,6 +76,7 @@ public:
   LEDSubsystem::Color c_colorGreen = LEDSubsystem::CreateColor(13, 80, 0, 0);//(133, 240, 45, 0);
   LEDSubsystem::Color c_colorBlack = LEDSubsystem::CreateColor(0, 0, 0, 0);
   LEDSubsystem::Color c_colorOrange = LEDSubsystem::CreateColor(43, 6, 0, 255);
+  LEDSubsystem::Color c_colorWhite = LEDSubsystem::CreateColor(255, 255, 255, 10);
 
 private:
   void SetDefaultCommands();
@@ -125,6 +126,49 @@ private:
     m_shooter.GoToElevation(angle);
   }, {} };
 
+  InstantCommand m_undershootAngle{[this]
+  { 
+    units::degree_t angle = m_vision.GetShotAngle();
+    if (m_shooter.GetElevation() > angle.value())
+    {
+      m_shooter.GoToElevation(angle - c_defaultCalibrationOffset);
+    }
+  }, {} };
+
+ InstantCommand m_jogIntakeIn{[this]
+  { 
+    m_intake.Set(0.6);
+  }, {} };
+
+ InstantCommand m_jogIntakeOut{[this]
+  { 
+    m_intake.Set(-0.6);
+  }, {} };
+
+  InstantCommand m_toggleAmpAllowed{[this]
+  { 
+    m_vision.ToggleAllowedAmp();
+  }, {} };
+  
+  InstantCommand m_toggleShooterAllowed{[this]
+  { 
+    m_vision.ToggleAllowedShooter();
+  }, {} };
+
+  InstantCommand m_posPipeline{[this]
+  { 
+    m_vision.SetShooterPositionPipeline();
+  }, {} };
+
+  InstantCommand m_angPipeline{[this]
+  { 
+    m_vision.SetShooterAnglePipeline();
+  }, {} };
+
+  InstantCommand m_PrintData{[this]
+  { 
+    printf("Elev %.3f ShotAngle %.3f FloorDist %.3f\n", m_shooter.GetElevation(), m_vision.GetShotAngle().value(), m_vision.GetFloorDist());
+  }, {} };
   InstantCommand m_stopClimb{[this] { m_climber.Stop(); }, {}};
 
   InstantCommand m_enableGyroSync{[this] { m_shooter.EnableSyncToGyro(); }, {}};

@@ -18,6 +18,7 @@ void ShootCommand::Initialize()
 {
   m_timer.Reset();
   m_timer.Start();
+  m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kShoot);
   m_logStartShootCommand.Append(true);
   m_intakeSubsystem.EjectNote();
 }
@@ -38,8 +39,7 @@ void ShootCommand::End(bool interrupted)
 {
   m_vision.DisableShooterLEDs();
   m_led.SetAnimation(m_led.GetDefaultColor(), LEDSubsystem::kSolid);
-  m_led.SetRobotBusy(false);
-  m_intakeSubsystem.SetTransferFinished(false);
+  m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kIdle);
   if (m_bIsAuto == false)
   {
     m_shooterSubsystem.Stop();

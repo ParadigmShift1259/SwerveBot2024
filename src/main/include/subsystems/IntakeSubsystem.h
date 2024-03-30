@@ -42,8 +42,6 @@ public:
     bool IsNotePresent() { return m_photoEye.Get(); }
     void EjectNote() { Set(kIngestSpeed); }
     void Stop() { Set(0.0); }
-    bool IsTransferFinished() { return m_transferComplete; }
-    void SetTransferFinished(bool finishedVal) { m_transferComplete = finishedVal; }
 
 private:
     void LoadDeployPid();
@@ -62,6 +60,4 @@ private:
 
     static constexpr bool kIntakeExtend = true;
     static constexpr bool kIntakeRetract = false;
-
-    bool m_transferComplete = false;
 };

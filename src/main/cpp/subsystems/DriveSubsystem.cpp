@@ -230,8 +230,10 @@ void DriveSubsystem::ResetOdometry(frc::Pose2d pose)
 
   SwerveModulePositions modulePositions = {m_frontLeft.GetPosition(), m_frontRight.GetPosition(),
                                            m_rearLeft.GetPosition(), m_rearRight.GetPosition()};
+  printf("m_gyro.GetRotation2d().Degrees %.3f pose.Rotation().Degrees %.3f\n", m_gyro.GetRotation2d().Degrees().value(), pose.Rotation().Degrees().value());
   m_gyro.Set(pose.Rotation().Degrees());
-  m_odometry.ResetPosition(m_gyro.GetRotation2d(), modulePositions, pose);
+  m_odometry.ResetPosition(pose.Rotation(), modulePositions, pose);
+  //m_odometry.ResetPosition(m_gyro.GetRotation2d(), modulePositions, pose);
 }
 
 void DriveSubsystem::SetHeading(units::degree_t heading)

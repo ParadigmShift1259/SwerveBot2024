@@ -24,5 +24,5 @@ class GoToPositionCommand: public frc2::CommandHelper<frc2::Command, GoToPositio
 
         frc::Timer m_timer;
 
-        LEDSubsystem::Color c_colorWhite = LEDSubsystem::CreateColor(255, 255, 255, 255);
+        LEDSubsystem::Color c_colorWhite = LEDSubsystem::CreateColor(255, 255, 255, 10);
 };

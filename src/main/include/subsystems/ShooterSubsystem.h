@@ -19,6 +19,7 @@
 
 constexpr units::angle::degree_t c_defaultShootFarAngle = 39.0_deg;
 constexpr units::angle::degree_t c_defaultShootCloseAngle = 55.0_deg;
+constexpr units::angle::degree_t c_defaultCalibrationOffset = 5.0_deg;
 
 class ShooterSubsystem : public frc2::SubsystemBase
 {
@@ -30,11 +31,13 @@ class ShooterSubsystem : public frc2::SubsystemBase
     void StartOverAndUnder(units::meter_t distance);
     void Shoot(units::meter_t distance);
     void Stop();
-    void EnableSyncToGyro() { m_bSyncToGyro = true; }
+    void EnableSyncToGyro() { m_bSyncToGyro = false; }
     void DisableSyncToGyro() { m_bSyncToGyro = false; }
     units::degree_t GetCloseAngle() const { return m_closeAngle; }
     const std::vector<std::vector<double>> GetReferenceTable() const { return m_shootReference; }
-    
+    double GetElevation() { return m_elevationAngle; }
+    double GetElevPitch() { return m_gyro.GetPitch(); }
+
   private:
     units::degree_t m_closeAngle;
     double m_elevationAngle = 55.0;

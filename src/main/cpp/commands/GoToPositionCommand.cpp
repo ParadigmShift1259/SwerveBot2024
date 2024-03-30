@@ -41,7 +41,11 @@ GoToPositionCommand::GoToPositionCommand(ISubsystemAccess& subsystemAccess, bool
 
 void GoToPositionCommand::Initialize()
 {
-    m_led.SetRobotBusy(true);
+    if (m_led.GetCurrentAction() == LEDSubsystem::CurrentAction::kAmpPosition)
+    {
+        m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kAmpMovement);
+    }
+    m_led.SetAnimation(c_colorWhite, LEDSubsystem::Animation::kFlow);
     m_timer.Reset();
     m_timer.Start();
 }
@@ -173,10 +177,6 @@ bool GoToPositionCommand::IsFinished()
 
 void GoToPositionCommand::End(bool interrupted)
 {
-    if (m_timer.HasElapsed(0.4_s))
-    {
-        m_led.SetAnimation(c_colorWhite, LEDSubsystem::kStrobe);
-    }
-    // m_led.SetRobotBusy(false);
+    m_led.SetAnimation(c_colorWhite, LEDSubsystem::kStrobe);
     m_driveSubsystem.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false);
 }

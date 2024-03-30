@@ -17,12 +17,24 @@ VisionSubsystem::VisionSubsystem()
     m_bIsBlue = (alliance.value() == frc::DriverStation::Alliance::kBlue);
   }
 
-  c_distanceToAngleMap.insert(53.25_in,   55.0_deg);
-  c_distanceToAngleMap.insert(61.24_in,   50.0_deg);
-  c_distanceToAngleMap.insert(76.0_in,    45.0_deg);
-  c_distanceToAngleMap.insert(100.0_in,   40.5_deg); // 41.0
-  c_distanceToAngleMap.insert(125.0_in,   36.5_deg); // 37.0
-  c_distanceToAngleMap.insert(150.0_in,   34.0_deg);
+  // c_distanceToAngleMap.insert(53.25_in,   55.0_deg);
+  // c_distanceToAngleMap.insert(61.24_in,   50.0_deg);
+  // c_distanceToAngleMap.insert(76.0_in,    45.0_deg);
+  // c_distanceToAngleMap.insert(100.0_in,   40.5_deg); // 41.0
+  // c_distanceToAngleMap.insert(125.0_in,   36.5_deg); // 37.0
+  // c_distanceToAngleMap.insert(150.0_in,   34.0_deg);
+  c_distanceToAngleMap.insert( 55.263_in, 55.000_deg);
+  c_distanceToAngleMap.insert( 62.329_in, 51.000_deg);
+  c_distanceToAngleMap.insert( 74.776_in, 45.250_deg);
+  c_distanceToAngleMap.insert( 87.309_in, 41.000_deg);
+  c_distanceToAngleMap.insert(101.211_in, 37.000_deg);
+  c_distanceToAngleMap.insert(114.604_in, 34.750_deg);
+  c_distanceToAngleMap.insert(128.599_in, 32.000_deg);
+  c_distanceToAngleMap.insert(142.725_in, 30.750_deg);
+  c_distanceToAngleMap.insert(153.514_in, 29.750_deg);
+  c_distanceToAngleMap.insert(167.518_in, 28.750_deg);
+  c_distanceToAngleMap.insert(182.300_in, 28.250_deg);
+  c_distanceToAngleMap.insert(199.069_in, 26.750_deg);
 
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
 
@@ -38,23 +50,25 @@ VisionSubsystem::VisionSubsystem()
   m_logtxAmp = wpi::log::DoubleLogEntry(log, "/vision/txAmp");
   m_logtyAmp = wpi::log::DoubleLogEntry(log, "/vision/tyAmp");
   m_logtidAmp = wpi::log::IntegerLogEntry(log, "/vision/tidAmp");
-  
-  // frc::SmartDashboard::PutNumber("ATTSAngle", 6.53);
-  frc::SmartDashboard::PutNumber("ATTSAngle", 8.2);
 
   frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
+
+  frc::SmartDashboard::PutBoolean("AllowedShooter", m_isAllowedShooter);
+  frc::SmartDashboard::PutBoolean("AllowedAmp", m_isAllowedAmp);
 }
 
 void VisionSubsystem::Periodic()
 {
   PeriodicShooter();
   PeriodicAmp();
+  m_isAllowedShooter = frc::SmartDashboard::GetBoolean("AllowedShooter", m_isAllowedShooter);
+  m_isAllowedAmp = frc::SmartDashboard::GetBoolean("AllowedAmp", m_isAllowedAmp);
 }
 
 void VisionSubsystem::PeriodicShooter()
 {
   m_isValidShooter = m_netTableShooter->GetNumber("tv", 0) == 1.0;
-  if (m_isValidShooter)
+  if (m_isValidShooter && m_isAllowedShooter)
   {
       m_netBufferField = m_netTableShooter->GetNumberArray("botpose", m_zero_vector);
       m_logRobotPoseX.Append(m_netBufferField[eX]);
@@ -74,13 +88,11 @@ void VisionSubsystem::PeriodicShooter()
 
       auto tyFilteredShooter = m_elevationAngleFilter.Calculate(m_tyShooter);
 
-      //double aprilTagToSpeakerAngle = frc::SmartDashboard::GetNumber("ATTSAngle", 6.53);
-      double yOffset = frc::SmartDashboard::GetNumber("ATTSAngle", 10.2);
-
       double targetAngle = (c_limelightShooterMountAngle + tyFilteredShooter) * std::numbers::pi / 180.0;
       
-      //floorDistance = height from camera to apriltag / tangent + limelight offset from robot
+      // floorDistance = height from camera to apriltag / tangent + limelight offset from robot
       m_floorDistance = (45.875 / tan(targetAngle)) + 11.0;
+      frc::SmartDashboard::PutNumber("VisionFloorDist", m_floorDistance);
       m_shotAngle = c_distanceToAngleMap[units::inch_t{m_floorDistance}].value();
       frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
       m_shotDistance = c_targetHeight.value() / sin(targetAngle);
@@ -99,7 +111,7 @@ void VisionSubsystem::PeriodicShooter()
 void VisionSubsystem::PeriodicAmp()
 {
   m_isValidAmp = m_netTableAmp->GetNumber("tv", 0) == 1.0;
-  if (m_isValidAmp)
+  if (m_isValidAmp && m_isAllowedAmp)
   {
       m_netBufferField = m_netTableAmp->GetNumberArray("botpose", m_zero_vector);
       m_logRobotPoseX.Append(m_netBufferField[eX]);

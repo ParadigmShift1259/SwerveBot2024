@@ -49,14 +49,16 @@ class LEDSubsystem : public frc2::SubsystemBase
       kShoot,
       kAmpPosition,
       kAmpMovement,
-      kAmpShoot
+      kAmpShoot,
+      kClimbing,
+      kClimbFinish
     };
 
     void SetAnimation(Color rgbw, Animation animate);
     static Color CreateColor(int r, int g, int b, int w);
 
-    bool IsRobotBusy() { return m_busy; }
-    void SetRobotBusy(bool value) { m_busy = value; }
+    bool IsRobotBusy() { return m_currentAction != kIdle; }
+    // void SetRobotBusy(bool value) { m_busy = value; }
 
     void SetDefaultColor(Color color) { m_defaultColor = color; }
     Color GetDefaultColor() { return m_defaultColor; }

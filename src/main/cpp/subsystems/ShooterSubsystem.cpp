@@ -17,7 +17,7 @@ constexpr double c_elevStartAngle = 55.0;
 
 constexpr double c_elevSlope = 1.09;
 constexpr double c_elevOffset = -69.7;
-constexpr double c_elevTurnTolerance = 1.5;  // In Periodic, if the encoder position is off by this much re-sync to gyro
+constexpr double c_elevTurnTolerance = 1.0;//1.5;  // In Periodic, if the encoder position is off by this much re-sync to gyro
 
 constexpr double c_defaultShootNeoP = 0.0005;
 constexpr double c_defaultShootNeoI = 0.0;
@@ -149,12 +149,15 @@ void ShooterSubsystem::Periodic()
       frc::SmartDashboard::PutNumber("ElevationAngleEcho", angle);
       frc::SmartDashboard::PutNumber("ShooterAngle", pitch);
       double turns = (c_elevSlope * pitch + c_elevOffset);
-      if (fabs(turns - ticks) > c_elevTurnTolerance)
+      if (fabs(turns - ticks) > c_elevTurnTolerance && fabs(m_elevationAngle - pitch) < 1.0)
       {
-        //printf("gyro angle pitch %.3f gyro turns %.3f emcoder ticks %.3f\n", pitch, turns, ticks);
+        printf("gyro angle pitch %.3f gyro turns %.3f emcoder ticks %.3f elevation angle %.3f\n", pitch, turns, ticks, m_elevationAngle);
         m_ElevationRelativeEnc.SetPosition(turns);
+        DisableSyncToGyro();
       }
     }
+
+    frc::SmartDashboard::PutNumber("ShooterAngle", pitch);
 
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("OverRPM",  -c_defaultRPM);
     m_shootReference[0][1] = frc::SmartDashboard::GetNumber("UnderRPM", c_defaultRPM);

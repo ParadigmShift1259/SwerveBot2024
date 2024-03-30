@@ -13,7 +13,7 @@ StartLEDCommand::StartLEDCommand(ISubsystemAccess& subsystemAccess)
 
 void StartLEDCommand::Initialize()
 {
-  m_led.SetRobotBusy(true);
+  m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kAmpPosition);
   m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
   m_logStartStartLEDCommand.Append(true);
 }

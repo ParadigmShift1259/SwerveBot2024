@@ -17,10 +17,11 @@ class GoToAzimuthCommand: public frc2::CommandHelper<frc2::Command, GoToAzimuthC
     private:
         DriveSubsystem&        m_driveSubsystem;
         VisionSubsystem&        m_visionSubsystem;
+        LEDSubsystem&        m_led;
         units::radian_t m_commandedAzimuth;
 
         units::radians_per_second_t m_rotInput;
         double m_yawError;
-        // double m_targetX;
-        // double m_targetY;
+
+        LEDSubsystem::Color c_colorWhite = LEDSubsystem::CreateColor(255, 255, 255, 10);
 };

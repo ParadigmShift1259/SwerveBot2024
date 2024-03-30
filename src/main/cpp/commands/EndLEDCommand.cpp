@@ -3,10 +3,9 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 
 EndLEDCommand::EndLEDCommand(ISubsystemAccess& subsystemAccess)
-    : m_intakeSubsystem(subsystemAccess.GetIntake())
-    , m_led(subsystemAccess.GetLED())
+    : m_led(subsystemAccess.GetLED())
 {
-    AddRequirements(frc2::Requirements{&subsystemAccess.GetIntake(), &subsystemAccess.GetLED()});
+    AddRequirements(frc2::Requirements{&subsystemAccess.GetLED()});
 
     wpi::log::DataLog& log = subsystemAccess.GetLogger();
     m_logStartEndLEDCommand = wpi::log::BooleanLogEntry(log, "/EndLEDCommand/startCommand");
@@ -21,9 +20,6 @@ void EndLEDCommand::Initialize()
 
 void EndLEDCommand::Execute()
 {
-  if (!m_intakeSubsystem.IsNotePresent()) {
-    m_led.SetAnimation(c_colorPink, LEDSubsystem::kStrobe);
-  }
 }
 
 bool EndLEDCommand::IsFinished()
@@ -34,6 +30,6 @@ bool EndLEDCommand::IsFinished()
 void EndLEDCommand::End(bool interrupted)
 {
   m_led.SetAnimation(m_led.GetDefaultColor(), LEDSubsystem::kSolid);
-  m_led.SetRobotBusy(false);
+  m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kIdle);
   m_logStartEndLEDCommand.Append(false);
 }
