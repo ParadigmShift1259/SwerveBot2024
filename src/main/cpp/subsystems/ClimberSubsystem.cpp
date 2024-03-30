@@ -100,18 +100,24 @@ void ClimberSubsystem::Periodic()
     }
     if (i != lastI)
     {
-        m_leadPIDController.SetI(i);
-        m_followPIDController.SetI(i);
+        m_leadPIDController.SetI(i, c_defaultClimbDownPIDSlot);
+        m_followPIDController.SetI(i, c_defaultClimbDownPIDSlot);
+        m_leadPIDController.SetI(i, c_defaultClimbUpPIDSlot);
+        m_followPIDController.SetI(i, c_defaultClimbUpPIDSlot);
     }
     if (d != lastD)
     {
-        m_leadPIDController.SetD(d);
-        m_followPIDController.SetD(d);
+        m_leadPIDController.SetD(d, c_defaultClimbDownPIDSlot);
+        m_followPIDController.SetD(d, c_defaultClimbDownPIDSlot);
+        m_leadPIDController.SetD(d, c_defaultClimbUpPIDSlot);
+        m_followPIDController.SetD(d, c_defaultClimbUpPIDSlot);
     }
     if (ff != lastFF)
     {
-        m_leadPIDController.SetFF(ff);
-       m_followPIDController.SetFF(ff);
+        m_leadPIDController.SetFF(ff, c_defaultClimbDownPIDSlot);
+        m_followPIDController.SetFF(ff, c_defaultClimbDownPIDSlot);
+        m_leadPIDController.SetFF(ff, c_defaultClimbUpPIDSlot);
+        m_followPIDController.SetFF(ff, c_defaultClimbUpPIDSlot);
     }
     lastDownP = pDown;
     lastUpP = pUp;

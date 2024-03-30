@@ -19,7 +19,8 @@ class GoToAzimuthCommand: public frc2::CommandHelper<frc2::Command, GoToAzimuthC
         VisionSubsystem&        m_visionSubsystem;
         units::radian_t m_commandedAzimuth;
 
-        units::radians_per_second_t m_rot;
+        units::radians_per_second_t m_rotInput;
+        double m_yawError;
         // double m_targetX;
         // double m_targetY;
 };

@@ -2,45 +2,35 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 
-const double c_targetPodiumX = (2.896_m - 14.75_in).value();
-const double c_targetPodiumY = 4.106;
 const double c_tolerance = 0.1;
 
-const double c_targetSpeakerX = 1.26;
-const double c_targetSpeakerY = 5.35;
 
 
 GoToAzimuthCommand::GoToAzimuthCommand(ISubsystemAccess& subsystemAccess)
     : m_driveSubsystem(subsystemAccess.GetDrive())
     , m_visionSubsystem(subsystemAccess.GetVision())
-    // , m_targetX(bGoToPodium ? c_targetPodiumX : c_targetSpeakerX)
-    // , m_targetY(bGoToPodium ? c_targetPodiumY : c_targetSpeakerY)
 {
     AddRequirements(frc2::Requirements{&subsystemAccess.GetDrive(), &subsystemAccess.GetVision()});
 }
 
 void GoToAzimuthCommand::Initialize()
 {
-    double adjustment = frc::SmartDashboard::GetNumber("SteerAdjustment", 0.0);
-    m_rot = units::radians_per_second_t{frc::SmartDashboard::GetNumber("AdjustRotation", 0.0)};//m_rotLimiter.Calculate(rotInput) * kMaxAngularSpeed;
-    frc::SmartDashboard::PutBoolean("IsAiming", true);
-    units::angle::radian_t poseRadians = m_driveSubsystem.GetGyroAzimuth();//GetPose().Rotation().Radians();
-    frc::SmartDashboard::PutNumber("startposeradians", poseRadians.value());
-    m_commandedAzimuth = units::angle::radian_t{poseRadians.value() + adjustment};
-    frc::SmartDashboard::PutNumber("commandedposition", m_commandedAzimuth.value());
- 
+    m_visionSubsystem.SetShooterAnglePipeline();
+    m_yawError = m_visionSubsystem.GetYawError();
+    m_commandedAzimuth = units::radian_t{m_yawError} + m_driveSubsystem.GetGyroAzimuth();
 }
 
 void GoToAzimuthCommand::Execute()
 {
-    m_rot = units::radians_per_second_t{frc::SmartDashboard::GetNumber("AdjustRotation", 0.0)};
-    m_driveSubsystem.Drive(0.0_mps, 0.0_mps, m_rot, false);
+    m_yawError = m_visionSubsystem.GetYawError();
+    auto yawRadians = (m_yawError / 180.0) * std::numbers::pi;
+    yawRadians = std::clamp(yawRadians, -std::numbers::pi / 2.0, std::numbers::pi / 2.0);
+    m_rotInput = units::radians_per_second_t{4.0 * sin(yawRadians)};
+    m_driveSubsystem.Drive(0.0_mps, 0.0_mps, m_rotInput, false);
 }
 
 bool GoToAzimuthCommand::IsFinished()
-{
-    // return false;
-    
+{   
     auto rot = m_driveSubsystem.GetPose().Rotation().Radians();
     // printf("rotation %.3f commandedpose %.3f\n", rot.value(), m_commandedAzimuth.value());
     bool finished = fabs(rot.value() - m_commandedAzimuth.value()) < c_tolerance;
@@ -61,5 +51,6 @@ bool GoToAzimuthCommand::IsFinished()
 void GoToAzimuthCommand::End(bool interrupted)
 {
     frc::SmartDashboard::PutBoolean("IsAiming", false);
+    m_visionSubsystem.SetShooterPositionPipeline();
     m_driveSubsystem.RotationDrive(0.0_mps, 0.0_mps, 0.0_rad, false);
 }

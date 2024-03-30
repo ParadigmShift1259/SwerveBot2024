@@ -117,6 +117,7 @@ ShooterSubsystem::ShooterSubsystem()
   frc::SmartDashboard::PutNumber("ElevationAngle", c_defaultTravelPosition.value());
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
   frc::SmartDashboard::PutNumber("PostIntakeRPM", 2000.0);
+  frc::SmartDashboard::PutNumber("Diff", 300.0);
 
   auto pitch = m_gyro.GetPitch();
   double turns = (c_elevSlope * pitch + c_elevOffset);
@@ -261,8 +262,9 @@ void ShooterSubsystem::StartOverAndUnder(units::meter_t distance)
     }
     else if (distanceAdder > 0.0_m)
     {
-      m_overRPM -= distanceAdder.value() * 200.0;
-      m_underRPM += distanceAdder.value() * 200.0;
+      double diff = frc::SmartDashboard::GetNumber("Diff", 300.0);
+      m_overRPM -= distanceAdder.value() * diff;
+      m_underRPM += distanceAdder.value() * diff;
     }
 
     double ffNeo = frc::Preferences::GetDouble("kShooterFF", c_defaultShootNeoFF);

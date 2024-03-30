@@ -6,6 +6,8 @@
 constexpr double c_limelightShooterMountAngle = 27.0;
 constexpr double c_limelightAmpMountAngle = 30.0;
 constexpr units::meter_t c_targetHeight = 55.875_in;
+constexpr double c_limelightShooterPositionPipeline = 0.0;
+constexpr double c_limelightShooterAnglePipeline = 1.0;
 
 VisionSubsystem::VisionSubsystem()
 {
@@ -18,8 +20,8 @@ VisionSubsystem::VisionSubsystem()
   c_distanceToAngleMap.insert(53.25_in,   55.0_deg);
   c_distanceToAngleMap.insert(61.24_in,   50.0_deg);
   c_distanceToAngleMap.insert(76.0_in,    45.0_deg);
-  c_distanceToAngleMap.insert(100.0_in,   41.0_deg);
-  c_distanceToAngleMap.insert(125.0_in,   37.0_deg);
+  c_distanceToAngleMap.insert(100.0_in,   40.5_deg); // 41.0
+  c_distanceToAngleMap.insert(125.0_in,   36.5_deg); // 37.0
   c_distanceToAngleMap.insert(150.0_in,   34.0_deg);
 
   wpi::log::DataLog& log = frc::DataLogManager::GetLog();
@@ -76,36 +78,21 @@ void VisionSubsystem::PeriodicShooter()
       double yOffset = frc::SmartDashboard::GetNumber("ATTSAngle", 10.2);
 
       double targetAngle = (c_limelightShooterMountAngle + tyFilteredShooter) * std::numbers::pi / 180.0;
-      // Linear Fit
-      // double aprilTagToSpeakerAngle = -0.291 * tyFilteredShooter + yOffset;//10.2;
-      // m_shotAngle = (targetAngle) + aprilTagToSpeakerAngle;
+      
       //floorDistance = height from camera to apriltag / tangent + limelight offset from robot
       m_floorDistance = (45.875 / tan(targetAngle)) + 11.0;
       m_shotAngle = c_distanceToAngleMap[units::inch_t{m_floorDistance}].value();
       frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
       m_shotDistance = c_targetHeight.value() / sin(targetAngle);
       frc::SmartDashboard::PutNumber("VisionShotDistance", m_shotDistance);
-      // printf("m_tx %.3f\n", m_tx);
-      double yawError = -1.0 * (m_txShooter / 180.0) * std::numbers::pi;
-      // double steeringAdjust = 0.0f;
-
-      // if (m_tx > 1.0)
-      // {
-      //   steeringAdjust = c_defaultAimP * yawError - c_minAimCommanded;
-      // }
-      // else if (m_tx < -1.0)
-      // {
-      //   steeringAdjust = c_defaultAimP * yawError + c_minAimCommanded;
-      // }
-
-      frc::SmartDashboard::PutNumber("SteerAdjustment", yawError);
+      m_yawError = m_txShooter;
+      frc::SmartDashboard::PutNumber("VisionYawError", m_yawError);
   }
   else
   {
     m_shotAngle = 0.0;
     m_shotDistance = 0.0;
-    double yawError = 0.0;
-    frc::SmartDashboard::PutNumber("SteerAdjustment", yawError);
+    m_yawError = 0.0;
   }
 }
 
@@ -140,4 +127,14 @@ void VisionSubsystem::PeriodicAmp()
 units::degree_t VisionSubsystem::GetShotAngle()
 {
   return units::degree_t{m_shotAngle};
+}
+
+void VisionSubsystem::SetShooterPositionPipeline() 
+{
+  m_netTableShooter->PutNumber("pipeline", c_limelightShooterPositionPipeline);
+}
+
+void VisionSubsystem::SetShooterAnglePipeline() 
+{
+  m_netTableShooter->PutNumber("pipeline", c_limelightShooterAnglePipeline);
 }

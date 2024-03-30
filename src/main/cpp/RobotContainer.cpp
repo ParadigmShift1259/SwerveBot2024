@@ -140,10 +140,6 @@ CommandPtr RobotContainer::GetAutonomousCommand()
 void RobotContainer::Periodic()
 {
   m_drive.Periodic();
-  double adjustment = frc::SmartDashboard::GetNumber("SteerAdjustment", 0.0);
-  double rotationInput = -1.0 * sin(adjustment);
-  auto adjRot = m_yawRotationLimiter.Calculate(rotationInput) * units::radians_per_second_t{2.0};
-  frc::SmartDashboard::PutNumber("AdjustRotation", adjRot.value());
   // m_vision.Periodic();
   static int count = 0;
   if (count++ % 25 == 0)
@@ -261,7 +257,7 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   }.ToPtr());
 
   // primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
-  primary.LeftBumper().WhileTrue(GoToAzimuthCommand(*this).ToPtr());
+  // primary.LeftBumper().WhileTrue(GoToAzimuthCommand(*this).ToPtr());
   primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
 }
 
@@ -345,7 +341,7 @@ void RobotContainer::ConfigButtonBoxBindings()
   // buttonBox.Back().OnTrue(GoToElevationCommand(*this, c_defaultStartPosition).ToPtr());      // Black
   // buttonBox.Start().OnTrue(GoToElevationCommand(*this, c_defaultShootCloseAngle).ToPtr());   // Blue
   // buttonBox.LeftStick().OnTrue(GoToElevationCommand(*this, c_defaultShootFarAngle).ToPtr()); // Green
-  //buttonBox.LeftStick().WhileTrue(GoToAzimuthCommand(*this).ToPtr()); // Green
+  buttonBox.LeftStick().WhileTrue(GoToAzimuthCommand(*this).ToPtr()); // Green
   // buttonBox.RightStick().OnTrue(GoToElevationCommand(*this, 0.0_deg).ToPtr());               // Yellow
   // buttonBox.LeftBumper().OnTrue(frc2::SequentialCommandGroup{                                // Red
   //     GoToElevationCommand(*this, c_defaultTravelPosition)

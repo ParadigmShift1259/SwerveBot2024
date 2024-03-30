@@ -12,6 +12,7 @@
 #include <frc/DataLogManager.h>
 
 #include <units/angle.h>
+#include <units/angular_velocity.h>
 #include <units/length.h>
 #include <iostream>
 
@@ -43,6 +44,9 @@ class VisionSubsystem : public frc2::SubsystemBase
     void EnableShooterLEDs() { m_netTableShooter->PutNumber("ledMode", 3); }
     void DisableShooterLEDs() { m_netTableShooter->PutNumber("ledMode", 1); }
     double GetShotDistance() { return m_shotDistance; }
+    double GetYawError() { return m_yawError; }
+    void SetShooterPositionPipeline();
+    void SetShooterAnglePipeline();
 
   private:
     void PeriodicShooter();
@@ -69,6 +73,8 @@ class VisionSubsystem : public frc2::SubsystemBase
   double m_shotAngle = 0.0;
   double m_floorDistance = 0.0;
   double m_shotDistance = 0.0;
+  double m_yawError = 0.0;
+  double m_commandedAzimuth = 0.0;
 
   double c_defaultAimP = -0.1;
   double c_minAimCommanded = 0.05;

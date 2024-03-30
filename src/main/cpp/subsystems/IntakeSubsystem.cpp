@@ -8,8 +8,12 @@
 #include <frc/Preferences.h>
 
 constexpr double c_defaultIntakeP = 0.03;
+constexpr double c_defaultIntakeExtendP = 0.03;
 constexpr double c_defaultIntakeI = 0.0;
 constexpr double c_defaultIntakeD = 0.0;
+
+constexpr int c_intakeGeneralPIDSlot = 0;
+constexpr int c_intakeExtendPIDSlot = 1;
 
 constexpr double c_defaultIntakeMin = -0.5;
 constexpr double c_defaultIntakeMax = 0.5;
@@ -30,6 +34,7 @@ IntakeSubsystem::IntakeSubsystem()
     m_deployRelativeEnc.SetPosition(0.0);
 
     frc::Preferences::InitDouble("kIntakeDeployP", c_defaultIntakeP);
+    frc::Preferences::InitDouble("kIntakeDeployExtendP", c_defaultIntakeExtendP);
     frc::Preferences::InitDouble("kIntakeDeployI", c_defaultIntakeI);
     frc::Preferences::InitDouble("kIntakeDeployD", c_defaultIntakeD);
 
@@ -62,28 +67,40 @@ void IntakeSubsystem::Periodic()
 void IntakeSubsystem::LoadDeployPid()
 {
     static double lastP = 0.0;
+    static double lastExtendP = 0.0;
     static double lastI = 0.0;
     static double lastD = 0.0;
 
     auto p = frc::Preferences::GetDouble("kIntakeDeployP", c_defaultIntakeP);
+    auto pExtend = frc::Preferences::GetDouble("kIntakeDeployExtendP", c_defaultIntakeExtendP);
     auto i = frc::Preferences::GetDouble("kIntakeDeployI", c_defaultIntakeI);
     auto d = frc::Preferences::GetDouble("kIntakeDeployD", c_defaultIntakeD);
     if (p != lastP)
     {
-        m_deployPIDController.SetP(p);
-        m_deployFollowPIDController.SetP(frc::Preferences::GetDouble("kIntakeDeployP", c_defaultIntakeP));
+        m_deployPIDController.SetP(p, c_intakeGeneralPIDSlot);
+        m_deployFollowPIDController.SetP(p, c_intakeGeneralPIDSlot);
+    }
+    if (pExtend != lastExtendP)
+    {
+        m_deployPIDController.SetP(pExtend, c_intakeExtendPIDSlot);
+        m_deployFollowPIDController.SetP(pExtend, c_intakeExtendPIDSlot);
     }
     if (i != lastI)
     {
-        m_deployPIDController.SetI(i);
-        m_deployFollowPIDController.SetI(frc::Preferences::GetDouble("kIntakeDeployI", c_defaultIntakeI));
+        m_deployPIDController.SetI(i, c_intakeExtendPIDSlot);
+        m_deployFollowPIDController.SetI(i, c_intakeExtendPIDSlot);
+        m_deployPIDController.SetI(i, c_intakeGeneralPIDSlot);
+        m_deployFollowPIDController.SetI(i, c_intakeGeneralPIDSlot);
     }
     if (d != lastD)
     {
-        m_deployPIDController.SetD(d);
-        m_deployFollowPIDController.SetD(frc::Preferences::GetDouble("kIntakeDeployD", c_defaultIntakeD));
+        m_deployPIDController.SetD(d, c_intakeExtendPIDSlot);
+        m_deployFollowPIDController.SetD(d, c_intakeExtendPIDSlot);
+        m_deployPIDController.SetD(d, c_intakeGeneralPIDSlot);
+        m_deployFollowPIDController.SetD(d, c_intakeGeneralPIDSlot);
     }
     lastP = p;
+    lastExtendP = pExtend;
     lastI = i;
     lastD = d;
 
@@ -110,9 +127,9 @@ void IntakeSubsystem::ExtendIntake()
     double turns = frc::SmartDashboard::GetNumber("DepExtTurns", c_defaultExtendTurns);
     double offsetTurns = frc::SmartDashboard::GetNumber("DepOffsetTurns", c_defaultOffsetTurns);
     //printf("dep extend turns %.3f\n", turns);
-    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition);
+    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition, c_intakeExtendPIDSlot);
 
-    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition, c_intakeExtendPIDSlot);
     // frc::SmartDashboard::PutNumber("DepApplOut", m_deployMotor.GetAppliedOutput()); 
     // frc::SmartDashboard::PutNumber("DepBusV", m_deployMotor.GetBusVoltage());
     // frc::SmartDashboard::PutNumber("DepTemp", m_deployMotor.GetMotorTemperature());
@@ -122,8 +139,8 @@ void IntakeSubsystem::ExtendIntake()
 void IntakeSubsystem::ExtendIntake(double turns)
 {
     double offsetTurns = frc::SmartDashboard::GetNumber("DepOffsetTurns", c_defaultOffsetTurns);
-    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition);
-    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition, c_intakeGeneralPIDSlot);
+    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition, c_intakeGeneralPIDSlot);
 }
 
 
@@ -132,13 +149,13 @@ void IntakeSubsystem::RetractIntake()
     double turns = frc::SmartDashboard::GetNumber("DepRtctTurns", c_defaultRetractTurns);
     //printf("dep retract turns %.3f\n", turns);
     double offsetTurns = frc::SmartDashboard::GetNumber("DepOffsetTurns", c_defaultOffsetTurns);
-    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition);
-    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition, c_intakeExtendPIDSlot);
+    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition, c_intakeExtendPIDSlot);
 }
 
 void IntakeSubsystem::GoToPosition(double turns)
 {
     double offsetTurns = frc::SmartDashboard::GetNumber("DepOffsetTurns", c_defaultOffsetTurns);
-    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition);
-    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition);
+    m_deployPIDController.SetReference(turns + offsetTurns, rev::CANSparkBase::ControlType::kPosition, c_intakeGeneralPIDSlot);
+    m_deployFollowPIDController.SetReference(turns, rev::CANSparkBase::ControlType::kPosition, c_intakeGeneralPIDSlot);
 }

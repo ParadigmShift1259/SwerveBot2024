@@ -54,6 +54,8 @@ bool IntakeIngest::IsFinished()
 
 void IntakeIngest::End(bool interrupted) 
 {
+  auto angle = frc::SmartDashboard::GetNumber("Travel Angle", c_defaultTravelPosition.value());
+  m_shooter.GoToElevation(units::degree_t(angle));
   m_led.SetRobotBusy(false);
   if (!interrupted) {
     m_led.SetDefaultColor(c_colorPink);
@@ -61,8 +63,6 @@ void IntakeIngest::End(bool interrupted)
   }
   m_intake.RetractIntake();
   m_intake.Set(0.0);
-  auto angle = frc::SmartDashboard::GetNumber("Travel Angle", c_defaultTravelPosition.value());
-  m_shooter.GoToElevation(units::degree_t(angle));
   m_shooter.StartOverAndUnder(-1.0_m);
   m_logStartCommand.Append(false);
 }
