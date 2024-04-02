@@ -43,6 +43,7 @@ public:
     , kAutoPathTwoNote
     , kAutoPathOneNoteLeft
     , kAutoPathOneNoteRight
+    , kAutoPathCollectNotes
     , kAutoPathDoNothing
     // Keep the emun in sync with the LUT
   };
@@ -53,6 +54,7 @@ public:
     , "2NoteAuto" 
     , "1NoteLeftBlueAuto"
     , "1NoteRightBlueAuto"
+    , "CollectNotesAuto"
     , "DoNothingAuto"       // These strings are the names of the PathPlanner .path files
   };
   frc::SendableChooser<EAutoPath> m_chooser;

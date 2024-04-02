@@ -12,6 +12,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "ShootClose"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "1NoteLeftBluePath"
@@ -44,7 +50,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ShootFar"
+            "name": "ShootClose"
           }
         },
         {
