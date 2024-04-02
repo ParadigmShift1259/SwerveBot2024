@@ -35,8 +35,8 @@ GoToPositionCommand::GoToPositionCommand(ISubsystemAccess& subsystemAccess, bool
 {
     AddRequirements(frc2::Requirements{&subsystemAccess.GetDrive(), &subsystemAccess.GetVision(), &subsystemAccess.GetLED()});
 
-    frc::SmartDashboard::PutNumber("GoAmpMaxSpd", c_defaultGoToAmpMaxSpeed.value());
-    frc::SmartDashboard::PutNumber("GoAmpMaxAnglSpd", 120.0);
+    //frc::SmartDashboard::PutNumber("GoAmpMaxSpd", c_defaultGoToAmpMaxSpeed.value());
+    //frc::SmartDashboard::PutNumber("GoAmpMaxAnglSpd", 120.0);
 }
 
 void GoToPositionCommand::Initialize()
@@ -78,7 +78,6 @@ void GoToPositionCommand::Execute()
             }
             else
             {
-                //xInput = (m_targetX - x) / c_maxX;
                 yInput = (x - m_targetX) / c_maxX;
             }
             if (yInput < 0.0)
@@ -93,7 +92,6 @@ void GoToPositionCommand::Execute()
 
         if (yDiff >= c_tolerance && yDiff < c_maxY)
         {
-            //yInput = (m_targetY - y) / c_maxY;
             if (m_visionSubsystem.GetTagId() == 5)
             {
                 xInput = (y - m_targetY) / c_maxY;
@@ -115,40 +113,33 @@ void GoToPositionCommand::Execute()
         if (rotDiff >= c_tolerance && rotDiff < c_maxRot)
         {
             rotInput = (rotation - m_targetRot) / c_maxRot;
-
-            // if (yInput < 0.0)
-            // {
-            //     yInput = std::min(-c_minInput, yInput);
-            // }
-            // else
-            // {
-            //     yInput = std::max(c_minInput, yInput);
-            // }
         }
 
-        units::velocity::meters_per_second_t maxSpeed = units::velocity::meters_per_second_t{frc::SmartDashboard::GetNumber("GoAmpMaxSpd", c_defaultGoToAmpMaxSpeed.value())};
+        //units::velocity::meters_per_second_t maxSpeed = units::velocity::meters_per_second_t{frc::SmartDashboard::GetNumber("GoAmpMaxSpd", c_defaultGoToAmpMaxSpeed.value())};
+        units::velocity::meters_per_second_t maxSpeed = c_defaultGoToAmpMaxSpeed;
         xSpeed = xInput * maxSpeed; 
         ySpeed = yInput * maxSpeed; 
-        units::angular_velocity::degrees_per_second_t maxAngularSpeed = units::angular_velocity::degrees_per_second_t{frc::SmartDashboard::GetNumber("GoAmpMaxAnglSpd", 120.0)};
+        //units::angular_velocity::degrees_per_second_t maxAngularSpeed = units::angular_velocity::degrees_per_second_t{frc::SmartDashboard::GetNumber("GoAmpMaxAnglSpd", 120.0)};
+        units::angular_velocity::degrees_per_second_t maxAngularSpeed = units::angular_velocity::degrees_per_second_t{120.0};
         rotSpeed = rotInput * maxAngularSpeed;         
         
         m_driveSubsystem.Drive(xSpeed, ySpeed, rotSpeed, false);
     }
 
-    printf("tv %s x %.3f y %.3f rot %.3f xDiff %.3f yDiff %.3f rotDiff %.3f xInput %.3f yInput %.3f rotInput %.3f xSpeed %.3f yspeed %.3f rotSpeed %.3f\n"
-        , m_visionSubsystem.IsValidAmp() ? "true" : "false"
-        , x
-        , y
-        , rotation
-        , xDiff
-        , yDiff
-        , rotDiff
-        , xInput
-        , yInput
-        , rotInput
-        , xSpeed.value()
-        , ySpeed.value()
-        , rotSpeed.value());
+    // printf("tv %s x %.3f y %.3f rot %.3f xDiff %.3f yDiff %.3f rotDiff %.3f xInput %.3f yInput %.3f rotInput %.3f xSpeed %.3f yspeed %.3f rotSpeed %.3f\n"
+    //     , m_visionSubsystem.IsValidAmp() ? "true" : "false"
+    //     , x
+    //     , y
+    //     , rotation
+    //     , xDiff
+    //     , yDiff
+    //     , rotDiff
+    //     , xInput
+    //     , yInput
+    //     , rotInput
+    //     , xSpeed.value()
+    //     , ySpeed.value()
+    //     , rotSpeed.value());
 }
 
 bool GoToPositionCommand::IsFinished()
@@ -160,18 +151,17 @@ bool GoToPositionCommand::IsFinished()
 
     bool finished = fabs(m_targetY - y) < c_tolerance && fabs(m_targetX - x) < c_tolerance;
 
-    if (finished) 
-    {
-        printf("tv %s x %.3f y %.3f xDiff %.3f yDiff %.3f \n"
-        , m_visionSubsystem.IsValidAmp() ? "true" : "false"
-        , x
-        , y
-        , xDiff
-        , yDiff
-        );
-    }
+    // if (finished) 
+    // {
+    //     printf("tv %s x %.3f y %.3f xDiff %.3f yDiff %.3f \n"
+    //     , m_visionSubsystem.IsValidAmp() ? "true" : "false"
+    //     , x
+    //     , y
+    //     , xDiff
+    //     , yDiff
+    //     );
+    // }
 
-    // return abs(c_targetY - y) < c_tolerance && abs(c_targetX - x) < c_tolerance;
     return finished;
 }
 
@@ -179,4 +169,5 @@ void GoToPositionCommand::End(bool interrupted)
 {
     m_led.SetAnimation(c_colorWhite, LEDSubsystem::kStrobe);
     m_driveSubsystem.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false);
+    m_visionSubsystem.SetPositionStarted(false);
 }

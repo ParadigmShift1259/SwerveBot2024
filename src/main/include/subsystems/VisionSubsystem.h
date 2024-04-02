@@ -50,6 +50,10 @@ class VisionSubsystem : public frc2::SubsystemBase
     double GetFloorDist() { return m_floorDistance; };
     void ToggleAllowedAmp() { m_isAllowedAmp = !m_isAllowedAmp; }
     void ToggleAllowedShooter() { m_isAllowedShooter = !m_isAllowedShooter; }
+    bool IsPositionStarted() { return m_positionStarted; }
+    void SetPositionStarted(bool bVal) { m_positionStarted = bVal; }
+    bool IsAzimuthStarted() { return m_azimuthStarted; }
+    void SetAzimuthStarted(bool bVal) { m_azimuthStarted = bVal; }
 
   private:
     void PeriodicShooter();
@@ -59,6 +63,8 @@ class VisionSubsystem : public frc2::SubsystemBase
     bool m_isValidAmp = false;
     bool m_isAllowedShooter = true;
     bool m_isAllowedAmp = true;
+    bool m_azimuthStarted = false;
+    bool m_positionStarted = false;
     std::vector<double> m_netBufferField{2};
     std::vector<double> m_netBufferAlli{2};
     std::vector<double> m_zero_vector = {42.0, 42.0, 42.0, 92, 10, 22};

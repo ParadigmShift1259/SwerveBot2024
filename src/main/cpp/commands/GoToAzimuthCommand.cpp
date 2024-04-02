@@ -12,6 +12,7 @@ GoToAzimuthCommand::GoToAzimuthCommand(ISubsystemAccess& subsystemAccess)
     , m_led(subsystemAccess.GetLED())
 {
     AddRequirements(frc2::Requirements{&subsystemAccess.GetDrive(), &subsystemAccess.GetVision(), &subsystemAccess.GetLED()});
+    frc::SmartDashboard::PutBoolean("IsAiming", false);
 }
 
 void GoToAzimuthCommand::Initialize()
@@ -58,4 +59,5 @@ void GoToAzimuthCommand::End(bool interrupted)
     frc::SmartDashboard::PutBoolean("IsAiming", false);
     // m_visionSubsystem.SetShooterPositionPipeline();
     m_driveSubsystem.RotationDrive(0.0_mps, 0.0_mps, 0.0_rad, false);
+    m_visionSubsystem.SetAzimuthStarted(false);
 }

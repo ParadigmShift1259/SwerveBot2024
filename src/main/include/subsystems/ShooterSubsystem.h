@@ -29,6 +29,7 @@ class ShooterSubsystem : public frc2::SubsystemBase
     void GoToElevation(units::degree_t angle);
     void GoToElevation(int shootIndex);
     void StartOverAndUnder(units::meter_t distance);
+    void StartOverAndUnder(double rpm);
     void Shoot(units::meter_t distance);
     void Stop();
     void EnableSyncToGyro() { m_bSyncToGyro = false; }
@@ -37,6 +38,8 @@ class ShooterSubsystem : public frc2::SubsystemBase
     const std::vector<std::vector<double>> GetReferenceTable() const { return m_shootReference; }
     double GetElevation() { return m_elevationAngle; }
     double GetElevPitch() { return m_gyro.GetPitch(); }
+    void SetUseLongShot(bool bUseLongShot) { m_bUseLongShot = bUseLongShot; }
+    bool UseLongShot() { return m_bUseLongShot; }
 
   private:
     units::degree_t m_closeAngle;
@@ -44,6 +47,7 @@ class ShooterSubsystem : public frc2::SubsystemBase
     double m_elevationTurns = 0.0;  // For calibration
     double m_lastElevationTurns = 0.0;  // For calibration
     bool m_bSyncToGyro = false;//true;
+    bool m_bUseLongShot = false;
     frc::Timer m_timer;
 
     PigeonGyro m_gyro;

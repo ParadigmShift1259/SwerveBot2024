@@ -117,6 +117,9 @@ private:
   
   InstantCommand m_toggleFieldRelative{[this] { m_fieldRelative = !m_fieldRelative; }, {}};
   InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
+  InstantCommand m_SetUseCloseShot{[this] { m_shooter.SetUseLongShot(false); }, {&m_shooter}};
+  InstantCommand m_SetUseLongShot{[this] { m_shooter.SetUseLongShot(true); }, {&m_shooter}};
+  
   // frc2::InstantCommand m_runCompressor{[this] { m_compressor.EnableDigital(); m_bRunningCompressor = true;}, {} };
   InstantCommand m_resetShooterToStart{[this] { m_shooter.GoToElevation(c_defaultStartPosition); }, {}};
   InstantCommand m_goToElev{[this]
@@ -160,6 +163,16 @@ private:
     m_vision.SetShooterPositionPipeline();
   }, {} };
 
+  InstantCommand m_visPosFalse{[this]
+  { 
+    m_vision.SetPositionStarted(false);
+  }, {} };
+
+  InstantCommand m_trapRPM{[this]
+  { 
+    m_shooter.StartOverAndUnder(1500.0);
+  }, {} };
+
   InstantCommand m_angPipeline{[this]
   { 
     m_vision.SetShooterAnglePipeline();
@@ -197,17 +210,13 @@ private:
   InstantCommand m_wheelsBackward{[this] { GetDrive().WheelsBackward(); }, {&m_drive} };
   InstantCommand m_wheelsRight{[this] { GetDrive().WheelsRight(); }, {&m_drive} };
 
-  InstantCommand m_OverrideOn{[this] { GetDrive().SetOverrideXboxInput(true); }, {&m_drive} };
-  InstantCommand m_OverrideOff{[this] { GetDrive().SetOverrideXboxInput(false); }, {&m_drive} };
-  // std::unordered_map<std::string, std::shared_ptr<frc2::Command>> m_eventMap;
-  // SwerveAutoBuilder m_autoBuilder;
-
+#ifdef USE_ORCESTRA
   ctre::phoenix6::Orchestra m_orchestra;	
 
   InstantCommand m_startOrchestra{[this] { m_orchestra.Play(); }, {} };
   InstantCommand m_endOrchestra{[this] { m_orchestra.Stop(); }, {} };
+#endif
 
   bool m_isAutoRunning = false;
   bool m_DriveStraightHook = false;
-
 };

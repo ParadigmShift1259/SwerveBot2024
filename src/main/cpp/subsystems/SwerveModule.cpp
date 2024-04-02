@@ -96,6 +96,8 @@ SwerveModule::SwerveModule(const int driveMotorCanId, const int turningMotorCanI
   m_timer.Reset();
   m_timer.Start();
 
+//#define SWERVE_ABS_ENC_TUNE
+#ifdef SWERVE_ABS_ENC_TUNE
   frc::ShuffleboardTab& tab = frc::Shuffleboard::GetTab("AbsEncTuning");
   std::string name = m_nameArray[stoi(m_id) - 1];
   std::string nteName = name + " offset";
@@ -113,6 +115,7 @@ SwerveModule::SwerveModule(const int driveMotorCanId, const int turningMotorCanI
   tab.Add(nteName, m_turningMotor.GetAnalog(rev::SparkAnalogSensor::Mode::kRelative).GetVoltage())
     .WithWidget(frc::BuiltInWidgets::kVoltageView)
     .GetEntry();
+#endif
 }
 
 void SwerveModule::Periodic()

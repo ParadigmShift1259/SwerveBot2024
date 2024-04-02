@@ -20,6 +20,7 @@ PreShootCommand::PreShootCommand(ISubsystemAccess& subsystemAccess)
 
 void PreShootCommand::Initialize()
 {
+  m_vision.SetAzimuthStarted(false);
   auto bSafeToShoot = true;
   if ((m_led.GetCurrentAction() == LEDSubsystem::CurrentAction::kAmpMovement)
   || (m_led.GetCurrentAction() == LEDSubsystem::CurrentAction::kAmpPosition)
@@ -33,7 +34,7 @@ void PreShootCommand::Initialize()
     m_distance = units::meter_t{m_vision.GetShotDistance()};
     frc::SmartDashboard::PutNumber("VisionDistance echo", m_distance.value());
     m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kPreShoot);
-    int shootIndex = m_distance < 2.0_m ? 0 : 1;
+    int shootIndex = (m_distance < 2.0_m) && (m_shooterSubsystem.UseLongShot() == false) ? 0 : 1;
     frc::SmartDashboard::PutNumber("ShootIndex", shootIndex);
     m_led.SetAnimation(c_colorPink, LEDSubsystem::kFlow);
     m_logStartPreShootCommand.Append(true);

@@ -52,7 +52,9 @@ constexpr units::degree_t c_elevAngleAmpShoot = -60.0_deg;
 
 RobotContainer::RobotContainer() 
   : m_drive()
+#ifdef USE_ORCESTRA
   , m_orchestra("output.chrp")
+#endif
 {
   //---------------------------------------------------------
   //printf("************************Calling SilenceJoystickConnectionWarning - Wisco2024 Day 1 only REMOVE!!!!!\n");
@@ -95,10 +97,12 @@ RobotContainer::RobotContainer()
   frc::SmartDashboard::PutNumber("AmpIntakePercent", 0.0);
   frc::SmartDashboard::PutBoolean("PitchOK", false);
 
-  // for (int moduleNumber = 0; moduleNumber < 4; moduleNumber++)
-  // {
-  //   m_orchestra.AddInstrument(GetDrive().GetTalon(moduleNumber));
-  // }
+#ifdef USE_ORCESTRA
+  for (int moduleNumber = 0; moduleNumber < 4; moduleNumber++)
+  {
+    m_orchestra.AddInstrument(GetDrive().GetTalon(moduleNumber));
+  }
+#endif
 }
 
 CommandPtr RobotContainer::GetAutonomousCommand()
@@ -217,37 +221,20 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // Primary
   // Keep the bindings in this order
   // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
-
-  // primary.A().WhileTrue(frc2::SequentialCommandGroup{
-  //     PreShootCommand(*this, 129_in)
-  //   , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
-  //   , ShootCommand(*this)
-  // }.ToPtr());
-
-  // primary.B().WhileTrue(frc2::SequentialCommandGroup{
-  //     PreShootCommand(*this, 30_in)
-  //   , frc2::WaitCommand(units::time::second_t(m_shootDelayMs))
-  //   , ShootCommand(*this)
-  // }.ToPtr());
-
   primary.A().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
   primary.B().WhileTrue(frc2::SequentialCommandGroup{
     GoToAzimuthCommand(*this)
     , m_posPipeline
   }.ToPtr());
 
-  primary.X().OnTrue(IntakeIngest(*this).ToPtr());
-  primary.Y().WhileTrue(IntakeStop(*this).ToPtr());
+  primary.X().OnTrue(&m_trapRPM);
+  primary.Y().OnTrue(&m_SetUseLongShot);
+  primary.Y().OnFalse(&m_SetUseCloseShot);
+
   primary.Back().OnTrue(ClimbCommand(*this, ClimberSubsystem::kParkPosition).ToPtr());
-  // primary.Back().OnTrue(frc2::SequentialCommandGroup{
-  //     ClimbCommand(*this, ClimberSubsystem::kParkPosition)
-  //   , frc2::WaitCommand(0.5_s)
-  //   , GoToElevationCommand(*this, 74.0_deg)
-  // }.ToPtr());
-  
   primary.Start().OnTrue(ClimbCommand(*this, ClimberSubsystem::kHighPosition).ToPtr());
-  // primary.Back().WhileTrue(&m_moveClimbDown);
   primary.LeftBumper().WhileTrue(&m_stopClimb);
+  // primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   primary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
@@ -264,10 +251,6 @@ void RobotContainer::ConfigPrimaryButtonBindings()
     , frc2::WaitCommand(0.35_s)
     , GoToElevationCommand(*this, c_defaultStartPosition)
   }.ToPtr());
-
-  // primary.LeftBumper().OnTrue(&m_toggleFieldRelative);
-  // primary.LeftBumper().WhileTrue(GoToAzimuthCommand(*this).ToPtr());
-  primary.RightBumper().OnTrue(&m_toggleSlowSpeed);
 }
 
 void RobotContainer::ConfigSecondaryButtonBindings()
@@ -298,6 +281,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   secondary.X().OnTrue(frc2::SequentialCommandGroup{
       IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
     , StartLEDCommand(*this)
+    , m_visPosFalse
     , StopShootCommand(*this)
     , frc2::WaitCommand(0.15_s)
     , GoToElevationCommand(*this, c_elevAngleAmpShoot)
@@ -333,21 +317,13 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   }.ToPtr());
 
   secondary.Back().OnTrue(ClimbCommand(*this, ClimberSubsystem::kParkPosition).ToPtr());
-  // secondary.Back().OnTrue(frc2::SequentialCommandGroup{
-  //     ClimbCommand(*this, ClimberSubsystem::kParkPosition)
-  //   , frc2::WaitCommand(0.5_s)
-  //   , GoToElevationCommand(*this, 74.0_deg)
-  // }.ToPtr());
   secondary.Start().OnTrue(ClimbCommand(*this, ClimberSubsystem::kHighPosition).ToPtr());
 
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   secondary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
   secondary.POVRight(loop).Rising().IfHigh([this] { KillEmAllCommand(*this).Schedule(); });
-  // secondary.POVLeft(loop).Rising().IfHigh([this] { IntakeDeploy(*this).Schedule(); });
-  // secondary.POVDown(loop).Rising().IfHigh([this] { IntakeStop(*this).Schedule(); });
   secondary.POVLeft(loop).Rising().IfHigh([this] { m_toggleAmpAllowed.Schedule(); });
   secondary.POVDown(loop).Rising().IfHigh([this] { m_toggleShooterAllowed.Schedule(); });
-
 }
 
 #ifdef USE_BUTTON_BOX
@@ -464,11 +440,23 @@ void RobotContainer::ConfigureRobotLEDs()
     if ((GetLED().GetCurrentAction() == LEDSubsystem::CurrentAction::kAmpPosition && GetVision().IsValidAmp())
     || (GetLED().GetCurrentAction() == LEDSubsystem::CurrentAction::kPreShoot && GetVision().IsValidShooter()))
     {
+      if (GetLED().GetCurrentAction() == LEDSubsystem::CurrentAction::kAmpPosition)
+      {
+        m_vision.SetPositionStarted(true);
+      }
+      else
+      {
+        m_vision.SetAzimuthStarted(true);
+      }
       GetLED().SetDefaultColor(c_colorWhite);
       GetLED().SetAnimation(GetLED().GetDefaultColor(), LEDSubsystem::kSolid);
     }
-    else if ((GetLED().GetCurrentAction() == LEDSubsystem::CurrentAction::kAmpPosition && !GetVision().IsValidAmp())
-    || (GetLED().GetCurrentAction() == LEDSubsystem::CurrentAction::kPreShoot && !GetVision().IsValidShooter()))
+    else if (
+      ((GetLED().GetCurrentAction() == LEDSubsystem::CurrentAction::kAmpPosition && !GetVision().IsValidAmp())
+      && m_vision.IsPositionStarted())
+    || ((GetLED().GetCurrentAction() == LEDSubsystem::CurrentAction::kPreShoot && !GetVision().IsValidShooter())
+      && m_vision.IsAzimuthStarted())
+    )
     {
       GetLED().SetDefaultColor(GetIntake().IsNotePresent() ? c_colorPink : c_colorGreen);
       GetLED().SetAnimation(GetLED().GetDefaultColor(), LEDSubsystem::kSolid);

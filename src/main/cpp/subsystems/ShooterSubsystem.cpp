@@ -118,6 +118,8 @@ ShooterSubsystem::ShooterSubsystem()
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
   frc::SmartDashboard::PutNumber("PostIntakeRPM", 2000.0);
   frc::SmartDashboard::PutNumber("Diff", 300.0);
+  frc::SmartDashboard::PutNumber("ElevationAngleEcho", 0.0);
+  frc::SmartDashboard::PutBoolean("UseLongShot", false);
 
   auto pitch = m_gyro.GetPitch();
   double turns = (c_elevSlope * pitch + c_elevOffset);
@@ -131,6 +133,7 @@ void ShooterSubsystem::Periodic()
   m_logUnderRPM.Append(m_UnderRelativeEnc.GetVelocity());
   m_logCommandedAngle.Append(m_elevationAngle);
   frc::SmartDashboard::PutNumber("CmdAngle", m_elevationAngle);
+  frc::SmartDashboard::PutBoolean("UseLongShot", m_bUseLongShot);
 
   m_logElevApplOut.Append(m_ElevationController.GetAppliedOutput());
   m_logElevBusV.Append(m_ElevationController.GetBusVoltage());
@@ -250,33 +253,43 @@ void ShooterSubsystem::GoToElevation(int shootIndex)
 
 void ShooterSubsystem::StartOverAndUnder(units::meter_t distance)
 {
-    m_shootIndex = distance < 2.0_m ? 0 : 1;
+  m_shootIndex = distance < 2.0_m ? 0 : 1;
 
-    m_overRPM = -m_shootReference[0][m_shootIndex];
-    m_underRPM = m_shootReference[0][m_shootIndex];
+  m_overRPM = -m_shootReference[0][m_shootIndex];
+  m_underRPM = m_shootReference[0][m_shootIndex];
 
-    auto distanceAdder = distance - c_minVisionShotDistance;
+  auto distanceAdder = distance - c_minVisionShotDistance;
 
-    if (distance < 0.0_m) 
-    {
-      auto postIntakeRPM = frc::SmartDashboard::GetNumber("PostIntakeRPM", 2000.0);
-      m_overRPM = -postIntakeRPM;
-      m_underRPM = postIntakeRPM;
-    }
-    else if (distanceAdder > 0.0_m)
-    {
-      double diff = frc::SmartDashboard::GetNumber("Diff", 300.0);
-      m_overRPM -= distanceAdder.value() * diff;
-      m_underRPM += distanceAdder.value() * diff;
-    }
+  if (distance < 0.0_m) 
+  {
+    auto postIntakeRPM = frc::SmartDashboard::GetNumber("PostIntakeRPM", 2000.0);
+    m_overRPM = -postIntakeRPM;
+    m_underRPM = postIntakeRPM;
+  }
+  else if (distanceAdder > 0.0_m)
+  {
+    double diff = frc::SmartDashboard::GetNumber("Diff", 300.0);
+    m_overRPM -= distanceAdder.value() * diff;
+    m_underRPM += distanceAdder.value() * diff;
+  }
 
-    double ffNeo = frc::Preferences::GetDouble("kShooterFF", c_defaultShootNeoFF);
-    m_OverPIDController.SetFF(ffNeo);
-    m_UnderPIDController.SetFF(ffNeo);
+  double ffNeo = frc::Preferences::GetDouble("kShooterFF", c_defaultShootNeoFF);
+  m_OverPIDController.SetFF(ffNeo);
+  m_UnderPIDController.SetFF(ffNeo);
 
-    //printf("over %.3f under %.3f\n", m_overRPM, m_underRPM);
-    m_OverPIDController.SetReference(m_overRPM, rev::CANSparkBase::ControlType::kVelocity);
-    m_UnderPIDController.SetReference(m_underRPM, rev::CANSparkBase::ControlType::kVelocity);
+  //printf("over %.3f under %.3f\n", m_overRPM, m_underRPM);
+  m_OverPIDController.SetReference(m_overRPM, rev::CANSparkBase::ControlType::kVelocity);
+  m_UnderPIDController.SetReference(m_underRPM, rev::CANSparkBase::ControlType::kVelocity);
+}
+
+void ShooterSubsystem::StartOverAndUnder(double rpm)
+{
+  double ffNeo = frc::Preferences::GetDouble("kShooterFF", c_defaultShootNeoFF);
+  m_OverPIDController.SetFF(ffNeo);
+  m_UnderPIDController.SetFF(ffNeo);
+
+  m_OverPIDController.SetReference(-rpm, rev::CANSparkBase::ControlType::kVelocity);
+  m_UnderPIDController.SetReference(rpm, rev::CANSparkBase::ControlType::kVelocity);
 }
 
 void ShooterSubsystem::Shoot(units::meter_t distance)
