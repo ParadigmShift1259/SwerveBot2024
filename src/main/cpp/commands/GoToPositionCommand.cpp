@@ -48,6 +48,7 @@ void GoToPositionCommand::Initialize()
     m_led.SetAnimation(c_colorWhite, LEDSubsystem::Animation::kFlow);
     m_timer.Reset();
     m_timer.Start();
+    m_visionSubsystem.EnableAmpLEDs();
 }
 
 void GoToPositionCommand::Execute()
@@ -170,4 +171,5 @@ void GoToPositionCommand::End(bool interrupted)
     m_led.SetAnimation(c_colorWhite, LEDSubsystem::kStrobe);
     m_driveSubsystem.Drive(0.0_mps, 0.0_mps, 0.0_rad_per_s, false);
     m_visionSubsystem.SetPositionStarted(false);
+    m_visionSubsystem.DisableAmpLEDs();
 }

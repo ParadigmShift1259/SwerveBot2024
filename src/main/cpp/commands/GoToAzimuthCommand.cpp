@@ -20,6 +20,7 @@ void GoToAzimuthCommand::Initialize()
     m_led.SetCurrentAction(LEDSubsystem::CurrentAction::kShootMovement);
     m_led.SetAnimation(c_colorWhite, LEDSubsystem::Animation::kFlow);
     m_visionSubsystem.SetShooterAnglePipeline();
+    m_visionSubsystem.EnableShooterLEDs();
     m_yawError = m_visionSubsystem.GetYawError();
     m_commandedAzimuth = units::radian_t{m_yawError} + m_driveSubsystem.GetGyroAzimuth();
 }

@@ -172,7 +172,7 @@ private:
 
   InstantCommand m_trapRPM{[this]
   { 
-    m_shooter.StartOverAndUnder(1500.0);
+    m_shooter.StartOverAndUnder(2300.0);
   }, {} };
 
   InstantCommand m_angPipeline{[this]

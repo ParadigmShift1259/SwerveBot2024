@@ -43,6 +43,8 @@ class VisionSubsystem : public frc2::SubsystemBase
     units::degree_t GetShotAngle();
     void EnableShooterLEDs() { m_netTableShooter->PutNumber("ledMode", 3); }
     void DisableShooterLEDs() { m_netTableShooter->PutNumber("ledMode", 1); }
+    void EnableAmpLEDs() { m_netTableAmp->PutNumber("ledMode", 3); }
+    void DisableAmpLEDs() { m_netTableAmp->PutNumber("ledMode", 1); }
     double GetShotDistance() { return m_shotDistance; }
     double GetYawError() { return m_yawError; }
     void SetShooterPositionPipeline();

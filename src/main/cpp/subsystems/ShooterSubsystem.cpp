@@ -114,6 +114,8 @@ ShooterSubsystem::ShooterSubsystem()
   frc::SmartDashboard::PutNumber("ShotAngleClose", c_defaultShootCloseAngle.value());
   frc::SmartDashboard::PutNumber("OverRPM",  m_shootReference[0][1]);
   frc::SmartDashboard::PutNumber("UnderRPM", m_shootReference[0][1]);
+  frc::SmartDashboard::PutNumber("OverRPMClose",  m_shootReference[0][0]);
+  frc::SmartDashboard::PutNumber("UnderRPMClose", m_shootReference[0][0]);
   frc::SmartDashboard::PutNumber("ElevationAngle", c_defaultTravelPosition.value());
   frc::SmartDashboard::PutNumber("ElevationTurns", 0.0);
   frc::SmartDashboard::PutNumber("PostIntakeRPM", 2000.0);
