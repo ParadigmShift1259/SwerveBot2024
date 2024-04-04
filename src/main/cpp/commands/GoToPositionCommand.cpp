@@ -1,3 +1,4 @@
+
 #include "commands/GoToPositionCommand.h"
 
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -9,6 +10,7 @@ const double c_targetPodiumY = 4.106;
 const double c_tolerance = 0.02;
 const double c_minInput = 0.07;
 
+constexpr int c_tagIdAmpBlue = 6;
 const double c_targetSpeakerBlueX = 1.26;
 const double c_targetSpeakerBlueY = 5.35;
 
@@ -19,6 +21,7 @@ const double c_targetAmpBlueX = (1.933_m - 0.050_m).value();  // 5cm bias on sho
 const double c_targetAmpBlueY = (8.111_m - c_halfRobotSize).value();
 const double c_targetAmpBlueRot = 90.0;
 
+const int c_tagIdAmpRed = 5;
 const double c_targetAmpRedX = c_targetAmpBlueX;
 const double c_targetAmpRedY = c_halfRobotSize.value();
 const double c_targetAmpRedRot = -1.0 * c_targetAmpBlueRot;
@@ -32,8 +35,13 @@ GoToPositionCommand::GoToPositionCommand(ISubsystemAccess& subsystemAccess, bool
     , m_targetX(bIsBlue ? c_targetAmpBlueX : c_targetAmpRedX)
     , m_targetY(bIsBlue ? c_targetAmpBlueY : c_targetAmpRedY)
     , m_targetRot(bIsBlue ? c_targetAmpBlueRot : c_targetAmpRedRot)
+    , m_bIsBlue(bIsBlue)
 {
     AddRequirements(frc2::Requirements{&subsystemAccess.GetDrive(), &subsystemAccess.GetVision(), &subsystemAccess.GetLED()});
+
+    wpi::log::DataLog& log = subsystemAccess.GetLogger();
+    m_logStartGoToPositionCommand = wpi::log::BooleanLogEntry(log, "/GoToPositionCommand/startCommand");
+    m_logGoToPositionCommandFlipped = wpi::log::BooleanLogEntry(log, "/GoToPositionCommand/startCommand");
 
     //frc::SmartDashboard::PutNumber("GoAmpMaxSpd", c_defaultGoToAmpMaxSpeed.value());
     //frc::SmartDashboard::PutNumber("GoAmpMaxAnglSpd", 120.0);
@@ -71,9 +79,24 @@ void GoToPositionCommand::Execute()
     
     if (m_visionSubsystem.IsValidAmp())
     {
+        int tagId = m_visionSubsystem.GetTagId();
+        bool bBlueAllianceFromTagId = (tagId == c_tagIdAmpBlue);
+        if (bBlueAllianceFromTagId != m_bIsBlue)
+        {
+            m_bIsBlue = bBlueAllianceFromTagId;
+            m_targetX = (m_bIsBlue ? c_targetAmpBlueX : c_targetAmpRedX);
+            m_targetY = (m_bIsBlue ? c_targetAmpBlueY : c_targetAmpRedY);
+            m_targetRot = (m_bIsBlue ? c_targetAmpBlueRot : c_targetAmpRedRot);
+            m_logGoToPositionCommandFlipped.Append(true);
+        }
+        else
+        {
+            m_logGoToPositionCommandFlipped.Append(false);
+        }
+
         if (xDiff >= c_tolerance && xDiff < c_maxX)
         {
-            if (m_visionSubsystem.GetTagId() == 5)
+            if (tagId == c_tagIdAmpRed)
             {
                 yInput = (m_targetX - x) / c_maxX;
             }
@@ -93,7 +116,7 @@ void GoToPositionCommand::Execute()
 
         if (yDiff >= c_tolerance && yDiff < c_maxY)
         {
-            if (m_visionSubsystem.GetTagId() == 5)
+            if (tagId == c_tagIdAmpRed)
             {
                 xInput = (y - m_targetY) / c_maxY;
             }
@@ -147,13 +170,13 @@ bool GoToPositionCommand::IsFinished()
 {
     auto x = m_visionSubsystem.GetX();
     auto y = m_visionSubsystem.GetY();
-    auto xDiff = fabs(m_targetX - x);
-    auto yDiff = fabs(m_targetY - y);
 
     bool finished = fabs(m_targetY - y) < c_tolerance && fabs(m_targetX - x) < c_tolerance;
 
     // if (finished) 
     // {
+    //     auto xDiff = fabs(m_targetX - x);
+    //     auto yDiff = fabs(m_targetY - y);
     //     printf("tv %s x %.3f y %.3f xDiff %.3f yDiff %.3f \n"
     //     , m_visionSubsystem.IsValidAmp() ? "true" : "false"
     //     , x

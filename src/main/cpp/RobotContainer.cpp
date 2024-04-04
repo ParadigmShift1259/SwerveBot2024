@@ -221,7 +221,7 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // Primary
   // Keep the bindings in this order
   // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
-  primary.A().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
+  primary.A().WhileTrue(GoToPositionCommand(*this, frc::DriverStation::GetAlliance().value() == frc::DriverStation::Alliance::kBlue).ToPtr());
   primary.B().WhileTrue(frc2::SequentialCommandGroup{
     GoToAzimuthCommand(*this)
     , m_posPipeline
