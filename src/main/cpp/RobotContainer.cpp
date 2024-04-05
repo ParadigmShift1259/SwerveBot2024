@@ -299,8 +299,12 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , EndLEDCommand(*this)
   }.ToPtr());
 
-  secondary.LeftBumper().OnTrue(&m_undershootAngle);
-  secondary.RightBumper().OnTrue(PreShootCommand(*this).ToPtr());
+  // secondary.LeftBumper().OnTrue(&m_undershootAngle);
+  secondary.LeftBumper().WhileTrue(frc2::SequentialCommandGroup{
+      PreShootCommand(*this)
+    , GoToAzimuthCommand(*this)
+  }.ToPtr());
+  secondary.RightBumper().WhileTrue(PreShootCommand(*this).ToPtr());
 
   secondary.LeftStick().OnTrue(ClimbCommand(*this, ClimberSubsystem::kResetPosition).ToPtr());
   secondary.RightStick().OnTrue(frc2::SequentialCommandGroup{
