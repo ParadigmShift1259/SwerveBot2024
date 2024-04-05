@@ -52,6 +52,7 @@ VisionSubsystem::VisionSubsystem()
   m_logtidAmp = wpi::log::IntegerLogEntry(log, "/vision/tidAmp");
 
   frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
+  frc::SmartDashboard::PutNumber("VisionShotOffset", m_visionShotOffset);
 
   frc::SmartDashboard::PutBoolean("AllowedShooter", m_isAllowedShooter);
   frc::SmartDashboard::PutBoolean("AllowedAmp", m_isAllowedAmp);
@@ -63,6 +64,7 @@ void VisionSubsystem::Periodic()
   PeriodicAmp();
   m_isAllowedShooter = frc::SmartDashboard::GetBoolean("AllowedShooter", m_isAllowedShooter);
   m_isAllowedAmp = frc::SmartDashboard::GetBoolean("AllowedAmp", m_isAllowedAmp);
+  m_visionShotOffset = frc::SmartDashboard::GetNumber("VisionShotOffset", 2.71);
 }
 
 void VisionSubsystem::PeriodicShooter()
@@ -93,7 +95,7 @@ void VisionSubsystem::PeriodicShooter()
       // floorDistance = height from camera to apriltag / tangent + limelight offset from robot
       m_floorDistance = (45.875 / tan(targetAngle)) + 11.0;
       frc::SmartDashboard::PutNumber("VisionFloorDist", m_floorDistance);
-      m_shotAngle = c_distanceToAngleMap[units::inch_t{m_floorDistance}].value();
+      m_shotAngle = c_distanceToAngleMap[units::inch_t{m_floorDistance}].value() + m_visionShotOffset;
       frc::SmartDashboard::PutNumber("VisionShotAngle", m_shotAngle);
       m_shotDistance = c_targetHeight.value() / sin(targetAngle);
       frc::SmartDashboard::PutNumber("VisionShotDistance", m_shotDistance);

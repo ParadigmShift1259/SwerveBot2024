@@ -19,12 +19,12 @@ const double c_targetSpeakerRedY = 4.106 - 1.448;
 
 const double c_targetAmpBlueX = (1.933_m - 0.050_m).value();  // 5cm bias on shooter/intake
 const double c_targetAmpBlueY = (8.111_m - c_halfRobotSize).value();
-const double c_targetAmpBlueRot = 90.0;
+const double c_targetAmpBlueRot = -90.0;
 
 const int c_tagIdAmpRed = 5;
 const double c_targetAmpRedX = c_targetAmpBlueX;
 const double c_targetAmpRedY = c_halfRobotSize.value();
-const double c_targetAmpRedRot = -1.0 * c_targetAmpBlueRot;
+const double c_targetAmpRedRot = c_targetAmpBlueRot;
 
 const units::velocity::meters_per_second_t c_defaultGoToAmpMaxSpeed = 4.5_mps;
 
@@ -72,7 +72,7 @@ void GoToPositionCommand::Execute()
     auto rotInput = 0.0;
     auto xDiff = fabs(m_targetX - x);
     auto yDiff = fabs(m_targetY - y);
-    auto rotDiff = fabs(m_targetY - y);
+    auto rotDiff = fabs(m_targetRot - rotation);
     auto xSpeed = 0.0_mps;
     auto ySpeed = 0.0_mps;
     auto rotSpeed = 0.0_deg_per_s;
