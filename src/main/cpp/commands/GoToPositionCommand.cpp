@@ -11,7 +11,7 @@ const double c_tolerance = 0.02;
 const double c_minInput = 0.07;
 
 constexpr int c_tagIdAmpBlue = 6;
-const double c_targetSpeakerBlueX = 1.26;
+const double c_targetSpeakerBlueX = 1.23;
 const double c_targetSpeakerBlueY = 5.35;
 
 const double c_targetSpeakerRedX = c_targetSpeakerBlueX;
@@ -44,7 +44,7 @@ GoToPositionCommand::GoToPositionCommand(ISubsystemAccess& subsystemAccess, bool
     m_logGoToPositionCommandFlipped = wpi::log::BooleanLogEntry(log, "/GoToPositionCommand/startCommand");
 
     //frc::SmartDashboard::PutNumber("GoAmpMaxSpd", c_defaultGoToAmpMaxSpeed.value());
-    //frc::SmartDashboard::PutNumber("GoAmpMaxAnglSpd", 120.0);
+    frc::SmartDashboard::PutNumber("GoAmpMaxAnglSpd", 360.0);
 }
 
 void GoToPositionCommand::Initialize()
@@ -143,8 +143,8 @@ void GoToPositionCommand::Execute()
         units::velocity::meters_per_second_t maxSpeed = c_defaultGoToAmpMaxSpeed;
         xSpeed = xInput * maxSpeed; 
         ySpeed = yInput * maxSpeed; 
-        //units::angular_velocity::degrees_per_second_t maxAngularSpeed = units::angular_velocity::degrees_per_second_t{frc::SmartDashboard::GetNumber("GoAmpMaxAnglSpd", 120.0)};
-        units::angular_velocity::degrees_per_second_t maxAngularSpeed = units::angular_velocity::degrees_per_second_t{120.0};
+        units::angular_velocity::degrees_per_second_t maxAngularSpeed = units::angular_velocity::degrees_per_second_t{frc::SmartDashboard::GetNumber("GoAmpMaxAnglSpd", 360.0)};
+        // units::angular_velocity::degrees_per_second_t maxAngularSpeed = units::angular_velocity::degrees_per_second_t{120.0};
         rotSpeed = rotInput * maxAngularSpeed;         
         
         m_driveSubsystem.Drive(xSpeed, ySpeed, rotSpeed, false);

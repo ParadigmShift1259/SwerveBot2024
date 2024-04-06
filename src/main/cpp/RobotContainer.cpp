@@ -251,6 +251,15 @@ void RobotContainer::ConfigPrimaryButtonBindings()
     , frc2::WaitCommand(0.35_s)
     , GoToElevationCommand(*this, c_defaultStartPosition)
   }.ToPtr());
+  
+  primary.RightTrigger(0.9).OnTrue(frc2::SequentialCommandGroup{
+      IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
+    , frc2::WaitCommand(0.15_s)
+    , GoToElevationCommand(*this, c_defaultTravelPosition)
+    , frc2::WaitCommand(0.35_s)
+    , IntakeGoToPositionCommand(*this, c_defaultRetractTurns)
+    , EndLEDCommand(*this)
+  }.ToPtr());
 }
 
 void RobotContainer::ConfigSecondaryButtonBindings()
