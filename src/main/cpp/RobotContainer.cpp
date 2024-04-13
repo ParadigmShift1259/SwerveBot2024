@@ -210,7 +210,7 @@ void RobotContainer::ConfigureBindings()
   ConfigPrimaryButtonBindings();
   ConfigSecondaryButtonBindings();
 #ifdef USE_BUTTON_BOX
-  ConfigButtonBoxBindings();
+  // ConfigButtonBoxBindings();
 #endif
 }
 
@@ -221,13 +221,13 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   // Primary
   // Keep the bindings in this order
   // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
-  primary.A().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
+  /*primary.A().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
   primary.B().WhileTrue(frc2::SequentialCommandGroup{
     GoToAzimuthCommand(*this)
     , m_posPipeline
-  }.ToPtr());
+  }.ToPtr());*/
 
-  primary.X().OnTrue(&m_trapRPM);
+  //primary.X().OnTrue(&m_trapRPM);
   primary.Y().OnTrue(&m_SetUseLongShot);
   primary.Y().OnFalse(&m_SetUseCloseShot);
 
@@ -239,7 +239,7 @@ void RobotContainer::ConfigPrimaryButtonBindings()
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   primary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
 
-  primary.LeftStick().OnTrue(&m_enableGyroSync);
+  //primary.LeftStick().OnTrue(&m_enableGyroSync);
   primary.RightStick().OnTrue(frc2::SequentialCommandGroup{
       IntakeGoToPositionCommand(*this, c_defaultRetractTurns)
     , frc2::WaitCommand(0.35_s)
@@ -278,7 +278,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
       IntakeRelease(*this) 
   ,   IntakeStop(*this)
   }.ToPtr());     
-  secondary.X().OnTrue(frc2::SequentialCommandGroup{
+  /*secondary.X().OnTrue(frc2::SequentialCommandGroup{
       IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
     , StartLEDCommand(*this)
     , m_visPosFalse
@@ -297,9 +297,9 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , frc2::WaitCommand(0.35_s)
     , IntakeGoToPositionCommand(*this, c_defaultRetractTurns)
     , EndLEDCommand(*this)
-  }.ToPtr());
+  }.ToPtr());*/
 
-  secondary.LeftBumper().OnTrue(&m_undershootAngle);
+  //secondary.LeftBumper().OnTrue(&m_undershootAngle);
   secondary.RightBumper().OnTrue(PreShootCommand(*this).ToPtr());
 
   secondary.LeftStick().OnTrue(ClimbCommand(*this, ClimberSubsystem::kResetPosition).ToPtr());
@@ -322,8 +322,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   secondary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
   secondary.POVRight(loop).Rising().IfHigh([this] { KillEmAllCommand(*this).Schedule(); });
-  secondary.POVLeft(loop).Rising().IfHigh([this] { m_toggleAmpAllowed.Schedule(); });
-  secondary.POVDown(loop).Rising().IfHigh([this] { m_toggleShooterAllowed.Schedule(); });
+//  secondary.POVLeft(loop).Rising().IfHigh([this] { m_toggleAmpAllowed.Schedule(); });
+//  secondary.POVDown(loop).Rising().IfHigh([this] { m_toggleShooterAllowed.Schedule(); });
 }
 
 #ifdef USE_BUTTON_BOX

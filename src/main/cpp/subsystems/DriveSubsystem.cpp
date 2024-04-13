@@ -44,10 +44,10 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   m_logDriveInputY.Append(ySpeed.to<double>());
   m_logDriveInputRot.Append(rot.to<double>());
 
-  m_frontLeft.SetMaxSpeed(m_currentMaxSpeed);
-  m_frontRight.SetMaxSpeed(m_currentMaxSpeed);
-  m_rearLeft.SetMaxSpeed(m_currentMaxSpeed);
-  m_rearRight.SetMaxSpeed(m_currentMaxSpeed);
+  // m_frontLeft.SetMaxSpeed(m_currentMaxSpeed);
+  // m_frontRight.SetMaxSpeed(m_currentMaxSpeed);
+  // m_rearLeft.SetMaxSpeed(m_currentMaxSpeed);
+  // m_rearRight.SetMaxSpeed(m_currentMaxSpeed);
 
   // frc::SmartDashboard::PutNumber("Input x speed", xSpeed.to<double>());
   // frc::SmartDashboard::PutNumber("Input y speed", ySpeed.to<double>());

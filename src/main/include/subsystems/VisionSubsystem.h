@@ -62,7 +62,7 @@ class VisionSubsystem : public frc2::SubsystemBase
     bool m_isValidShooter = false;
     bool m_isValidAmp = false;
     bool m_isAllowedShooter = true;
-    bool m_isAllowedAmp = true;
+    bool m_isAllowedAmp = false;//true;
     bool m_azimuthStarted = false;
     bool m_positionStarted = false;
     std::vector<double> m_netBufferField{2};
