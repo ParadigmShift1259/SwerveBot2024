@@ -114,6 +114,7 @@ private:
 
   // TODO Make sure field relative starts how the drive team wants
   bool m_fieldRelative = false; //true;
+  bool m_bAllowElevJoystick = true;
   
   InstantCommand m_toggleFieldRelative{[this] { m_fieldRelative = !m_fieldRelative; }, {}};
   InstantCommand m_toggleSlowSpeed{[this] { GetDrive().ToggleSlowSpeed(); }, {&m_drive}};
@@ -141,6 +142,16 @@ private:
  InstantCommand m_jogIntakeIn{[this]
   { 
     m_intake.Set(0.6);
+  }, {} };
+
+ InstantCommand m_supressElevJoystick{[this]
+  { 
+    m_bAllowElevJoystick = false;
+  }, {} };
+  
+  InstantCommand m_allowElevJoystick{[this]
+  { 
+    m_bAllowElevJoystick = true;
   }, {} };
 
  InstantCommand m_jogIntakeOut{[this]
