@@ -153,6 +153,25 @@ void RobotContainer::Periodic()
     frc::SmartDashboard::PutBoolean("FieldRelative", m_fieldRelative);
   }
 
+//#define DEMO_MODE_EXPERIMENT
+#ifdef DEMO_MODE_EXPERIMENT
+  const double kDeadband = 0.1;
+  const double direction = -1.0;
+  const auto elevInput = direction* ApplyDeadband(m_secondaryController.GetLeftY(), kDeadband);
+  printf("elevInput %.3f m_bAllowElevJoystick %s m_intake.GetPosition() %.3f m_shooter.GetElevation() %.3f"
+        , elevInput
+        , m_bAllowElevJoystick ? "true" : "false"
+        , m_intake.GetPosition()
+        , m_shooter.GetElevation());
+  if (m_bAllowElevJoystick && elevInput != 0.0 && m_intake.GetPosition() < c_defaultRetractTurns + 1)
+  {
+    auto newElev = m_shooter.GetElevation() + elevInput;
+    std::clamp(newElev, 0.0, c_defaultStartPosition.value());
+    m_shooter.GoToElevation(newElev);
+    printf(" newElev %.3f", newElev);
+  }
+  printf("\n");
+#endif
   auto angleDiff = m_shooter.GetElevPitch() - m_shooter.GetElevation();
   auto bOk = (angleDiff >= 1.25 && angleDiff <= 2.75);
   frc::SmartDashboard::PutBoolean("PitchOK", bOk);
@@ -269,6 +288,9 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   // Keep the bindings in this order
   // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
   secondary.A().OnTrue(frc2::SequentialCommandGroup{
+#ifdef DEMO_MODE_EXPERIMENT
+       m_supressElevJoystick,
+#endif
       IntakeIngest(*this)
       , m_jogIntakeOut
       , frc2::WaitCommand(0.075_s)
@@ -282,6 +304,9 @@ void RobotContainer::ConfigSecondaryButtonBindings()
       , m_jogIntakeIn
       , frc2::WaitCommand(0.075_s)
       , IntakeStop(*this)
+#ifdef DEMO_MODE_EXPERIMENT
+      , m_allowElevJoystick
+#endif
   }.ToPtr());                          
   secondary.B().WhileTrue(frc2::SequentialCommandGroup{
       IntakeRelease(*this) 
