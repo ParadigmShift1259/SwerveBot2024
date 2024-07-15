@@ -40,7 +40,7 @@ void IntakeIngest::Execute()
   }
   else if (m_intake.GetPosition() > 35.0)
   {
-    auto angle = frc::SmartDashboard::GetNumber("IntakeFinalAngle", 55.0);
+    auto angle = frc::SmartDashboard::GetNumber("IntakeFinalAngle", 45.0);
     m_shooter.GoToElevation(units::degree_t(angle));
   }
 
