@@ -3,29 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.6608862052352296,
-        "y": 6.656403279510222
+        "x": 2.86,
+        "y": 1.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4502780614884208,
-        "y": 7.381542310254432
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.909735098049553,
-        "y": 7.923101839544413
-      },
-      "prevControl": {
-        "x": 1.5851600576397085,
-        "y": 7.784584188259723
-      },
-      "nextControl": {
-        "x": 4.314118284174416,
-        "y": 8.069965440707797
+        "x": 3.845762222923731,
+        "y": 0.8318547061126486
       },
       "isLocked": false,
       "linkedName": null
@@ -33,37 +17,38 @@
     {
       "anchor": {
         "x": 8.5,
-        "y": 7.601837711999509
+        "y": 0.59
       },
       "prevControl": {
-        "x": 7.453596841710887,
-        "y": 7.702806437799335
+        "x": 7.5,
+        "y": 0.5900000000000001
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1.0,
-      "rotationDegrees": 180.0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Intake Note Marker",
-      "waypointRelativePos": 1.45,
+      "name": "Intake Note",
+      "waypointRelativePos": 0.45,
       "command": {
         "type": "sequential",
         "data": {
           "commands": [
             {
-              "type": "named",
+              "type": "sequential",
               "data": {
-                "name": "Intake Note"
+                "commands": [
+                  {
+                    "type": "named",
+                    "data": {
+                      "name": "Intake Note"
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -85,7 +70,7 @@
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -117.75854060106,
+    "rotation": 177.75333895811704,
     "velocity": 0
   },
   "useDefaultConstraints": true

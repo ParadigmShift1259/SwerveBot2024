@@ -52,6 +52,7 @@ void Robot::AutonomousInit()
   m_container.SetIsAutoRunning(true);
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
+
   if (m_autonomousCommand)
   {
      m_autonomousCommand->Schedule();

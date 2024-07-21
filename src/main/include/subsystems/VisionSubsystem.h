@@ -89,7 +89,7 @@ class VisionSubsystem : public frc2::SubsystemBase
   double m_yawError = 0.0;
   double m_commandedAzimuth = 0.0;
 
-  double m_visionShotOffset = 2.71;
+  double m_visionShotOffset = -3.5;
 
   double c_defaultAimP = -0.1;
   double c_minAimCommanded = 0.05;

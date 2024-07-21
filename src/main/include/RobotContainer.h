@@ -201,7 +201,7 @@ private:
 
   InstantCommand m_ampPositionIntake{[this]
   { 
-    double turns = frc::SmartDashboard::GetNumber("AmpShotTurns", 21);
+    double turns = frc::SmartDashboard::GetNumber("AmpShotTurns", 24.5);
     m_intake.ExtendIntake(turns);
   }, {} };
 

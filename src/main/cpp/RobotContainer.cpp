@@ -93,7 +93,7 @@ RobotContainer::RobotContainer()
   }
   frc::SmartDashboard::PutData("Auto Path", &m_chooser);
 
-  frc::SmartDashboard::PutNumber("AmpShotTurns", 21);
+  frc::SmartDashboard::PutNumber("AmpShotTurns", 24.5);
   frc::SmartDashboard::PutNumber("AmpIntakePercent", 0.0);
   frc::SmartDashboard::PutBoolean("PitchOK", false);
 

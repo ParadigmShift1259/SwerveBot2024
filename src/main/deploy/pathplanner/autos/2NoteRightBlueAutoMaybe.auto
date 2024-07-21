@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.2850565101796132,
-      "y": 5.55492627078484
+      "x": 0.6517072301625181,
+      "y": 4.435091311914034
     },
-    "rotation": 0
+    "rotation": 120.0
   },
   "command": {
     "type": "sequential",
@@ -18,27 +18,27 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Pre Ingest"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.75
+            "pathName": "1NoteRightBluePath"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "2NoteRightBluePathMaybe1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2NoteRightBluePathMaybe2"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ShootFar"
+            "name": "ShootClose"
           }
         },
         {

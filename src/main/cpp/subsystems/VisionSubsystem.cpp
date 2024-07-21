@@ -64,7 +64,7 @@ void VisionSubsystem::Periodic()
   PeriodicAmp();
   m_isAllowedShooter = frc::SmartDashboard::GetBoolean("AllowedShooter", m_isAllowedShooter);
   m_isAllowedAmp = frc::SmartDashboard::GetBoolean("AllowedAmp", m_isAllowedAmp);
-  m_visionShotOffset = frc::SmartDashboard::GetNumber("VisionShotOffset", 2.71);
+  m_visionShotOffset = frc::SmartDashboard::GetNumber("VisionShotOffset", -3.5);
 }
 
 void VisionSubsystem::PeriodicShooter()
