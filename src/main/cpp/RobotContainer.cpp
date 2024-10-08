@@ -158,20 +158,14 @@ void RobotContainer::Periodic()
   const double kDeadband = 0.1;
   const double direction = -1.0;
   const auto elevInput = direction* ApplyDeadband(m_secondaryController.GetLeftY(), kDeadband);
-  printf("elevInput %.3f m_bAllowElevJoystick %s m_intake.GetPosition() %.3f m_shooter.GetElevation() %.3f"
-        , elevInput
-        , m_bAllowElevJoystick ? "true" : "false"
-        , m_intake.GetPosition()
-        , m_shooter.GetElevation());
   if (m_bAllowElevJoystick && elevInput != 0.0 && m_intake.GetPosition() < c_defaultRetractTurns + 1)
   {
     auto newElev = m_shooter.GetElevation() + elevInput;
     std::clamp(newElev, 0.0, c_defaultStartPosition.value());
     m_shooter.GoToElevation(newElev);
-    printf(" newElev %.3f", newElev);
   }
-  printf("\n");
 #endif
+
   auto angleDiff = m_shooter.GetElevPitch() - m_shooter.GetElevation();
   auto bOk = (angleDiff >= 1.25 && angleDiff <= 2.75);
   frc::SmartDashboard::PutBoolean("PitchOK", bOk);
@@ -229,24 +223,24 @@ void RobotContainer::ConfigureBindings()
   ConfigPrimaryButtonBindings();
   ConfigSecondaryButtonBindings();
 #ifdef USE_BUTTON_BOX
-  ConfigButtonBoxBindings();
+  // ConfigButtonBoxBindings();
 #endif
 }
 
 void RobotContainer::ConfigPrimaryButtonBindings()
 {
   auto& primary = m_primaryController;
-
+ 
   // Primary
   // Keep the bindings in this order
   // A, B, X, Y, Left Bumper, Right Bumper, Back, Start
-  primary.A().WhileTrue(GoToPositionCommand(*this, frc::DriverStation::GetAlliance().value() == frc::DriverStation::Alliance::kBlue).ToPtr());
+  /*primary.A().WhileTrue(GoToPositionCommand(*this, false).ToPtr());
   primary.B().WhileTrue(frc2::SequentialCommandGroup{
     GoToAzimuthCommand(*this)
     , m_posPipeline
-  }.ToPtr());
+  }.ToPtr());*/
 
-  primary.X().OnTrue(&m_trapRPM);
+  //primary.X().OnTrue(&m_trapRPM);
   primary.Y().OnTrue(&m_SetUseLongShot);
   primary.Y().OnFalse(&m_SetUseCloseShot);
 
@@ -269,16 +263,8 @@ void RobotContainer::ConfigPrimaryButtonBindings()
       IntakeGoToPositionCommand(*this, 0.0)
     , frc2::WaitCommand(0.35_s)
     , GoToElevationCommand(*this, c_defaultStartPosition)
-  }.ToPtr());
-  
-  primary.RightTrigger(0.9).OnTrue(frc2::SequentialCommandGroup{
-      IntakeGoToPositionCommand(*this, c_deployTurnsAmpClearance)
-    , frc2::WaitCommand(0.15_s)
-    , GoToElevationCommand(*this, c_defaultTravelPosition)
-    , frc2::WaitCommand(0.35_s)
-    , IntakeGoToPositionCommand(*this, c_defaultRetractTurns)
-    , EndLEDCommand(*this)
-  }.ToPtr());
+  }.ToPtr()); 
+
 }
 
 void RobotContainer::ConfigSecondaryButtonBindings()
@@ -291,7 +277,7 @@ void RobotContainer::ConfigSecondaryButtonBindings()
 #ifdef DEMO_MODE_EXPERIMENT
        m_supressElevJoystick,
 #endif
-      IntakeIngest(*this)
+        IntakeIngest(*this)
       , m_jogIntakeOut
       , frc2::WaitCommand(0.075_s)
       , IntakeStop(*this)
@@ -333,12 +319,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
     , EndLEDCommand(*this)
   }.ToPtr());
 
-  // secondary.LeftBumper().OnTrue(&m_undershootAngle);
-  secondary.LeftBumper().WhileTrue(frc2::SequentialCommandGroup{
-      PreShootCommand(*this)
-    , GoToAzimuthCommand(*this)
-  }.ToPtr());
-  secondary.RightBumper().WhileTrue(PreShootCommand(*this).ToPtr());
+  //secondary.LeftBumper().OnTrue(&m_undershootAngle);
+  secondary.RightBumper().OnTrue(PreShootCommand(*this).ToPtr());
 
   secondary.LeftStick().OnTrue(ClimbCommand(*this, ClimberSubsystem::kResetPosition).ToPtr());
   secondary.RightStick().OnTrue(frc2::SequentialCommandGroup{
@@ -360,8 +342,8 @@ void RobotContainer::ConfigSecondaryButtonBindings()
   auto loop = CommandScheduler::GetInstance().GetDefaultButtonLoop();
   secondary.POVUp(loop).Rising().IfHigh([this] { StopAllCommand(*this).Schedule(); });
   secondary.POVRight(loop).Rising().IfHigh([this] { KillEmAllCommand(*this).Schedule(); });
-  secondary.POVLeft(loop).Rising().IfHigh([this] { m_toggleAmpAllowed.Schedule(); });
-  secondary.POVDown(loop).Rising().IfHigh([this] { m_toggleShooterAllowed.Schedule(); });
+//  secondary.POVLeft(loop).Rising().IfHigh([this] { m_toggleAmpAllowed.Schedule(); });
+//  secondary.POVDown(loop).Rising().IfHigh([this] { m_toggleShooterAllowed.Schedule(); });
 }
 
 #ifdef USE_BUTTON_BOX
