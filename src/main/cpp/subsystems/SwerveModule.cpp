@@ -245,7 +245,7 @@ void SwerveModule::SetDesiredState(const frc::SwerveModuleState& referenceState)
   // Calculate the turning motor output from the turning PID controller.
   //frc::SmartDashboard::PutNumber("Turn Ref Opt" + m_id, state.angle.Radians().to<double>());
   //frc::SmartDashboard::PutNumber("Turn Ref" + m_id, referenceState.angle.Radians().to<double>());
-  double newRef = state.angle.Radians().to<double>();
+  double newRef = 25.0 * state.angle.Radians().to<double>();
  
   m_logTurningRefSpeed.Append(referenceState.speed.to<double>());
   m_logTurningRefAngle.Append(referenceState.angle.Degrees().to<double>());
